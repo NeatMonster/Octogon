@@ -1,0 +1,212 @@
+define endian=little;
+define alignment=4;
+
+define space ram type=ram_space size=4 default;
+define space register type=register_space size=4;
+
+#
+# General registers
+#
+
+define register offset=0 size=4
+    [R0  R1  R2  R3  R4  R5  R6  R7
+     R8  R9  R10 R11 R12 R13 R14 R15
+     R16 R17 R18 R19 R20 R21 R22 R23
+     R24 R25 R26 R27 R28 R29 R30 R31];
+
+#define register offset=116 size=4 [SP FP LR];
+@define SP "R29"
+@define FP "R30"
+@define LR "R31"
+
+define register offset=0 size=8
+    [R1_0    R3_2    R5_4    R7_6
+     R9_8    R11_10  R13_12  R15_14
+     R17_16  R19_18  R21_20  R23_22
+     R25_24  R27_26  R29_28  R31_30];
+
+#define register offset=120 size=8 [LR_FP];
+@define LR_FP "R31_30"
+
+#
+# Control registers
+#
+
+define register offset=128 size=4
+    [C0  C1  C2  C3  C4  C5  C6  C7
+     C8  C9  C10 C11 C12 C13 C14 C15
+     C16 C17 C18 C19 C20 C21 C22 C23
+     C24 C25 C26 C27 C28 C29 C30 C31];
+
+#define register offset=128 size=4 [SA0 LC0 SA1 LC1 P3_0];
+@define SA0 "C0"
+@define LC0 "C1"
+@define SA1 "C2"
+@define LC1 "C3"
+@define P3_0 "C4"
+#define register offset=152 size=4 [M0 M1 USR PC UGP GP CS0 CS1 UPCYCLELO UPCYCLEHI FRAMELIMIT FRAMEKEY PKTCOUNTLO PKTCOUNTHI];
+@define M0 "C6"
+@define M1 "C7"
+@define USR "C8"
+@define PC "C9"
+@define UGP "C10"
+@define GP "C11"
+@define CS0 "C12"
+@define CS1 "C13"
+@define UPCYCLELO "C14"
+@define UPCYCLEHI "C15"
+@define FRAMELIMIT "C16"
+@define FRAMEKEY "C17"
+@define PKTCOUNTLO "C18"
+@define PKTCOUNTHI "C18"
+#define register offset=248 size=4 [UTIMERLO UTIMERHI];
+@define UTIMERLO "C30"
+@define UTIMERHI "C31"
+
+define register offset=128 size=8
+    [C1_0    C3_2    C5_4    C7_6
+     C9_8    C11_10  C13_12  C15_14
+     C17_16  C19_18  C21_20  C23_22
+     C25_24  C27_26  C29_28  C31_30];
+
+#define register offset=184 size=8 [UPCYCLE];
+@define UPCYCLE "C15_14"
+#define register offset=200 size=8 [PKTCOUNT];
+@define PKTCOUNT "C19_18"
+#define register offset=248 size=8 [UTIMER];
+@define UTIMER "C31_30"
+
+#
+# User status register
+#
+
+@define PFA "C8[31,1]"
+@define FPINEE "C8[29,1]"
+@define FPUNFE "C8[28,1]"
+@define FPOVFE "C8[27,1]"
+@define FPDBZE "C8[26,1]"
+@define FPINVE "C8[25,1]"
+@define FPRND "C8[22,2]"
+@define HFI "C8[15,2]"
+@define HFD "C8[13,2]"
+@define PCMME "C8[12,1]"
+@define PCGME "C8[11,1]"
+@define PCUME "C8[10,1]"
+@define LPCFG "C8[8,2]"
+@define FPINPF "C8[5,1]"
+@define FPUNFF "C8[4,1]"
+@define FPOVFF "C8[3,1]"
+@define FPDBZF "C8[2,1]"
+@define FPINVF "C8[1,1]"
+@define OVF "C8[0,1]"
+
+#
+# Predicate registers
+#
+
+define register offset=144 size=1 [P0 P1 P2 P3];
+
+#
+# Guest control registers
+#
+
+define register offset=256 size=4
+    [G0  G1  G2  G3  G4  G5  G6  G7
+     G8  G9  G10 G11 G12 G13 G14 G15
+     G16 G17 G18 G19 G20 G21 G22 G23
+     G24 G25 G26 G27 G28 G29 G30 G31];
+
+#define register offset=320 size=4 [GISDBMBXIN GISDBMBXOUT];
+@define GISDBMBXIN "G16"
+@define GISDBMBXOUT "G17"
+#define register offset=352 size=4 [GPCYCLELO GPCYCLEHI GPMUCNT0 GPMUCNT1 GPMUCNT2 GPMUCNT3];
+@define GPCYCLELO "G24"
+@define GPCYCLEHI "G25"
+@define GPMUCNT0 "G26"
+@define GPMUCNT1 "G27"
+@define GPMUCNT2 "G28"
+@define GPMUCNT3 "G29"
+
+define register offset=256 size=8
+    [G1_0    G3_2    G5_4    G7_6
+     G9_8    G11_10  G13_12  G15_14
+     G17_16  G19_18  G21_20  G23_22
+     G25_24  G27_26  G29_28  G31_30];
+
+#
+# System control registers
+#
+
+define register offset=384 size=4
+    [S0  S1  S2  S3  S4  S5  S6  S7
+     S8  S9  S10 S11 S12 S13 S14 S15
+     S16 S17 S18 S19 S20 S21 S22 S23
+     S24 S25 S26 S27 S28 S29 S30 S31
+     S32 S33 S34 S35 S36 S37 S38 S39
+     S40 S41 S42 S43 S44 S45 S46 S47
+     S48 S49 S50 S51 S52 S53 S54 S55
+     S56 S57 S58 S59 S60 S61 S62 S63];
+
+#define register offset=384 size=4 [SGP0 SGP1 STID ELR BADVA0 BADVA1 SSR CCR HTID BADVA IMASK];
+@define SGP0 "S0"
+@define SGP1 "S1"
+@define STID "S2"
+@define ELR "S3"
+@define BADVA0 "S4"
+@define BADVA1 "S5"
+@define SSR "S6"
+@define CCR "S7"
+@define HTID "S8"
+@define BADVA "S9"
+@define IMASK "S10"
+#define register offset=448 size=4 [EVB MODECTL SYSCFG _ IPEND VID IAD _ IEL _ IAHL CFGBASE DIAG REV PCYCLELO PCYCLEHI];
+@define EVB "S16"
+@define MODECTL "S17"
+@define SYSCFG "S18"
+@define IPEND "S20"
+@define VID "S21"
+@define IAD "S22"
+@define IEL "S24"
+@define IAHL "S26"
+@define CFGBASE "S27"
+@define DIAG "S28"
+@define REV "S29"
+@define PCYCLELO "S30"
+@define PCYCLEHI "S31"
+#define register offset=512 size=4 [ISDBST ISDBCFG0 ISDBCFG1 _ BRKPTPC0 BRKPTCFG0 BRKPTPC1 BRKPTCFG1 ISDBMBXIN ISDBMBXOUT ISDBEN ISDBGPR];
+@define ISDBST "S32"
+@define ISDBCFG0 "S33"
+@define ISDBCFG1 "S34"
+@define BRKPTPC0 "S36"
+@define BRKPTCFG0 "S37"
+@define BRKPTPC1 "S38"
+@define BRKPTCFG1 "S39"
+@define ISDBMBXIN "S40"
+@define ISDBMBXOUT "S41"
+@define ISDBEN "S42"
+@define ISDBGPR "S43"
+#define register offset=576 size=4 [PMUCNT0 PMUCNT1 PMUCNT2 PMUCNT3 PMUEVTCFG PMUCFG];
+@define PMUCNT0 "S48"
+@define PMUCNT1 "S49"
+@define PMUCNT2 "S50"
+@define PMUCNT3 "S51"
+@define PMUEVTCFG "S52"
+@define PMUCFG "S53"
+
+# undefined in the manual
+@define TLBLOCK "S18[0,1]"
+@define K0LOCK "S18[1,1]"
+
+define register offset=384 size=8
+    [S1_0    S3_2    S5_4    S7_6
+     S9_8    S11_10  S13_12  S15_14
+     S17_16  S19_18  S21_20  S23_22
+     S25_24  S27_26  S29_28  S31_30
+     S33_32  S35_34  S37_36  S39_38
+     S41_40  S43_42  S45_44  S47_46
+     S49_48  S51_50  S53_52  S55_54
+     S57_56  S59_58  S61_60  S63_62];
+
+@define SGP "S1_0"
+
+@include "hexagon.sinc"

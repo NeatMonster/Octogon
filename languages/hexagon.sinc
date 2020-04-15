@@ -1,0 +1,1813 @@
+#
+# This file was generated automatically
+#
+
+define token encoding (32)
+     Rs_20_16=(16,20)
+     Rd_4_0=(0,4)
+     s16_27_21=(21,27) signed
+     s16_13_5=(5,13) signed
+     bits_31_28=(28,31)
+     Rt_12_8=(8,12)
+     bits_31_21=(21,31)
+     s10_21_21=(21,21) signed
+     s10_13_5=(5,13) signed
+     bits_31_22=(22,31)
+     bits_31_24=(24,31)
+     bits_13_13=(13,13)
+     Rx_20_16=(16,20)
+     u16_23_22=(22,23)
+     u16_13_0=(0,13)
+     bits_21_21=(21,21)
+     s16_23_22=(22,23) signed
+     s16_20_16=(16,20) signed
+     bits_22_21=(21,22)
+     Rdd_4_0=(0,4)
+     s8_12_5=(5,12) signed
+     S8_22_16=(16,22) signed
+     S8_13_13=(13,13) signed
+     bits_31_23=(23,31)
+     U6_20_16=(16,20)
+     U6_13_13=(13,13)
+     Pu_22_21=(21,22)
+     Pu_24_23=(23,24)
+     bits_31_25=(25,31)
+     Pu_6_5=(5,6)
+     bits_7_7=(7,7)
+     Pu_9_8=(8,9)
+     bits_11_10=(10,11)
+     s12_19_16=(16,19) signed
+     s12_12_5=(5,12) signed
+     bits_20_20=(20,20)
+;
+
+attach variables [ Rx_20_16 Rs_20_16 Rt_12_8 Rd_4_0 ]
+    [R0  R1  R2  R3  R4  R5  R6  R7 
+     R8  R9  R10 R11 R12 R13 R14 R15
+     R16 R17 R18 R19 R20 R21 R22 R23
+     R24 R25 R26 R27 R28 R29 R30 R31]
+;
+
+attach variables [ Rdd_4_0 ]
+    [R1_0   _      R3_2   _      R5_4   _      R7_6   _     
+     R9_8   _      R11_10 _      R13_12 _      R15_14 _     
+     R17_16 _      R19_18 _      R21_20 _      R23_22 _     
+     R25_24 _      R27_26 _      R29_28 _      R31_30 _     ]
+;
+
+attach variables [ Pu_24_23 Pu_9_8 Pu_6_5 Pu_22_21 ]
+    [P0 P1 P2 P3]
+;
+
+define pcodeop newSuffix;
+
+# 
+# Rd=add(Rs,#s16)
+# 1011iiiiiiisssssPPiiiiiiiiiddddd
+# 
+# apply_extension(imm_s);
+# Rd = Rs + imm_s;
+# 
+:Q6_R_add_R_S_6 Rd_4_0, Rs_20_16, s16
+        is Rs_20_16 & Rd_4_0 & s16_27_21 & s16_13_5 & bits_31_28=0b1011
+            [s16 = (s16_27_21 << 0) | (s16_13_5 << 7);] {
+    Rd_4_0 = (Rs_20_16 + s16);
+}
+
+# 
+# Rd=add(Rs,Rt)
+# 11110011000sssssPP-ttttt---ddddd
+# 
+# Rd = Rs + Rt;
+# 
+:Q6_R_add_R_R Rd_4_0, Rs_20_16, Rt_12_8
+        is Rt_12_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b11110011000 {
+    Rd_4_0 = (Rs_20_16 + Rt_12_8);
+}
+
+# 
+# Rd=add(Rs,Rt):sat
+# 11110110010sssssPP-ttttt---ddddd
+# 
+# Rd = sat(32, Rs + Rt);
+# 
+:Q6_R_add_R_R_sat Rd_4_0, Rs_20_16, Rt_12_8
+        is Rt_12_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b11110110010 {
+    Rd_4_0 = (Rs_20_16 + Rt_12_8);
+}
+
+# 
+# Rd=and(Rs,#s10)
+# 0111011000isssssPPiiiiiiiiiddddd
+# 
+# apply_extension(imm_s);
+# Rd = Rs & imm_s;
+# 
+:Q6_R_and_R_S_0 Rd_4_0, Rs_20_16, s10
+        is Rs_20_16 & Rd_4_0 & s10_21_21 & s10_13_5 & bits_31_22=0b0111011000
+            [s10 = (s10_21_21 << 0) | (s10_13_5 << 1);] {
+    Rd_4_0 = (Rs_20_16 & s10);
+}
+
+# 
+# Rd=or(Rs,#s10)
+# 0111011010isssssPPiiiiiiiiiddddd
+# 
+# apply_extension(imm_s);
+# Rd = Rs | imm_s;
+# 
+:Q6_R_or_R_S_0 Rd_4_0, Rs_20_16, s10
+        is Rs_20_16 & Rd_4_0 & s10_21_21 & s10_13_5 & bits_31_22=0b0111011010
+            [s10 = (s10_21_21 << 0) | (s10_13_5 << 1);] {
+    Rd_4_0 = (Rs_20_16 | s10);
+}
+
+# 
+# Rd=and(Rs,Rt)
+# 11110001000sssssPP-ttttt---ddddd
+# 
+# Rd = Rs & Rt;
+# 
+:Q6_R_and_R_R Rd_4_0, Rs_20_16, Rt_12_8
+        is Rt_12_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b11110001000 {
+    Rd_4_0 = (Rs_20_16 & Rt_12_8);
+}
+
+# 
+# Rd=or(Rs,Rt)
+# 11110001001sssssPP-ttttt---ddddd
+# 
+# Rd = Rs | Rt;
+# 
+:Q6_R_or_R_R Rd_4_0, Rs_20_16, Rt_12_8
+        is Rt_12_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b11110001001 {
+    Rd_4_0 = (Rs_20_16 | Rt_12_8);
+}
+
+# 
+# Rd=xor(Rs,Rt)
+# 11110001011sssssPP-ttttt---ddddd
+# 
+# Rd = Rs ^ Rt;
+# 
+:Q6_R_xor_R_R Rd_4_0, Rs_20_16, Rt_12_8
+        is Rt_12_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b11110001011 {
+    Rd_4_0 = (Rs_20_16 ^ Rt_12_8);
+}
+
+# 
+# Rd=and(Rt,~Rs)
+# 11110001100sssssPP-ttttt---ddddd
+# 
+# Rd = (Rt & ~Rs);
+# 
+:Q6_R_and_R_neg_R Rd_4_0, Rt_12_8, Rs_20_16
+        is Rs_20_16 & Rt_12_8 & Rd_4_0 & bits_31_21=0b11110001100 {
+    Rd_4_0 = (Rt_12_8 & (~Rs_20_16));
+}
+
+# 
+# Rd=or(Rt,~Rs)
+# 11110001101sssssPP-ttttt---ddddd
+# 
+# Rd = (Rt | ~Rs);
+# 
+:Q6_R_or_R_neg_R Rd_4_0, Rt_12_8, Rs_20_16
+        is Rs_20_16 & Rt_12_8 & Rd_4_0 & bits_31_21=0b11110001101 {
+    Rd_4_0 = (Rt_12_8 | (~Rs_20_16));
+}
+
+# 
+# nop
+# 01111111--------PP--------------
+# 
+# 
+# 
+:Q6_nop 
+        is bits_31_24=0b01111111 {
+}
+
+# 
+# Rd=sub(#s10,Rs)
+# 0111011001isssssPPiiiiiiiiiddddd
+# 
+# apply_extension(imm_s);
+# Rd = imm_s - Rs;
+# 
+:Q6_R_sub_S_0_R Rd_4_0, s10, Rs_20_16
+        is Rs_20_16 & Rd_4_0 & s10_21_21 & s10_13_5 & bits_31_22=0b0111011001
+            [s10 = (s10_21_21 << 0) | (s10_13_5 << 1);] {
+    Rd_4_0 = (s10 - Rs_20_16);
+}
+
+# 
+# Rd=sub(Rt,Rs)
+# 11110011001sssssPP-ttttt---ddddd
+# 
+# Rd = Rt - Rs;
+# 
+:Q6_R_sub_R_R Rd_4_0, Rt_12_8, Rs_20_16
+        is Rs_20_16 & Rt_12_8 & Rd_4_0 & bits_31_21=0b11110011001 {
+    Rd_4_0 = (Rt_12_8 - Rs_20_16);
+}
+
+# 
+# Rd=sub(Rt,Rs):sat
+# 11110110110sssssPP-ttttt---ddddd
+# 
+# Rd = sat(32, Rt - Rs);
+# 
+:Q6_R_sub_R_R_sat Rd_4_0, Rt_12_8, Rs_20_16
+        is Rs_20_16 & Rt_12_8 & Rd_4_0 & bits_31_21=0b11110110110 {
+    Rd_4_0 = (Rt_12_8 - Rs_20_16);
+}
+
+# 
+# Rd=sxtb(Rs)
+# 01110000101sssssPP0--------ddddd
+# 
+# Rd = sxt(8, 32, Rs);
+# 
+:Q6_R_sxtb_R Rd_4_0, Rs_20_16
+        is Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000101 & bits_13_13=0b0 {
+    Rd_4_0 = sext(Rs_20_16:1);
+}
+
+# 
+# Rd=sxth(Rs)
+# 01110000111sssssPP0--------ddddd
+# 
+# Rd = sxt(16, 32, Rs);
+# 
+:Q6_R_sxth_R Rd_4_0, Rs_20_16
+        is Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000111 & bits_13_13=0b0 {
+    Rd_4_0 = sext(Rs_20_16:2);
+}
+
+# 
+# Rx.L=#u16
+# 01110001ii1xxxxxPPiiiiiiiiiiiiii
+# 
+# Rx.h[0] = imm_u;
+# 
+:Q6_Rl_U_6 Rx_20_16, u16
+        is Rx_20_16 & u16_23_22 & u16_13_0 & bits_31_24=0b01110001 & bits_21_21=0b1
+            [u16 = (u16_23_22 << 0) | (u16_13_0 << 2);] {
+    local Rx_20_16_h:4 = (&Rx_20_16);
+    *[register]:2 (Rx_20_16_h + 2 * 0) = u16:2;
+}
+
+# 
+# Rx.H=#u16
+# 01110010ii1xxxxxPPiiiiiiiiiiiiii
+# 
+# Rx.h[1] = imm_u;
+# 
+:Q6_Rh_U_6 Rx_20_16, u16
+        is Rx_20_16 & u16_23_22 & u16_13_0 & bits_31_24=0b01110010 & bits_21_21=0b1
+            [u16 = (u16_23_22 << 0) | (u16_13_0 << 2);] {
+    local Rx_20_16_h:4 = (&Rx_20_16);
+    *[register]:2 (Rx_20_16_h + 2 * 1) = u16:2;
+}
+
+# 
+# Rd=#s16
+# 01111000ii-iiiiiPPiiiiiiiiiddddd
+# 
+# apply_extension(imm_s);
+# Rd = imm_s;
+# 
+:Q6_R_S_6 Rd_4_0, s16
+        is Rd_4_0 & s16_23_22 & s16_20_16 & s16_13_5 & bits_31_24=0b01111000
+            [s16 = (s16_23_22 << 0) | (s16_20_16 << 2) | (s16_13_5 << 7);] {
+    Rd_4_0 = s16;
+}
+
+# 
+# Rd=Rs
+# 01110000011sssssPP0--------ddddd
+# 
+# Rd = Rs;
+# 
+:Q6_R_R Rd_4_0, Rs_20_16
+        is Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000011 & bits_13_13=0b0 {
+    Rd_4_0 = Rs_20_16;
+}
+
+# 
+# Rd=vaddh(Rs,Rt)
+# 11110110000sssssPP-ttttt---ddddd
+# 
+# for (i = 0; i < 2; i++) {
+#     Rd.h[i] = (Rs.h[i] + Rt.h[i]);
+# }
+# 
+:Q6_R_vaddh_R_R Rd_4_0, Rs_20_16, Rt_12_8
+        is Rt_12_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b11110110000 {
+    local i:4 = 0;
+    <for_i>
+    local Rd_4_0_h:4 = (&Rd_4_0);
+    local Rs_20_16_h:4 = (&Rs_20_16);
+    local Rt_12_8_h:4 = (&Rt_12_8);
+    *[register]:2 (Rd_4_0_h + 2 * i) = (*[register]:2 (Rs_20_16_h + 2 * i) + *[register]:2 (Rt_12_8_h + 2 * i));
+    i = i + 1;
+    if (i < 2) goto <for_i>;
+}
+
+# 
+# Rd=vaddh(Rs,Rt):sat
+# 11110110001sssssPP-ttttt---ddddd
+# 
+# for (i = 0; i < 2; i++) {
+#     Rd.h[i] = sat(16, Rs.h[i] + Rt.h[i]);
+# }
+# 
+:Q6_R_vaddh_R_R_sat Rd_4_0, Rs_20_16, Rt_12_8
+        is Rt_12_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b11110110001 {
+    local i:4 = 0;
+    <for_i>
+    local Rd_4_0_h:4 = (&Rd_4_0);
+    local Rs_20_16_h:4 = (&Rs_20_16);
+    local Rt_12_8_h:4 = (&Rt_12_8);
+    *[register]:2 (Rd_4_0_h + 2 * i) = (*[register]:2 (Rs_20_16_h + 2 * i) + *[register]:2 (Rt_12_8_h + 2 * i));
+    i = i + 1;
+    if (i < 2) goto <for_i>;
+}
+
+# 
+# Rd=vadduh(Rs,Rt):sat
+# 11110110011sssssPP-ttttt---ddddd
+# 
+# for (i = 0; i < 2; i++) {
+#     Rd.h[i] = usat(16, Rs.uh[i] + Rt.uh[i]);
+# }
+# 
+:Q6_R_vadduh_R_R_sat Rd_4_0, Rs_20_16, Rt_12_8
+        is Rt_12_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b11110110011 {
+    local i:4 = 0;
+    <for_i>
+    local Rd_4_0_h:4 = (&Rd_4_0);
+    local Rs_20_16_uh:4 = (&Rs_20_16);
+    local Rt_12_8_uh:4 = (&Rt_12_8);
+    *[register]:2 (Rd_4_0_h + 2 * i) = (*[register]:2 (Rs_20_16_uh + 2 * i) + *[register]:2 (Rt_12_8_uh + 2 * i));
+    i = i + 1;
+    if (i < 2) goto <for_i>;
+}
+
+# 
+# Rd=vavgh(Rs,Rt)
+# 11110111-00sssssPP-ttttt---ddddd
+# 
+# for (i = 0; i < 2; i++) {
+#     Rd.h[i] = ((Rs.h[i] + Rt.h[i]) >> 1);
+# }
+# 
+:Q6_R_vavgh_R_R Rd_4_0, Rs_20_16, Rt_12_8
+        is Rt_12_8 & Rs_20_16 & Rd_4_0 & bits_31_24=0b11110111 & bits_22_21=0b00 {
+    local i:4 = 0;
+    <for_i>
+    local Rd_4_0_h:4 = (&Rd_4_0);
+    local Rs_20_16_h:4 = (&Rs_20_16);
+    local Rt_12_8_h:4 = (&Rt_12_8);
+    *[register]:2 (Rd_4_0_h + 2 * i) = ((*[register]:2 (Rs_20_16_h + 2 * i) + *[register]:2 (Rt_12_8_h + 2 * i)) >> 1);
+    i = i + 1;
+    if (i < 2) goto <for_i>;
+}
+
+# 
+# Rd=vavgh(Rs,Rt):rnd
+# 11110111-01sssssPP-ttttt---ddddd
+# 
+# for (i = 0; i < 2; i++) {
+#     Rd.h[i] = ((Rs.h[i] + Rt.h[i] + 1) >> 1);
+# }
+# 
+:Q6_R_vavgh_R_R_rnd Rd_4_0, Rs_20_16, Rt_12_8
+        is Rt_12_8 & Rs_20_16 & Rd_4_0 & bits_31_24=0b11110111 & bits_22_21=0b01 {
+    local i:4 = 0;
+    <for_i>
+    local Rd_4_0_h:4 = (&Rd_4_0);
+    local Rs_20_16_h:4 = (&Rs_20_16);
+    local Rt_12_8_h:4 = (&Rt_12_8);
+    *[register]:2 (Rd_4_0_h + 2 * i) = (((*[register]:2 (Rs_20_16_h + 2 * i) + *[register]:2 (Rt_12_8_h + 2 * i)) + 1) >> 1);
+    i = i + 1;
+    if (i < 2) goto <for_i>;
+}
+
+# 
+# Rd=vnavgh(Rt,Rs)
+# 11110111-11sssssPP-ttttt---ddddd
+# 
+# for (i = 0; i < 2; i++) {
+#     Rd.h[i] = ((Rt.h[i] - Rs.h[i]) >> 1);
+# }
+# 
+:Q6_R_vnavgh_R_R Rd_4_0, Rt_12_8, Rs_20_16
+        is Rs_20_16 & Rt_12_8 & Rd_4_0 & bits_31_24=0b11110111 & bits_22_21=0b11 {
+    local i:4 = 0;
+    <for_i>
+    local Rd_4_0_h:4 = (&Rd_4_0);
+    local Rt_12_8_h:4 = (&Rt_12_8);
+    local Rs_20_16_h:4 = (&Rs_20_16);
+    *[register]:2 (Rd_4_0_h + 2 * i) = ((*[register]:2 (Rt_12_8_h + 2 * i) - *[register]:2 (Rs_20_16_h + 2 * i)) >> 1);
+    i = i + 1;
+    if (i < 2) goto <for_i>;
+}
+
+# 
+# Rd=vsubh(Rt,Rs)
+# 11110110100sssssPP-ttttt---ddddd
+# 
+# for (i = 0; i < 2; i++) {
+#     Rd.h[i] = (Rt.h[i] - Rs.h[i]);
+# }
+# 
+:Q6_R_vsubh_R_R Rd_4_0, Rt_12_8, Rs_20_16
+        is Rs_20_16 & Rt_12_8 & Rd_4_0 & bits_31_21=0b11110110100 {
+    local i:4 = 0;
+    <for_i>
+    local Rd_4_0_h:4 = (&Rd_4_0);
+    local Rt_12_8_h:4 = (&Rt_12_8);
+    local Rs_20_16_h:4 = (&Rs_20_16);
+    *[register]:2 (Rd_4_0_h + 2 * i) = (*[register]:2 (Rt_12_8_h + 2 * i) - *[register]:2 (Rs_20_16_h + 2 * i));
+    i = i + 1;
+    if (i < 2) goto <for_i>;
+}
+
+# 
+# Rd=vsubh(Rt,Rs):sat
+# 11110110101sssssPP-ttttt---ddddd
+# 
+# for (i = 0; i < 2; i++) {
+#     Rd.h[i] = sat(16, Rt.h[i] - Rs.h[i]);
+# }
+# 
+:Q6_R_vsubh_R_R_sat Rd_4_0, Rt_12_8, Rs_20_16
+        is Rs_20_16 & Rt_12_8 & Rd_4_0 & bits_31_21=0b11110110101 {
+    local i:4 = 0;
+    <for_i>
+    local Rd_4_0_h:4 = (&Rd_4_0);
+    local Rt_12_8_h:4 = (&Rt_12_8);
+    local Rs_20_16_h:4 = (&Rs_20_16);
+    *[register]:2 (Rd_4_0_h + 2 * i) = (*[register]:2 (Rt_12_8_h + 2 * i) - *[register]:2 (Rs_20_16_h + 2 * i));
+    i = i + 1;
+    if (i < 2) goto <for_i>;
+}
+
+# 
+# Rd=vsubuh(Rt,Rs):sat
+# 11110110111sssssPP-ttttt---ddddd
+# 
+# for (i = 0; i < 2; i++) {
+#     Rd.h[i] = usat(16, Rt.uh[i] - Rs.uh[i]);
+# }
+# 
+:Q6_R_vsubuh_R_R_sat Rd_4_0, Rt_12_8, Rs_20_16
+        is Rs_20_16 & Rt_12_8 & Rd_4_0 & bits_31_21=0b11110110111 {
+    local i:4 = 0;
+    <for_i>
+    local Rd_4_0_h:4 = (&Rd_4_0);
+    local Rt_12_8_uh:4 = (&Rt_12_8);
+    local Rs_20_16_uh:4 = (&Rs_20_16);
+    *[register]:2 (Rd_4_0_h + 2 * i) = (*[register]:2 (Rt_12_8_uh + 2 * i) - *[register]:2 (Rs_20_16_uh + 2 * i));
+    i = i + 1;
+    if (i < 2) goto <for_i>;
+}
+
+# 
+# Rd=zxth(Rs)
+# 01110000110sssssPP0--------ddddd
+# 
+# Rd = zxt(16, 32, Rs);
+# 
+:Q6_R_zxth_R Rd_4_0, Rs_20_16
+        is Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000110 & bits_13_13=0b0 {
+    Rd_4_0 = zext(Rs_20_16:2);
+}
+
+# 
+# Rdd=combine(Rs,#s8)
+# 01110011-00sssssPP1iiiiiiiiddddd
+# 
+# apply_extension(imm_s);
+# Rdd.w[0] = imm_s;
+# Rdd.w[1] = Rs;
+# 
+:Q6_RR_combine_R_S Rdd_4_0, Rs_20_16, s8
+        is Rs_20_16 & Rdd_4_0 & s8_12_5 & bits_31_24=0b01110011 & bits_22_21=0b00 & bits_13_13=0b1
+            [s8 = (s8_12_5 << 0);] {
+    local Rdd_4_0_w:4 = (&Rdd_4_0);
+    *[register]:4 (Rdd_4_0_w + 4 * 0) = s8;
+    *[register]:4 (Rdd_4_0_w + 4 * 1) = Rs_20_16;
+}
+
+# 
+# Rdd=combine(#s8,Rs)
+# 01110011-01sssssPP1iiiiiiiiddddd
+# 
+# apply_extension(imm_s);
+# Rdd.w[0] = Rs;
+# Rdd.w[1] = imm_s;
+# 
+:Q6_RR_combine_S_R Rdd_4_0, s8, Rs_20_16
+        is Rs_20_16 & Rdd_4_0 & s8_12_5 & bits_31_24=0b01110011 & bits_22_21=0b01 & bits_13_13=0b1
+            [s8 = (s8_12_5 << 0);] {
+    local Rdd_4_0_w:4 = (&Rdd_4_0);
+    *[register]:4 (Rdd_4_0_w + 4 * 0) = Rs_20_16;
+    *[register]:4 (Rdd_4_0_w + 4 * 1) = s8;
+}
+
+# 
+# Rdd=combine(#s8,#S8)
+# 011111000IIIIIIIPPIiiiiiiiiddddd
+# 
+# apply_extension(imm_s);
+# Rdd.w[0] = imm_S;
+# Rdd.w[1] = imm_s;
+# 
+:Q6_RR_combine_S_S Rdd_4_0, s8, S8
+        is Rdd_4_0 & S8_22_16 & S8_13_13 & s8_12_5 & bits_31_23=0b011111000
+            [S8 = (S8_22_16 << 0) | (S8_13_13 << 7); s8 = (s8_12_5 << 0);] {
+    local Rdd_4_0_w:4 = (&Rdd_4_0);
+    *[register]:4 (Rdd_4_0_w + 4 * 0) = S8;
+    *[register]:4 (Rdd_4_0_w + 4 * 1) = s8;
+}
+
+# 
+# Rdd=combine(#s8,#U6)
+# 011111001--IIIIIPPIiiiiiiiiddddd
+# 
+# apply_extension(imm_U);
+# Rdd.w[0] = imm_U;
+# Rdd.w[1] = imm_s;
+# 
+:Q6_RR_combine_S_U Rdd_4_0, s8, U6
+        is Rdd_4_0 & U6_20_16 & U6_13_13 & s8_12_5 & bits_31_23=0b011111001
+            [U6 = (U6_20_16 << 0) | (U6_13_13 << 5); s8 = (s8_12_5 << 0);] {
+    local Rdd_4_0_w:4 = (&Rdd_4_0);
+    *[register]:4 (Rdd_4_0_w + 4 * 0) = U6;
+    *[register]:4 (Rdd_4_0_w + 4 * 1) = s8;
+}
+
+# 
+# Rd=combine(Rt.H,Rs.H)
+# 11110011100sssssPP-ttttt---ddddd
+# 
+# Rd = (Rt.uh[1] << 16) | Rs.uh[1];
+# 
+:Q6_R_combine_Rh_Rh Rd_4_0, Rt_12_8, Rs_20_16
+        is Rs_20_16 & Rt_12_8 & Rd_4_0 & bits_31_21=0b11110011100 {
+    local Rt_12_8_uh:4 = (&Rt_12_8);
+    local Rs_20_16_uh:4 = (&Rs_20_16);
+    Rd_4_0 = zext(((*[register]:2 (Rt_12_8_uh + 2 * 1) << 16) | *[register]:2 (Rs_20_16_uh + 2 * 1)));
+}
+
+# 
+# Rd=combine(Rt.H,Rs.L)
+# 11110011101sssssPP-ttttt---ddddd
+# 
+# Rd = (Rt.uh[1] << 16) | Rs.uh[0];
+# 
+:Q6_R_combine_Rh_Rl Rd_4_0, Rt_12_8, Rs_20_16
+        is Rs_20_16 & Rt_12_8 & Rd_4_0 & bits_31_21=0b11110011101 {
+    local Rt_12_8_uh:4 = (&Rt_12_8);
+    local Rs_20_16_uh:4 = (&Rs_20_16);
+    Rd_4_0 = zext(((*[register]:2 (Rt_12_8_uh + 2 * 1) << 16) | *[register]:2 (Rs_20_16_uh + 2 * 0)));
+}
+
+# 
+# Rd=combine(Rt.L,Rs.H)
+# 11110011110sssssPP-ttttt---ddddd
+# 
+# Rd = (Rt.uh[0] << 16) | Rs.uh[1];
+# 
+:Q6_R_combine_Rl_Rh Rd_4_0, Rt_12_8, Rs_20_16
+        is Rs_20_16 & Rt_12_8 & Rd_4_0 & bits_31_21=0b11110011110 {
+    local Rt_12_8_uh:4 = (&Rt_12_8);
+    local Rs_20_16_uh:4 = (&Rs_20_16);
+    Rd_4_0 = zext(((*[register]:2 (Rt_12_8_uh + 2 * 0) << 16) | *[register]:2 (Rs_20_16_uh + 2 * 1)));
+}
+
+# 
+# Rd=combine(Rt.L,Rs.L)
+# 11110011111sssssPP-ttttt---ddddd
+# 
+# Rd = (Rt.uh[0] << 16) | Rs.uh[0];
+# 
+:Q6_R_combine_Rl_Rl Rd_4_0, Rt_12_8, Rs_20_16
+        is Rs_20_16 & Rt_12_8 & Rd_4_0 & bits_31_21=0b11110011111 {
+    local Rt_12_8_uh:4 = (&Rt_12_8);
+    local Rs_20_16_uh:4 = (&Rs_20_16);
+    Rd_4_0 = zext(((*[register]:2 (Rt_12_8_uh + 2 * 0) << 16) | *[register]:2 (Rs_20_16_uh + 2 * 0)));
+}
+
+# 
+# Rdd=combine(Rs,Rt)
+# 111101010--sssssPP-ttttt---ddddd
+# 
+# Rdd.w[0] = Rt;
+# Rdd.w[1] = Rs;
+# 
+:Q6_RR_combine_R_R Rdd_4_0, Rs_20_16, Rt_12_8
+        is Rt_12_8 & Rs_20_16 & Rdd_4_0 & bits_31_23=0b111101010 {
+    local Rdd_4_0_w:4 = (&Rdd_4_0);
+    *[register]:4 (Rdd_4_0_w + 4 * 0) = Rt_12_8;
+    *[register]:4 (Rdd_4_0_w + 4 * 1) = Rs_20_16;
+}
+
+# 
+# Rd=mux(Pu,Rs,#s8)
+# 011100110uusssssPP0iiiiiiiiddddd
+# 
+# PREDUSE_TIMING;
+# apply_extension(imm_s);
+# (Pu[0]) ? (Rd = Rs) : (Rd = imm_s);
+# 
+:Q6_R_mux_P_R_S Rd_4_0, Pu_22_21, Rs_20_16, s8
+        is Pu_22_21 & Rs_20_16 & Rd_4_0 & s8_12_5 & bits_31_23=0b011100110 & bits_13_13=0b0
+            [s8 = (s8_12_5 << 0);] {
+    if (Pu_22_21[0, 1]) goto <if_Pu_22_21_0_1>;
+    Rd_4_0 = s8;
+    goto <endif_Pu_22_21_0_1>;
+    <if_Pu_22_21_0_1>
+    Rd_4_0 = Rs_20_16;
+    <endif_Pu_22_21_0_1>
+}
+
+# 
+# Rd=mux(Pu,#s8,Rs)
+# 011100111uusssssPP0iiiiiiiiddddd
+# 
+# PREDUSE_TIMING;
+# apply_extension(imm_s);
+# (Pu[0]) ? (Rd = imm_s) : (Rd = Rs);
+# 
+:Q6_R_mux_P_S_R Rd_4_0, Pu_22_21, s8, Rs_20_16
+        is Pu_22_21 & Rs_20_16 & Rd_4_0 & s8_12_5 & bits_31_23=0b011100111 & bits_13_13=0b0
+            [s8 = (s8_12_5 << 0);] {
+    if (Pu_22_21[0, 1]) goto <if_Pu_22_21_0_1>;
+    Rd_4_0 = Rs_20_16;
+    goto <endif_Pu_22_21_0_1>;
+    <if_Pu_22_21_0_1>
+    Rd_4_0 = s8;
+    <endif_Pu_22_21_0_1>
+}
+
+# 
+# Rd=mux(Pu,#s8,#S8)
+# 0111101uuIIIIIIIPPIiiiiiiiiddddd
+# 
+# PREDUSE_TIMING;
+# apply_extension(imm_s);
+# (Pu[0]) ? (Rd = imm_s) : (Rd = imm_S);
+# 
+:Q6_R_mux_P_S_S Rd_4_0, Pu_24_23, s8, S8
+        is Pu_24_23 & Rd_4_0 & S8_22_16 & S8_13_13 & s8_12_5 & bits_31_25=0b0111101
+            [S8 = (S8_22_16 << 0) | (S8_13_13 << 7); s8 = (s8_12_5 << 0);] {
+    if (Pu_24_23[0, 1]) goto <if_Pu_24_23_0_1>;
+    Rd_4_0 = S8;
+    goto <endif_Pu_24_23_0_1>;
+    <if_Pu_24_23_0_1>
+    Rd_4_0 = s8;
+    <endif_Pu_24_23_0_1>
+}
+
+# 
+# Rd=mux(Pu,Rs,Rt)
+# 11110100---sssssPP-ttttt-uuddddd
+# 
+# PREDUSE_TIMING;
+# (Pu[0]) ? (Rd = Rs) : (Rd = Rt);
+# 
+:Q6_R_mux_P_R_R Rd_4_0, Pu_6_5, Rs_20_16, Rt_12_8
+        is Pu_6_5 & Rt_12_8 & Rs_20_16 & Rd_4_0 & bits_31_24=0b11110100 {
+    if (Pu_6_5[0, 1]) goto <if_Pu_6_5_0_1>;
+    Rd_4_0 = Rt_12_8;
+    goto <endif_Pu_6_5_0_1>;
+    <if_Pu_6_5_0_1>
+    Rd_4_0 = Rs_20_16;
+    <endif_Pu_6_5_0_1>
+}
+
+# 
+# Rd=aslh(Rs)
+# 01110000000sssssPP0--------ddddd
+# 
+# Rd = Rs << 16;
+# 
+:Q6_R_aslh_R Rd_4_0, Rs_20_16
+        is Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000000 & bits_13_13=0b0 {
+    Rd_4_0 = (Rs_20_16 << 16);
+}
+
+# 
+# Rd=asrh(Rs)
+# 01110000001sssssPP0--------ddddd
+# 
+# Rd = Rs >> 16;
+# 
+:Q6_R_asrh_R Rd_4_0, Rs_20_16
+        is Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000001 & bits_13_13=0b0 {
+    Rd_4_0 = (Rs_20_16 >> 16);
+}
+
+# 
+# Rdd=packhl(Rs,Rt)
+# 111101011--sssssPP-ttttt---ddddd
+# 
+# Rdd.h[0] = Rt.h[0];
+# Rdd.h[1] = Rs.h[0];
+# Rdd.h[2] = Rt.h[1];
+# Rdd.h[3] = Rs.h[1];
+# 
+:Q6_RR_packhl_R_R Rdd_4_0, Rs_20_16, Rt_12_8
+        is Rt_12_8 & Rs_20_16 & Rdd_4_0 & bits_31_23=0b111101011 {
+    local Rdd_4_0_h:4 = (&Rdd_4_0);
+    local Rt_12_8_h:4 = (&Rt_12_8);
+    local Rs_20_16_h:4 = (&Rs_20_16);
+    *[register]:2 (Rdd_4_0_h + 2 * 0) = *[register]:2 (Rt_12_8_h + 2 * 0);
+    *[register]:2 (Rdd_4_0_h + 2 * 1) = *[register]:2 (Rs_20_16_h + 2 * 0);
+    *[register]:2 (Rdd_4_0_h + 2 * 2) = *[register]:2 (Rt_12_8_h + 2 * 1);
+    *[register]:2 (Rdd_4_0_h + 2 * 3) = *[register]:2 (Rs_20_16_h + 2 * 1);
+}
+
+# 
+# if (Pu) Rd=add(Rs,#s8)
+# 011101000uusssssPP0iiiiiiiiddddd
+# 
+# if (Pu[0]) {
+#     apply_extension(imm_s);
+#     Rd = Rs + imm_s;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_R_add_R_S Pu_22_21, Rd_4_0, Rs_20_16, s8
+        is Pu_22_21 & Rs_20_16 & Rd_4_0 & s8_12_5 & bits_31_23=0b011101000 & bits_13_13=0b0
+            [s8 = (s8_12_5 << 0);] {
+    if (Pu_22_21[0, 1]) goto <if_Pu_22_21_0_1>;
+    goto <endif_Pu_22_21_0_1>;
+    <if_Pu_22_21_0_1>
+    Rd_4_0 = (Rs_20_16 + s8);
+    <endif_Pu_22_21_0_1>
+}
+
+# 
+# if (Pu.new) Rd=add(Rs,#s8)
+# 011101000uusssssPP1iiiiiiiiddddd
+# 
+# if (Pu.new[0]) {
+#     apply_extension(imm_s);
+#     Rd = Rs + imm_s;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_new_R_add_R_S Pu_22_21, Rd_4_0, Rs_20_16, s8
+        is Pu_22_21 & Rs_20_16 & Rd_4_0 & s8_12_5 & bits_31_23=0b011101000 & bits_13_13=0b1
+            [s8 = (s8_12_5 << 0);] {
+    local new_new:1 = newSuffix(Pu_22_21);
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    Rd_4_0 = (Rs_20_16 + s8);
+    <endif_new_new_0_1>
+}
+
+# 
+# if (!Pu) Rd=add(Rs,#s8)
+# 011101001uusssssPP0iiiiiiiiddddd
+# 
+# if (!Pu[0]) {
+#     apply_extension(imm_s);
+#     Rd = Rs + imm_s;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_not_P_R_add_R_S Pu_22_21, Rd_4_0, Rs_20_16, s8
+        is Pu_22_21 & Rs_20_16 & Rd_4_0 & s8_12_5 & bits_31_23=0b011101001 & bits_13_13=0b0
+            [s8 = (s8_12_5 << 0);] {
+    if ((!Pu_22_21[0, 1])) goto <if_Pu_22_21_0_1>;
+    goto <endif_Pu_22_21_0_1>;
+    <if_Pu_22_21_0_1>
+    Rd_4_0 = (Rs_20_16 + s8);
+    <endif_Pu_22_21_0_1>
+}
+
+# 
+# if (!Pu.new) Rd=add(Rs,#s8)
+# 011101001uusssssPP1iiiiiiiiddddd
+# 
+# if (!Pu.new[0]) {
+#     apply_extension(imm_s);
+#     Rd = Rs + imm_s;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_not_P_new_R_add_R_S Pu_22_21, Rd_4_0, Rs_20_16, s8
+        is Pu_22_21 & Rs_20_16 & Rd_4_0 & s8_12_5 & bits_31_23=0b011101001 & bits_13_13=0b1
+            [s8 = (s8_12_5 << 0);] {
+    local new_new:1 = newSuffix(Pu_22_21);
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    Rd_4_0 = (Rs_20_16 + s8);
+    <endif_new_new_0_1>
+}
+
+# 
+# if (Pu) Rd=add(Rs,Rt)
+# 111110110-0sssssPP0ttttt0uuddddd
+# 
+# if (Pu[0]) {
+#     Rd = Rs + Rt;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_R_add_R_R Pu_6_5, Rd_4_0, Rs_20_16, Rt_12_8
+        is Pu_6_5 & Rt_12_8 & Rs_20_16 & Rd_4_0 & bits_31_23=0b111110110 & bits_21_21=0b0 & bits_13_13=0b0 & bits_7_7=0b0 {
+    if (Pu_6_5[0, 1]) goto <if_Pu_6_5_0_1>;
+    goto <endif_Pu_6_5_0_1>;
+    <if_Pu_6_5_0_1>
+    Rd_4_0 = (Rs_20_16 + Rt_12_8);
+    <endif_Pu_6_5_0_1>
+}
+
+# 
+# if (!Pu) Rd=add(Rs,Rt)
+# 111110110-0sssssPP0ttttt1uuddddd
+# 
+# if (!Pu[0]) {
+#     Rd = Rs + Rt;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_not_P_R_add_R_R Pu_6_5, Rd_4_0, Rs_20_16, Rt_12_8
+        is Pu_6_5 & Rt_12_8 & Rs_20_16 & Rd_4_0 & bits_31_23=0b111110110 & bits_21_21=0b0 & bits_13_13=0b0 & bits_7_7=0b1 {
+    if ((!Pu_6_5[0, 1])) goto <if_Pu_6_5_0_1>;
+    goto <endif_Pu_6_5_0_1>;
+    <if_Pu_6_5_0_1>
+    Rd_4_0 = (Rs_20_16 + Rt_12_8);
+    <endif_Pu_6_5_0_1>
+}
+
+# 
+# if (Pu.new) Rd=add(Rs,Rt)
+# 111110110-0sssssPP1ttttt0uuddddd
+# 
+# if (Pu.new[0]) {
+#     Rd = Rs + Rt;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_new_R_add_R_R Pu_6_5, Rd_4_0, Rs_20_16, Rt_12_8
+        is Pu_6_5 & Rt_12_8 & Rs_20_16 & Rd_4_0 & bits_31_23=0b111110110 & bits_21_21=0b0 & bits_13_13=0b1 & bits_7_7=0b0 {
+    local new_new:1 = newSuffix(Pu_6_5);
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    Rd_4_0 = (Rs_20_16 + Rt_12_8);
+    <endif_new_new_0_1>
+}
+
+# 
+# if (!Pu.new) Rd=add(Rs,Rt)
+# 111110110-0sssssPP1ttttt1uuddddd
+# 
+# if (!Pu.new[0]) {
+#     Rd = Rs + Rt;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_not_P_new_R_add_R_R Pu_6_5, Rd_4_0, Rs_20_16, Rt_12_8
+        is Pu_6_5 & Rt_12_8 & Rs_20_16 & Rd_4_0 & bits_31_23=0b111110110 & bits_21_21=0b0 & bits_13_13=0b1 & bits_7_7=0b1 {
+    local new_new:1 = newSuffix(Pu_6_5);
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    Rd_4_0 = (Rs_20_16 + Rt_12_8);
+    <endif_new_new_0_1>
+}
+
+# 
+# if (Pu) Rd=aslh(Rs)
+# 01110000000sssssPP1-00uu---ddddd
+# 
+# if (Pu[0]) {
+#     Rd = Rs << 16;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_R_aslh_R Pu_9_8, Rd_4_0, Rs_20_16
+        is Pu_9_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000000 & bits_13_13=0b1 & bits_11_10=0b00 {
+    if (Pu_9_8[0, 1]) goto <if_Pu_9_8_0_1>;
+    goto <endif_Pu_9_8_0_1>;
+    <if_Pu_9_8_0_1>
+    Rd_4_0 = (Rs_20_16 << 16);
+    <endif_Pu_9_8_0_1>
+}
+
+# 
+# if (Pu.new) Rd=aslh(Rs)
+# 01110000000sssssPP1-01uu---ddddd
+# 
+# if (Pu.new[0]) {
+#     Rd = Rs << 16;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_new_R_aslh_R Pu_9_8, Rd_4_0, Rs_20_16
+        is Pu_9_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000000 & bits_13_13=0b1 & bits_11_10=0b01 {
+    local new_new:1 = newSuffix(Pu_9_8);
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    Rd_4_0 = (Rs_20_16 << 16);
+    <endif_new_new_0_1>
+}
+
+# 
+# if (!Pu) Rd=aslh(Rs)
+# 01110000000sssssPP1-10uu---ddddd
+# 
+# if (!Pu[0]) {
+#     Rd = Rs << 16;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_not_P_R_aslh_R Pu_9_8, Rd_4_0, Rs_20_16
+        is Pu_9_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000000 & bits_13_13=0b1 & bits_11_10=0b10 {
+    if ((!Pu_9_8[0, 1])) goto <if_Pu_9_8_0_1>;
+    goto <endif_Pu_9_8_0_1>;
+    <if_Pu_9_8_0_1>
+    Rd_4_0 = (Rs_20_16 << 16);
+    <endif_Pu_9_8_0_1>
+}
+
+# 
+# if (!Pu.new) Rd=aslh(Rs)
+# 01110000000sssssPP1-11uu---ddddd
+# 
+# if (!Pu.new[0]) {
+#     Rd = Rs << 16;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_not_P_new_R_aslh_R Pu_9_8, Rd_4_0, Rs_20_16
+        is Pu_9_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000000 & bits_13_13=0b1 & bits_11_10=0b11 {
+    local new_new:1 = newSuffix(Pu_9_8);
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    Rd_4_0 = (Rs_20_16 << 16);
+    <endif_new_new_0_1>
+}
+
+# 
+# if (Pu) Rd=asrh(Rs)
+# 01110000001sssssPP1-00uu---ddddd
+# 
+# if (Pu[0]) {
+#     Rd = Rs >> 16;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_R_asrh_R Pu_9_8, Rd_4_0, Rs_20_16
+        is Pu_9_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000001 & bits_13_13=0b1 & bits_11_10=0b00 {
+    if (Pu_9_8[0, 1]) goto <if_Pu_9_8_0_1>;
+    goto <endif_Pu_9_8_0_1>;
+    <if_Pu_9_8_0_1>
+    Rd_4_0 = (Rs_20_16 >> 16);
+    <endif_Pu_9_8_0_1>
+}
+
+# 
+# if (Pu.new) Rd=asrh(Rs)
+# 01110000001sssssPP1-01uu---ddddd
+# 
+# if (Pu.new[0]) {
+#     Rd = Rs >> 16;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_new_R_asrh_R Pu_9_8, Rd_4_0, Rs_20_16
+        is Pu_9_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000001 & bits_13_13=0b1 & bits_11_10=0b01 {
+    local new_new:1 = newSuffix(Pu_9_8);
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    Rd_4_0 = (Rs_20_16 >> 16);
+    <endif_new_new_0_1>
+}
+
+# 
+# if (!Pu) Rd=asrh(Rs)
+# 01110000001sssssPP1-10uu---ddddd
+# 
+# if (!Pu[0]) {
+#     Rd = Rs >> 16;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_not_P_R_asrh_R Pu_9_8, Rd_4_0, Rs_20_16
+        is Pu_9_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000001 & bits_13_13=0b1 & bits_11_10=0b10 {
+    if ((!Pu_9_8[0, 1])) goto <if_Pu_9_8_0_1>;
+    goto <endif_Pu_9_8_0_1>;
+    <if_Pu_9_8_0_1>
+    Rd_4_0 = (Rs_20_16 >> 16);
+    <endif_Pu_9_8_0_1>
+}
+
+# 
+# if (!Pu.new) Rd=asrh(Rs)
+# 01110000001sssssPP1-11uu---ddddd
+# 
+# if (!Pu.new[0]) {
+#     Rd = Rs >> 16;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_not_P_new_R_asrh_R Pu_9_8, Rd_4_0, Rs_20_16
+        is Pu_9_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000001 & bits_13_13=0b1 & bits_11_10=0b11 {
+    local new_new:1 = newSuffix(Pu_9_8);
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    Rd_4_0 = (Rs_20_16 >> 16);
+    <endif_new_new_0_1>
+}
+
+# 
+# if (Pu) Rdd=combine(Rs,Rt)
+# 11111101---sssssPP0ttttt0uuddddd
+# 
+# if (Pu[0]) {
+#     Rdd.w[0] = Rt;
+#     Rdd.w[1] = Rs;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_RR_combine_R_R Pu_6_5, Rdd_4_0, Rs_20_16, Rt_12_8
+        is Pu_6_5 & Rt_12_8 & Rs_20_16 & Rdd_4_0 & bits_31_24=0b11111101 & bits_13_13=0b0 & bits_7_7=0b0 {
+    if (Pu_6_5[0, 1]) goto <if_Pu_6_5_0_1>;
+    goto <endif_Pu_6_5_0_1>;
+    <if_Pu_6_5_0_1>
+    local Rdd_4_0_w:4 = (&Rdd_4_0);
+    *[register]:4 (Rdd_4_0_w + 4 * 0) = Rt_12_8;
+    *[register]:4 (Rdd_4_0_w + 4 * 1) = Rs_20_16;
+    <endif_Pu_6_5_0_1>
+}
+
+# 
+# if (!Pu) Rdd=combine(Rs,Rt)
+# 11111101---sssssPP0ttttt1uuddddd
+# 
+# if (!Pu[0]) {
+#     Rdd.w[0] = Rt;
+#     Rdd.w[1] = Rs;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_not_P_RR_combine_R_R Pu_6_5, Rdd_4_0, Rs_20_16, Rt_12_8
+        is Pu_6_5 & Rt_12_8 & Rs_20_16 & Rdd_4_0 & bits_31_24=0b11111101 & bits_13_13=0b0 & bits_7_7=0b1 {
+    if ((!Pu_6_5[0, 1])) goto <if_Pu_6_5_0_1>;
+    goto <endif_Pu_6_5_0_1>;
+    <if_Pu_6_5_0_1>
+    local Rdd_4_0_w:4 = (&Rdd_4_0);
+    *[register]:4 (Rdd_4_0_w + 4 * 0) = Rt_12_8;
+    *[register]:4 (Rdd_4_0_w + 4 * 1) = Rs_20_16;
+    <endif_Pu_6_5_0_1>
+}
+
+# 
+# if (Pu.new) Rdd=combine(Rs,Rt)
+# 11111101---sssssPP1ttttt0uuddddd
+# 
+# if (Pu.new[0]) {
+#     Rdd.w[0] = Rt;
+#     Rdd.w[1] = Rs;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_new_RR_combine_R_R Pu_6_5, Rdd_4_0, Rs_20_16, Rt_12_8
+        is Pu_6_5 & Rt_12_8 & Rs_20_16 & Rdd_4_0 & bits_31_24=0b11111101 & bits_13_13=0b1 & bits_7_7=0b0 {
+    local new_new:1 = newSuffix(Pu_6_5);
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local Rdd_4_0_w:4 = (&Rdd_4_0);
+    *[register]:4 (Rdd_4_0_w + 4 * 0) = Rt_12_8;
+    *[register]:4 (Rdd_4_0_w + 4 * 1) = Rs_20_16;
+    <endif_new_new_0_1>
+}
+
+# 
+# if (!Pu.new) Rdd=combine(Rs,Rt)
+# 11111101---sssssPP1ttttt1uuddddd
+# 
+# if (!Pu.new[0]) {
+#     Rdd.w[0] = Rt;
+#     Rdd.w[1] = Rs;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_not_P_new_RR_combine_R_R Pu_6_5, Rdd_4_0, Rs_20_16, Rt_12_8
+        is Pu_6_5 & Rt_12_8 & Rs_20_16 & Rdd_4_0 & bits_31_24=0b11111101 & bits_13_13=0b1 & bits_7_7=0b1 {
+    local new_new:1 = newSuffix(Pu_6_5);
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local Rdd_4_0_w:4 = (&Rdd_4_0);
+    *[register]:4 (Rdd_4_0_w + 4 * 0) = Rt_12_8;
+    *[register]:4 (Rdd_4_0_w + 4 * 1) = Rs_20_16;
+    <endif_new_new_0_1>
+}
+
+# 
+# if (Pu) Rd=and(Rs,Rt)
+# 11111001-00sssssPP0ttttt0uuddddd
+# 
+# if (Pu[0]) {
+#     Rd = Rs & Rt;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_R_and_R_R Pu_6_5, Rd_4_0, Rs_20_16, Rt_12_8
+        is Pu_6_5 & Rt_12_8 & Rs_20_16 & Rd_4_0 & bits_31_24=0b11111001 & bits_22_21=0b00 & bits_13_13=0b0 & bits_7_7=0b0 {
+    if (Pu_6_5[0, 1]) goto <if_Pu_6_5_0_1>;
+    goto <endif_Pu_6_5_0_1>;
+    <if_Pu_6_5_0_1>
+    Rd_4_0 = (Rs_20_16 & Rt_12_8);
+    <endif_Pu_6_5_0_1>
+}
+
+# 
+# if (!Pu) Rd=and(Rs,Rt)
+# 11111001-00sssssPP0ttttt1uuddddd
+# 
+# if (!Pu[0]) {
+#     Rd = Rs & Rt;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_not_P_R_and_R_R Pu_6_5, Rd_4_0, Rs_20_16, Rt_12_8
+        is Pu_6_5 & Rt_12_8 & Rs_20_16 & Rd_4_0 & bits_31_24=0b11111001 & bits_22_21=0b00 & bits_13_13=0b0 & bits_7_7=0b1 {
+    if ((!Pu_6_5[0, 1])) goto <if_Pu_6_5_0_1>;
+    goto <endif_Pu_6_5_0_1>;
+    <if_Pu_6_5_0_1>
+    Rd_4_0 = (Rs_20_16 & Rt_12_8);
+    <endif_Pu_6_5_0_1>
+}
+
+# 
+# if (Pu.new) Rd=and(Rs,Rt)
+# 11111001-00sssssPP1ttttt0uuddddd
+# 
+# if (Pu.new[0]) {
+#     Rd = Rs & Rt;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_new_R_and_R_R Pu_6_5, Rd_4_0, Rs_20_16, Rt_12_8
+        is Pu_6_5 & Rt_12_8 & Rs_20_16 & Rd_4_0 & bits_31_24=0b11111001 & bits_22_21=0b00 & bits_13_13=0b1 & bits_7_7=0b0 {
+    local new_new:1 = newSuffix(Pu_6_5);
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    Rd_4_0 = (Rs_20_16 & Rt_12_8);
+    <endif_new_new_0_1>
+}
+
+# 
+# if (!Pu.new) Rd=and(Rs,Rt)
+# 11111001-00sssssPP1ttttt1uuddddd
+# 
+# if (!Pu.new[0]) {
+#     Rd = Rs & Rt;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_not_P_new_R_and_R_R Pu_6_5, Rd_4_0, Rs_20_16, Rt_12_8
+        is Pu_6_5 & Rt_12_8 & Rs_20_16 & Rd_4_0 & bits_31_24=0b11111001 & bits_22_21=0b00 & bits_13_13=0b1 & bits_7_7=0b1 {
+    local new_new:1 = newSuffix(Pu_6_5);
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    Rd_4_0 = (Rs_20_16 & Rt_12_8);
+    <endif_new_new_0_1>
+}
+
+# 
+# if (Pu) Rd=or(Rs,Rt)
+# 11111001-01sssssPP0ttttt0uuddddd
+# 
+# if (Pu[0]) {
+#     Rd = Rs | Rt;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_R_or_R_R Pu_6_5, Rd_4_0, Rs_20_16, Rt_12_8
+        is Pu_6_5 & Rt_12_8 & Rs_20_16 & Rd_4_0 & bits_31_24=0b11111001 & bits_22_21=0b01 & bits_13_13=0b0 & bits_7_7=0b0 {
+    if (Pu_6_5[0, 1]) goto <if_Pu_6_5_0_1>;
+    goto <endif_Pu_6_5_0_1>;
+    <if_Pu_6_5_0_1>
+    Rd_4_0 = (Rs_20_16 | Rt_12_8);
+    <endif_Pu_6_5_0_1>
+}
+
+# 
+# if (!Pu) Rd=or(Rs,Rt)
+# 11111001-01sssssPP0ttttt1uuddddd
+# 
+# if (!Pu[0]) {
+#     Rd = Rs | Rt;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_not_P_R_or_R_R Pu_6_5, Rd_4_0, Rs_20_16, Rt_12_8
+        is Pu_6_5 & Rt_12_8 & Rs_20_16 & Rd_4_0 & bits_31_24=0b11111001 & bits_22_21=0b01 & bits_13_13=0b0 & bits_7_7=0b1 {
+    if ((!Pu_6_5[0, 1])) goto <if_Pu_6_5_0_1>;
+    goto <endif_Pu_6_5_0_1>;
+    <if_Pu_6_5_0_1>
+    Rd_4_0 = (Rs_20_16 | Rt_12_8);
+    <endif_Pu_6_5_0_1>
+}
+
+# 
+# if (Pu.new) Rd=or(Rs,Rt)
+# 11111001-01sssssPP1ttttt0uuddddd
+# 
+# if (Pu.new[0]) {
+#     Rd = Rs | Rt;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_new_R_or_R_R Pu_6_5, Rd_4_0, Rs_20_16, Rt_12_8
+        is Pu_6_5 & Rt_12_8 & Rs_20_16 & Rd_4_0 & bits_31_24=0b11111001 & bits_22_21=0b01 & bits_13_13=0b1 & bits_7_7=0b0 {
+    local new_new:1 = newSuffix(Pu_6_5);
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    Rd_4_0 = (Rs_20_16 | Rt_12_8);
+    <endif_new_new_0_1>
+}
+
+# 
+# if (!Pu.new) Rd=or(Rs,Rt)
+# 11111001-01sssssPP1ttttt1uuddddd
+# 
+# if (!Pu.new[0]) {
+#     Rd = Rs | Rt;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_not_P_new_R_or_R_R Pu_6_5, Rd_4_0, Rs_20_16, Rt_12_8
+        is Pu_6_5 & Rt_12_8 & Rs_20_16 & Rd_4_0 & bits_31_24=0b11111001 & bits_22_21=0b01 & bits_13_13=0b1 & bits_7_7=0b1 {
+    local new_new:1 = newSuffix(Pu_6_5);
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    Rd_4_0 = (Rs_20_16 | Rt_12_8);
+    <endif_new_new_0_1>
+}
+
+# 
+# if (Pu) Rd=xor(Rs,Rt)
+# 11111001-11sssssPP0ttttt0uuddddd
+# 
+# if (Pu[0]) {
+#     Rd = Rs ^ Rt;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_R_xor_R_R Pu_6_5, Rd_4_0, Rs_20_16, Rt_12_8
+        is Pu_6_5 & Rt_12_8 & Rs_20_16 & Rd_4_0 & bits_31_24=0b11111001 & bits_22_21=0b11 & bits_13_13=0b0 & bits_7_7=0b0 {
+    if (Pu_6_5[0, 1]) goto <if_Pu_6_5_0_1>;
+    goto <endif_Pu_6_5_0_1>;
+    <if_Pu_6_5_0_1>
+    Rd_4_0 = (Rs_20_16 ^ Rt_12_8);
+    <endif_Pu_6_5_0_1>
+}
+
+# 
+# if (!Pu) Rd=xor(Rs,Rt)
+# 11111001-11sssssPP0ttttt1uuddddd
+# 
+# if (!Pu[0]) {
+#     Rd = Rs ^ Rt;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_not_P_R_xor_R_R Pu_6_5, Rd_4_0, Rs_20_16, Rt_12_8
+        is Pu_6_5 & Rt_12_8 & Rs_20_16 & Rd_4_0 & bits_31_24=0b11111001 & bits_22_21=0b11 & bits_13_13=0b0 & bits_7_7=0b1 {
+    if ((!Pu_6_5[0, 1])) goto <if_Pu_6_5_0_1>;
+    goto <endif_Pu_6_5_0_1>;
+    <if_Pu_6_5_0_1>
+    Rd_4_0 = (Rs_20_16 ^ Rt_12_8);
+    <endif_Pu_6_5_0_1>
+}
+
+# 
+# if (Pu.new) Rd=xor(Rs,Rt)
+# 11111001-11sssssPP1ttttt0uuddddd
+# 
+# if (Pu.new[0]) {
+#     Rd = Rs ^ Rt;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_new_R_xor_R_R Pu_6_5, Rd_4_0, Rs_20_16, Rt_12_8
+        is Pu_6_5 & Rt_12_8 & Rs_20_16 & Rd_4_0 & bits_31_24=0b11111001 & bits_22_21=0b11 & bits_13_13=0b1 & bits_7_7=0b0 {
+    local new_new:1 = newSuffix(Pu_6_5);
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    Rd_4_0 = (Rs_20_16 ^ Rt_12_8);
+    <endif_new_new_0_1>
+}
+
+# 
+# if (!Pu.new) Rd=xor(Rs,Rt)
+# 11111001-11sssssPP1ttttt1uuddddd
+# 
+# if (!Pu.new[0]) {
+#     Rd = Rs ^ Rt;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_not_P_new_R_xor_R_R Pu_6_5, Rd_4_0, Rs_20_16, Rt_12_8
+        is Pu_6_5 & Rt_12_8 & Rs_20_16 & Rd_4_0 & bits_31_24=0b11111001 & bits_22_21=0b11 & bits_13_13=0b1 & bits_7_7=0b1 {
+    local new_new:1 = newSuffix(Pu_6_5);
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    Rd_4_0 = (Rs_20_16 ^ Rt_12_8);
+    <endif_new_new_0_1>
+}
+
+# 
+# if (Pu) Rd=sub(Rt,Rs)
+# 111110110-1sssssPP0ttttt0uuddddd
+# 
+# if (Pu[0]) {
+#     Rd = Rt - Rs;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_R_sub_R_R Pu_6_5, Rd_4_0, Rt_12_8, Rs_20_16
+        is Rs_20_16 & Pu_6_5 & Rt_12_8 & Rd_4_0 & bits_31_23=0b111110110 & bits_21_21=0b1 & bits_13_13=0b0 & bits_7_7=0b0 {
+    if (Pu_6_5[0, 1]) goto <if_Pu_6_5_0_1>;
+    goto <endif_Pu_6_5_0_1>;
+    <if_Pu_6_5_0_1>
+    Rd_4_0 = (Rt_12_8 - Rs_20_16);
+    <endif_Pu_6_5_0_1>
+}
+
+# 
+# if (!Pu) Rd=sub(Rt,Rs)
+# 111110110-1sssssPP0ttttt1uuddddd
+# 
+# if (!Pu[0]) {
+#     Rd = Rt - Rs;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_not_P_R_sub_R_R Pu_6_5, Rd_4_0, Rt_12_8, Rs_20_16
+        is Rs_20_16 & Pu_6_5 & Rt_12_8 & Rd_4_0 & bits_31_23=0b111110110 & bits_21_21=0b1 & bits_13_13=0b0 & bits_7_7=0b1 {
+    if ((!Pu_6_5[0, 1])) goto <if_Pu_6_5_0_1>;
+    goto <endif_Pu_6_5_0_1>;
+    <if_Pu_6_5_0_1>
+    Rd_4_0 = (Rt_12_8 - Rs_20_16);
+    <endif_Pu_6_5_0_1>
+}
+
+# 
+# if (Pu.new) Rd=sub(Rt,Rs)
+# 111110110-1sssssPP1ttttt0uuddddd
+# 
+# if (Pu.new[0]) {
+#     Rd = Rt - Rs;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_new_R_sub_R_R Pu_6_5, Rd_4_0, Rt_12_8, Rs_20_16
+        is Rs_20_16 & Pu_6_5 & Rt_12_8 & Rd_4_0 & bits_31_23=0b111110110 & bits_21_21=0b1 & bits_13_13=0b1 & bits_7_7=0b0 {
+    local new_new:1 = newSuffix(Pu_6_5);
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    Rd_4_0 = (Rt_12_8 - Rs_20_16);
+    <endif_new_new_0_1>
+}
+
+# 
+# if (!Pu.new) Rd=sub(Rt,Rs)
+# 111110110-1sssssPP1ttttt1uuddddd
+# 
+# if (!Pu.new[0]) {
+#     Rd = Rt - Rs;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_not_P_new_R_sub_R_R Pu_6_5, Rd_4_0, Rt_12_8, Rs_20_16
+        is Rs_20_16 & Pu_6_5 & Rt_12_8 & Rd_4_0 & bits_31_23=0b111110110 & bits_21_21=0b1 & bits_13_13=0b1 & bits_7_7=0b1 {
+    local new_new:1 = newSuffix(Pu_6_5);
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    Rd_4_0 = (Rt_12_8 - Rs_20_16);
+    <endif_new_new_0_1>
+}
+
+# 
+# if (Pu) Rd=sxtb(Rs)
+# 01110000101sssssPP1-00uu---ddddd
+# 
+# if (Pu[0]) {
+#     Rd = sxt(8, 32, Rs);
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_R_sxtb_R Pu_9_8, Rd_4_0, Rs_20_16
+        is Pu_9_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000101 & bits_13_13=0b1 & bits_11_10=0b00 {
+    if (Pu_9_8[0, 1]) goto <if_Pu_9_8_0_1>;
+    goto <endif_Pu_9_8_0_1>;
+    <if_Pu_9_8_0_1>
+    Rd_4_0 = sext(Rs_20_16:1);
+    <endif_Pu_9_8_0_1>
+}
+
+# 
+# if (Pu.new) Rd=sxtb(Rs)
+# 01110000101sssssPP1-01uu---ddddd
+# 
+# if (Pu.new[0]) {
+#     Rd = sxt(8, 32, Rs);
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_new_R_sxtb_R Pu_9_8, Rd_4_0, Rs_20_16
+        is Pu_9_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000101 & bits_13_13=0b1 & bits_11_10=0b01 {
+    local new_new:1 = newSuffix(Pu_9_8);
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    Rd_4_0 = sext(Rs_20_16:1);
+    <endif_new_new_0_1>
+}
+
+# 
+# if (!Pu) Rd=sxtb(Rs)
+# 01110000101sssssPP1-10uu---ddddd
+# 
+# if (!Pu[0]) {
+#     Rd = sxt(8, 32, Rs);
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_not_P_R_sxtb_R Pu_9_8, Rd_4_0, Rs_20_16
+        is Pu_9_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000101 & bits_13_13=0b1 & bits_11_10=0b10 {
+    if ((!Pu_9_8[0, 1])) goto <if_Pu_9_8_0_1>;
+    goto <endif_Pu_9_8_0_1>;
+    <if_Pu_9_8_0_1>
+    Rd_4_0 = sext(Rs_20_16:1);
+    <endif_Pu_9_8_0_1>
+}
+
+# 
+# if (!Pu.new) Rd=sxtb(Rs)
+# 01110000101sssssPP1-11uu---ddddd
+# 
+# if (!Pu.new[0]) {
+#     Rd = sxt(8, 32, Rs);
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_not_P_new_R_sxtb_R Pu_9_8, Rd_4_0, Rs_20_16
+        is Pu_9_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000101 & bits_13_13=0b1 & bits_11_10=0b11 {
+    local new_new:1 = newSuffix(Pu_9_8);
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    Rd_4_0 = sext(Rs_20_16:1);
+    <endif_new_new_0_1>
+}
+
+# 
+# if (Pu) Rd=sxth(Rs)
+# 01110000111sssssPP1-00uu---ddddd
+# 
+# if (Pu[0]) {
+#     Rd = sxt(16, 32, Rs);
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_R_sxth_R Pu_9_8, Rd_4_0, Rs_20_16
+        is Pu_9_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000111 & bits_13_13=0b1 & bits_11_10=0b00 {
+    if (Pu_9_8[0, 1]) goto <if_Pu_9_8_0_1>;
+    goto <endif_Pu_9_8_0_1>;
+    <if_Pu_9_8_0_1>
+    Rd_4_0 = sext(Rs_20_16:2);
+    <endif_Pu_9_8_0_1>
+}
+
+# 
+# if (Pu.new) Rd=sxth(Rs)
+# 01110000111sssssPP1-01uu---ddddd
+# 
+# if (Pu.new[0]) {
+#     Rd = sxt(16, 32, Rs);
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_new_R_sxth_R Pu_9_8, Rd_4_0, Rs_20_16
+        is Pu_9_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000111 & bits_13_13=0b1 & bits_11_10=0b01 {
+    local new_new:1 = newSuffix(Pu_9_8);
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    Rd_4_0 = sext(Rs_20_16:2);
+    <endif_new_new_0_1>
+}
+
+# 
+# if (!Pu) Rd=sxth(Rs)
+# 01110000111sssssPP1-10uu---ddddd
+# 
+# if (!Pu[0]) {
+#     Rd = sxt(16, 32, Rs);
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_not_P_R_sxth_R Pu_9_8, Rd_4_0, Rs_20_16
+        is Pu_9_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000111 & bits_13_13=0b1 & bits_11_10=0b10 {
+    if ((!Pu_9_8[0, 1])) goto <if_Pu_9_8_0_1>;
+    goto <endif_Pu_9_8_0_1>;
+    <if_Pu_9_8_0_1>
+    Rd_4_0 = sext(Rs_20_16:2);
+    <endif_Pu_9_8_0_1>
+}
+
+# 
+# if (!Pu.new) Rd=sxth(Rs)
+# 01110000111sssssPP1-11uu---ddddd
+# 
+# if (!Pu.new[0]) {
+#     Rd = sxt(16, 32, Rs);
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_not_P_new_R_sxth_R Pu_9_8, Rd_4_0, Rs_20_16
+        is Pu_9_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000111 & bits_13_13=0b1 & bits_11_10=0b11 {
+    local new_new:1 = newSuffix(Pu_9_8);
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    Rd_4_0 = sext(Rs_20_16:2);
+    <endif_new_new_0_1>
+}
+
+# 
+# if (Pu) Rd=#s12
+# 011111100uu0iiiiPP0iiiiiiiiddddd
+# 
+# apply_extension(imm_s);
+# if (Pu[0]) {
+#     Rd = imm_s;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_R_S_2 Pu_22_21, Rd_4_0, s12
+        is Pu_22_21 & Rd_4_0 & s12_19_16 & s12_12_5 & bits_31_23=0b011111100 & bits_20_20=0b0 & bits_13_13=0b0
+            [s12 = (s12_19_16 << 0) | (s12_12_5 << 4);] {
+    if (Pu_22_21[0, 1]) goto <if_Pu_22_21_0_1>;
+    goto <endif_Pu_22_21_0_1>;
+    <if_Pu_22_21_0_1>
+    Rd_4_0 = s12;
+    <endif_Pu_22_21_0_1>
+}
+
+# 
+# if (Pu.new) Rd=#s12
+# 011111100uu0iiiiPP1iiiiiiiiddddd
+# 
+# apply_extension(imm_s);
+# if (Pu.new[0]) {
+#     Rd = imm_s;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_new_R_S_2 Pu_22_21, Rd_4_0, s12
+        is Pu_22_21 & Rd_4_0 & s12_19_16 & s12_12_5 & bits_31_23=0b011111100 & bits_20_20=0b0 & bits_13_13=0b1
+            [s12 = (s12_19_16 << 0) | (s12_12_5 << 4);] {
+    local new_new:1 = newSuffix(Pu_22_21);
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    Rd_4_0 = s12;
+    <endif_new_new_0_1>
+}
+
+# 
+# if (!Pu) Rd=#s12
+# 011111101uu0iiiiPP0iiiiiiiiddddd
+# 
+# apply_extension(imm_s);
+# if (!Pu[0]) {
+#     Rd = imm_s;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_not_P_R_S_2 Pu_22_21, Rd_4_0, s12
+        is Pu_22_21 & Rd_4_0 & s12_19_16 & s12_12_5 & bits_31_23=0b011111101 & bits_20_20=0b0 & bits_13_13=0b0
+            [s12 = (s12_19_16 << 0) | (s12_12_5 << 4);] {
+    if ((!Pu_22_21[0, 1])) goto <if_Pu_22_21_0_1>;
+    goto <endif_Pu_22_21_0_1>;
+    <if_Pu_22_21_0_1>
+    Rd_4_0 = s12;
+    <endif_Pu_22_21_0_1>
+}
+
+# 
+# if (!Pu.new) Rd=#s12
+# 011111101uu0iiiiPP1iiiiiiiiddddd
+# 
+# apply_extension(imm_s);
+# if (!Pu.new[0]) {
+#     Rd = imm_s;
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_not_P_new_R_S_2 Pu_22_21, Rd_4_0, s12
+        is Pu_22_21 & Rd_4_0 & s12_19_16 & s12_12_5 & bits_31_23=0b011111101 & bits_20_20=0b0 & bits_13_13=0b1
+            [s12 = (s12_19_16 << 0) | (s12_12_5 << 4);] {
+    local new_new:1 = newSuffix(Pu_22_21);
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    Rd_4_0 = s12;
+    <endif_new_new_0_1>
+}
+
+# 
+# if (Pu) Rd=zxtb(Rs)
+# 01110000100sssssPP1-00uu---ddddd
+# 
+# if (Pu[0]) {
+#     Rd = zxt(8, 32, Rs);
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_R_zxtb_R Pu_9_8, Rd_4_0, Rs_20_16
+        is Pu_9_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000100 & bits_13_13=0b1 & bits_11_10=0b00 {
+    if (Pu_9_8[0, 1]) goto <if_Pu_9_8_0_1>;
+    goto <endif_Pu_9_8_0_1>;
+    <if_Pu_9_8_0_1>
+    Rd_4_0 = zext(Rs_20_16:1);
+    <endif_Pu_9_8_0_1>
+}
+
+# 
+# if (Pu.new) Rd=zxtb(Rs)
+# 01110000100sssssPP1-01uu---ddddd
+# 
+# if (Pu.new[0]) {
+#     Rd = zxt(8, 32, Rs);
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_new_R_zxtb_R Pu_9_8, Rd_4_0, Rs_20_16
+        is Pu_9_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000100 & bits_13_13=0b1 & bits_11_10=0b01 {
+    local new_new:1 = newSuffix(Pu_9_8);
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    Rd_4_0 = zext(Rs_20_16:1);
+    <endif_new_new_0_1>
+}
+
+# 
+# if (!Pu) Rd=zxtb(Rs)
+# 01110000100sssssPP1-10uu---ddddd
+# 
+# if (!Pu[0]) {
+#     Rd = zxt(8, 32, Rs);
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_not_P_R_zxtb_R Pu_9_8, Rd_4_0, Rs_20_16
+        is Pu_9_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000100 & bits_13_13=0b1 & bits_11_10=0b10 {
+    if ((!Pu_9_8[0, 1])) goto <if_Pu_9_8_0_1>;
+    goto <endif_Pu_9_8_0_1>;
+    <if_Pu_9_8_0_1>
+    Rd_4_0 = zext(Rs_20_16:1);
+    <endif_Pu_9_8_0_1>
+}
+
+# 
+# if (!Pu.new) Rd=zxtb(Rs)
+# 01110000100sssssPP1-11uu---ddddd
+# 
+# if (!Pu.new[0]) {
+#     Rd = zxt(8, 32, Rs);
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_not_P_new_R_zxtb_R Pu_9_8, Rd_4_0, Rs_20_16
+        is Pu_9_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000100 & bits_13_13=0b1 & bits_11_10=0b11 {
+    local new_new:1 = newSuffix(Pu_9_8);
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    Rd_4_0 = zext(Rs_20_16:1);
+    <endif_new_new_0_1>
+}
+
+# 
+# if (Pu) Rd=zxth(Rs)
+# 01110000110sssssPP1-00uu---ddddd
+# 
+# if (Pu[0]) {
+#     Rd = zxt(16, 32, Rs);
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_R_zxth_R Pu_9_8, Rd_4_0, Rs_20_16
+        is Pu_9_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000110 & bits_13_13=0b1 & bits_11_10=0b00 {
+    if (Pu_9_8[0, 1]) goto <if_Pu_9_8_0_1>;
+    goto <endif_Pu_9_8_0_1>;
+    <if_Pu_9_8_0_1>
+    Rd_4_0 = zext(Rs_20_16:2);
+    <endif_Pu_9_8_0_1>
+}
+
+# 
+# if (Pu.new) Rd=zxth(Rs)
+# 01110000110sssssPP1-01uu---ddddd
+# 
+# if (Pu.new[0]) {
+#     Rd = zxt(16, 32, Rs);
+# } else {
+#     NOP;
+# }
+# 
+:Q6_if_P_new_R_zxth_R Pu_9_8, Rd_4_0, Rs_20_16
+        is Pu_9_8 & Rs_20_16 & Rd_4_0 & bits_31_21=0b01110000110 & bits_13_13=0b1 & bits_11_10=0b01 {
+    local new_new:1 = newSuffix(Pu_9_8);
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    Rd_4_0 = zext(Rs_20_16:2);
+    <endif_new_new_0_1>
+}

@@ -1,0 +1,4222 @@
+[
+    [
+        "Rd=add(Rs,#s16)", 
+        "apply_extension(#s);\nRd=Rs+#s;"
+    ], 
+    [
+        "Rd=add(Rs,Rt)", 
+        "Rd=Rs+Rt;"
+    ], 
+    [
+        "Rd=add(Rs,Rt):sat", 
+        "Rd=sat_32(Rs+Rt);"
+    ], 
+    [
+        "Rd=and(Rs,#s10)", 
+        "apply_extension(#s);\nRd=Rs&#s;"
+    ], 
+    [
+        "Rd=and(Rs,Rt)", 
+        "Rd=Rs&Rt;"
+    ], 
+    [
+        "Rd=and(Rt,~Rs)", 
+        "Rd = (Rt & ~Rs);"
+    ], 
+    [
+        "Rd=not(Rs)", 
+        "Assembler mapped to: \"Rd=sub(#-1,Rs)\""
+    ], 
+    [
+        "Rd=or(Rs,#s10)", 
+        "apply_extension(#s);\nRd=Rs|#s;"
+    ], 
+    [
+        "Rd=or(Rs,Rt)", 
+        "Rd=Rs|Rt;"
+    ], 
+    [
+        "Rd=or(Rt,~Rs)", 
+        "Rd = (Rt | ~Rs);"
+    ], 
+    [
+        "Rd=xor(Rs,Rt)", 
+        "Rd=Rs^Rt;"
+    ], 
+    [
+        "Rd=neg(Rs)", 
+        "Assembler mapped to: \"Rd=sub(#0,Rs)\""
+    ], 
+    [
+        "nop", 
+        ""
+    ], 
+    [
+        "Rd=sub(#s10,Rs)", 
+        "apply_extension(#s);\nRd=#s-Rs;"
+    ], 
+    [
+        "Rd=sub(Rt,Rs)", 
+        "Rd=Rt-Rs;"
+    ], 
+    [
+        "Rd=sub(Rt,Rs):sat", 
+        "Rd=sat_32(Rt - Rs);\n"
+    ], 
+    [
+        "Rd=sxtb(Rs)", 
+        "Rd = sxt8->32(Rs);"
+    ], 
+    [
+        "Rd=sxth(Rs)", 
+        "Rd = sxt16->32(Rs);"
+    ], 
+    [
+        "Rd=#s16", 
+        "apply_extension(#s);\nRd=#s;"
+    ], 
+    [
+        "Rdd=#s8", 
+        "if (\"#s8<0\") {\nAssembler mapped to: \"Rdd=combine(#-1,#s8)\";\n} else {\nAssembler mapped to: \"Rdd=combine(#0,#s8)\";\n}"
+    ], 
+    [
+        "Rx.[HL]=#u16", 
+        "Rx.h[01]=#u;"
+    ], 
+    [
+        "Rd=Rs", 
+        "Rd=Rs;"
+    ], 
+    [
+        "Rdd=Rss", 
+        "Assembler mapped to:\n\"Rdd=combine(Rss.H32,Rss.L32)\""
+    ], 
+    [
+        "Rd=vaddh(Rs,Rt)[:sat]", 
+        "for (i=0;i<2;i++) {\nRd.h[i]=[sat_16](Rs.h[i]+Rt.h[i]);\n}"
+    ], 
+    [
+        "Rd=vadduh(Rs,Rt):sat", 
+        "for (i=0;i<2;i++) {\nRd.h[i]=usat_16(Rs.uh[i]+Rt.uh[i]);\n}"
+    ], 
+    [
+        "Rd=vavgh(Rs,Rt)", 
+        "for (i=0;i<2;i++) {\nRd.h[i]=((Rs.h[i]+Rt.h[i])>>1);\n}"
+    ], 
+    [
+        "Rd=vavgh(Rs,Rt):rnd", 
+        "for (i=0;i<2;i++) {\nRd.h[i]=((Rs.h[i]+Rt.h[i]+1)>>1);\n}"
+    ], 
+    [
+        "Rd=vnavgh(Rt,Rs)", 
+        "for (i=0;i<2;i++) {\nRd.h[i]=((Rt.h[i]-Rs.h[i])>>1);\n}"
+    ], 
+    [
+        "Rd=vsubh(Rt,Rs)[:sat]", 
+        "for (i=0;i<2;i++) {\nRd.h[i]=[sat_16](Rt.h[i]-Rs.h[i]);\n}"
+    ], 
+    [
+        "Rd=vsubuh(Rt,Rs):sat", 
+        "for (i=0;i<2;i++) {\nRd.h[i]=usat_16(Rt.uh[i]-Rs.uh[i]);\n}"
+    ], 
+    [
+        "Rd=zxtb(Rs)", 
+        "Assembler mapped to: \"Rd=and(Rs,#255)\""
+    ], 
+    [
+        "Rd=zxth(Rs)", 
+        "Rd = zxt16->32(Rs);"
+    ], 
+    [
+        "Rd=combine(Rt.[HL],Rs.[HL])", 
+        "Rd = (Rt.uh[01]<<16) | Rs.uh[01];"
+    ], 
+    [
+        "Rdd=combine(#s8,#S8)", 
+        "apply_extension(#s);\nRdd.w[0]=#S;\nRdd.w[1]=#s;"
+    ], 
+    [
+        "Rdd=combine(#s8,#U6)", 
+        "apply_extension(#U);\nRdd.w[0]=#U;\nRdd.w[1]=#s;"
+    ], 
+    [
+        "Rdd=combine(#s8,Rs)", 
+        "apply_extension(#s);\nRdd.w[0]=Rs;\nRdd.w[1]=#s;"
+    ], 
+    [
+        "Rdd=combine(Rs,#s8)", 
+        "apply_extension(#s);\nRdd.w[0]=#s;\nRdd.w[1]=Rs;"
+    ], 
+    [
+        "Rdd=combine(Rs,Rt)", 
+        "Rdd.w[0]=Rt;\nRdd.w[1]=Rs;"
+    ], 
+    [
+        "Rd=mux(Pu,#s8,#S8)", 
+        "PREDUSE_TIMING;\napply_extension(#s);\n(Pu[0]) ? (Rd=#s):(Rd=#S);"
+    ], 
+    [
+        "Rd=mux(Pu,#s8,Rs)", 
+        "PREDUSE_TIMING;\napply_extension(#s);\n(Pu[0]) ? (Rd=#s):(Rd=Rs);"
+    ], 
+    [
+        "Rd=mux(Pu,Rs,#s8)", 
+        "PREDUSE_TIMING;\napply_extension(#s);\n(Pu[0]) ? (Rd=Rs):(Rd=#s);"
+    ], 
+    [
+        "Rd=mux(Pu,Rs,Rt)", 
+        "PREDUSE_TIMING;\n(Pu[0]) ? (Rd=Rs):(Rd=Rt);\n"
+    ], 
+    [
+        "Rd=aslh(Rs)", 
+        "Rd=Rs<<16;"
+    ], 
+    [
+        "Rd=asrh(Rs)", 
+        "Rd=Rs>>16;"
+    ], 
+    [
+        "Rdd=packhl(Rs,Rt)", 
+        "Rdd.h[0]=Rt.h[0];\nRdd.h[1]=Rs.h[0];\nRdd.h[2]=Rt.h[1];\nRdd.h[3]=Rs.h[1];"
+    ], 
+    [
+        "if ([!]Pu[.new]) Rd=add(Rs,#s8)", 
+        "if([!]Pu[.new][0]){\napply_extension(#s);\nRd=Rs+#s;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pu[.new]) Rd=add(Rs,Rt)", 
+        "if([!]Pu[.new][0]){\nRd=Rs+Rt;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pu[.new]) Rd=aslh(Rs)", 
+        "if([!]Pu[.new][0]){\nRd=Rs<<16;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pu[.new]) Rd=asrh(Rs)", 
+        "if([!]Pu[.new][0]){\nRd=Rs>>16;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pu[.new])Rdd=combine(Rs,Rt)", 
+        "if ([!]Pu[.new][0]) {Rdd.w[0]=Rt;\nRdd.w[1]=Rs;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pu[.new]) Rd=and(Rs,Rt)", 
+        "if([!]Pu[.new][0]){\nRd=Rs&Rt;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pu[.new]) Rd=or(Rs,Rt)", 
+        "if([!]Pu[.new][0]){\nRd=Rs|Rt;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pu[.new]) Rd=xor(Rs,Rt)", 
+        "if([!]Pu[.new][0]){\nRd=Rs^Rt;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pu[.new]) Rd=sub(Rt,Rs)", 
+        "if([!]Pu[.new][0]){\nRd=Rt-Rs;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pu[.new]) Rd=sxtb(Rs)", 
+        "if([!]Pu[.new][0]){\nRd=sxt8->32(Rs);\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pu[.new]) Rd=sxth(Rs)", 
+        "if([!]Pu[.new][0]){\nRd=sxt16->32(Rs);\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pu[.new]) Rd=#s12", 
+        "apply_extension(#s);\nif ([!]Pu[.new][0]) Rd=#s;\nelse NOP;"
+    ], 
+    [
+        "if ([!]Pu[.new]) Rd=Rs", 
+        "Assembler mapped to: \"if ([!]Pu[.new])\nRd=add(Rs,#0)\""
+    ], 
+    [
+        "if ([!]Pu[.new]) Rdd=Rss", 
+        "Assembler mapped to: \"if ([!]Pu[.new])\nRdd=combine(Rss.H32,Rss.L32)\""
+    ], 
+    [
+        "if ([!]Pu[.new]) Rd=zxtb(Rs)", 
+        "if([!]Pu[.new][0]){\r\nRd=zxt8->32(Rs);\r\n} else {\r\nNOP;\r\n}"
+    ], 
+    [
+        "if ([!]Pu[.new]) Rd=zxth(Rs)", 
+        "if([!]Pu[.new][0]){\r\nRd=zxt16->32(Rs);\r\n} else {\r\nNOP;\r\n}"
+    ], 
+    [
+        "Pd=[!]cmp.eq(Rs,#s10)", 
+        "apply_extension(#s);\r\nPd=Rs[!]=#s ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=[!]cmp.eq(Rs,Rt)", 
+        "Pd=Rs[!]=Rt ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=[!]cmp.gt(Rs,#s10)", 
+        "apply_extension(#s);\r\nPd=Rs<=#s ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=[!]cmp.gt(Rs,Rt)", 
+        "Pd=Rs<=Rt ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=[!]cmp.gtu(Rs,#u9)", 
+        "apply_extension(#u);\r\nPd=Rs.uw[0]<=#u ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=[!]cmp.gtu(Rs,Rt)", 
+        "Pd=Rs.uw[0]<=Rt.uw[0] ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=cmp.ge(Rs,#s8)", 
+        "Assembler mapped to: \"Pd=cmp.gt(Rs,#s8-1)\""
+    ], 
+    [
+        "Pd=cmp.geu(Rs,#u8)", 
+        "if (\"#u8==0\") {\r\nAssembler mapped to: \"Pd=cmp.eq(Rs,Rs)\";\r\n} else {\r\nAssembler mapped to: \"Pd=cmp.gtu(Rs,#u8-1)\";\r\n}"
+    ], 
+    [
+        "Pd=cmp.lt(Rs,Rt)", 
+        "Assembler mapped to: \"Pd=cmp.gt(Rt,Rs)\""
+    ], 
+    [
+        "Pd=cmp.ltu(Rs,Rt)", 
+        "Assembler mapped to: \"Pd=cmp.gtu(Rt,Rs)\""
+    ], 
+    [
+        "Rd=[!]cmp.eq(Rs,#s8)", 
+        "apply_extension(#s);\nRd=(Rs[!]=#s);"
+    ], 
+    [
+        "Rd=[!]cmp.eq(Rs,Rt)", 
+        "Rd=(Rs[!]=Rt);"
+    ], 
+    [
+        "endloop0", 
+        "if (USR.LPCFG) {\r\nif (USR.LPCFG==1) {\r\nP3=0xff;\r\n}\r\nUSR.LPCFG=USR.LPCFG-1;\r\n}\r\nif (LC0>1) {\r\nPC=SA0;\r\nLC0=LC0-1;\r\n}"
+    ], 
+    [
+        "endloop01", 
+        "if (USR.LPCFG) {\r\nif (USR.LPCFG==1) {\r\nP3=0xff;\r\n}\r\nUSR.LPCFG=USR.LPCFG-1;\r\n}\r\nif (LC0>1) {\r\nPC=SA0;\r\nLC0=LC0-1;\r\n} else {\r\nif (LC1>1) {\r\nPC=SA1;\r\nLC1=LC1-1;\r\n}\r\n}"
+    ], 
+    [
+        "endloop1", 
+        "if (LC1>1) {\r\nPC=SA1;\r\nLC1=LC1-1;\r\n}"
+    ], 
+    [
+        "Pd=[!]fastcorner9(Ps,Pt)", 
+        "PREDUSE_TIMING;\ntmp.h[0]=(Ps<<8)|Pt;\ntmp.h[1]=(Ps<<8)|Pt;\nfor (i = 1; i < 9; i++) {\ntmp &= tmp >> 1;\n}\nPd = tmp == 0 ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=all8(Ps)", 
+        "PREDUSE_TIMING;\n(Ps==0xff) ? (Pd=0xff) : (Pd=0x00);"
+    ], 
+    [
+        "Pd=any8(Ps)", 
+        "PREDUSE_TIMING;\nPs ? (Pd=0xff) : (Pd=0x00);"
+    ], 
+    [
+        "loop0(#r7:2,#U10)", 
+        "apply_extension(#r);\n#r=#r & ~0x3;\nSA0=PC+#r;\nLC0=#U;\nUSR.LPCFG=0;"
+    ], 
+    [
+        "loop0(#r7:2,Rs)", 
+        "apply_extension(#r);\n#r=#r & ~0x3;\nSA0=PC+#r;\nLC0=Rs;\nUSR.LPCFG=0;"
+    ], 
+    [
+        "loop1(#r7:2,#U10)", 
+        "apply_extension(#r);\n#r=#r & ~0x3;\nSA1=PC+#r;\nLC1=#U;"
+    ], 
+    [
+        "loop1(#r7:2,Rs)", 
+        "apply_extension(#r);\n#r=#r & ~0x3;\nSA1=PC+#r;\nLC1=Rs;"
+    ], 
+    [
+        "Rd=add(pc,#u6)", 
+        "Rd=PC+apply_extension(#u);"
+    ], 
+    [
+        "p3=sp1loop0(#r7:2,#U10)", 
+        "apply_extension(#r);\r\n#r=#r & ~0x3;\r\nSA0=PC+#r;\r\nLC0=#U;\r\nUSR.LPCFG=1;\r\nP3=0;"
+    ], 
+    [
+        "p3=sp1loop0(#r7:2,Rs)", 
+        "apply_extension(#r);\r\n#r=#r & ~0x3;\r\nSA0=PC+#r;\r\nLC0=Rs;\r\nUSR.LPCFG=1;\r\nP3=0;"
+    ], 
+    [
+        "p3=sp2loop0(#r7:2,#U10)", 
+        "apply_extension(#r);\r\n#r=#r & ~0x3;\r\nSA0=PC+#r;\r\nLC0=#U;\r\nUSR.LPCFG=2;\r\nP3=0;"
+    ], 
+    [
+        "p3=sp2loop0(#r7:2,Rs)", 
+        "apply_extension(#r);\r\n#r=#r & ~0x3;\r\nSA0=PC+#r;\r\nLC0=Rs;\r\nUSR.LPCFG=2;\r\nP3=0;"
+    ], 
+    [
+        "p3=sp3loop0(#r7:2,#U10)", 
+        "apply_extension(#r);\r\n#r=#r & ~0x3;\r\nSA0=PC+#r;\r\nLC0=#U;\r\nUSR.LPCFG=3;\r\nP3=0;"
+    ], 
+    [
+        "p3=sp3loop0(#r7:2,Rs)", 
+        "apply_extension(#r);\r\n#r=#r & ~0x3;\r\nSA0=PC+#r;\r\nLC0=Rs;\r\nUSR.LPCFG=3;\r\nP3=0;"
+    ], 
+    [
+        "Pd=Ps", 
+        "Assembler mapped to: \"Pd=or(Ps,Ps)\""
+    ], 
+    [
+        "Pd=and(Ps,and(Pt,[!]Pu))", 
+        "PREDUSE_TIMING;\r\nPd = Ps & Pt & (~Pu);"
+    ], 
+    [
+        "Pd=and(Ps,or(Pt,[!]Pu))", 
+        "PREDUSE_TIMING;\r\nPd = Ps & (Pt | (~Pu));"
+    ], 
+    [
+        "Pd=and(Pt,[!]Ps)", 
+        "PREDUSE_TIMING;\r\nPd=Pt & (~Ps);"
+    ], 
+    [
+        "Pd=not(Ps)", 
+        "PREDUSE_TIMING;\r\nPd=~Ps;"
+    ], 
+    [
+        "Pd=or(Ps,and(Pt,[!]Pu))", 
+        "PREDUSE_TIMING;\r\nPd = Ps | (Pt & (~Pu));"
+    ], 
+    [
+        "Pd=or(Ps,or(Pt,[!]Pu))", 
+        "PREDUSE_TIMING;\r\nPd = Ps | Pt | (~Pu);"
+    ], 
+    [
+        "Pd=or(Pt,[!]Ps)", 
+        "PREDUSE_TIMING;\r\nPd=Pt | (~Ps);"
+    ], 
+    [
+        "Pd=xor(Ps,Pt)", 
+        "PREDUSE_TIMING;\r\nPd=Ps ^ Pt;"
+    ], 
+    [
+        "Cd=Rs", 
+        "Cd=Rs;"
+    ], 
+    [
+        "Cdd=Rss", 
+        "Cdd=Rss;"
+    ], 
+    [
+        "Rd=Cs", 
+        "Rd=Cs;"
+    ], 
+    [
+        "Rdd=Css", 
+        "Rdd=Css;"
+    ], 
+    [
+        "callr Rs", 
+        "LR=NPC;\nPC=Rs;\n;"
+    ], 
+    [
+        "if ([!]Pu) callr Rs", 
+        ";\nif ([!]Pu[0]) {\nLR=NPC;\nPC=Rs;\n;\n}"
+    ], 
+    [
+        "hintjr(Rs)", 
+        ";"
+    ], 
+    [
+        "if ([!]Pu) jumpr Rs", 
+        "Assembler mapped to: \"if ([!]Pu) \"\"jumpr\"\":nt\n\"\"Rs\""
+    ], 
+    [
+        "if ([!]Pu[.new]) jumpr:<hint> Rs", 
+        "}\n{\nif([!]Pu[.new][0]){\nPC=Rs;\n;\n}"
+    ], 
+    [
+        "jumpr Rs", 
+        "PC=Rs;"
+    ], 
+    [
+        "call #r22:2", 
+        "apply_extension(#r);\n#r=#r & ~0x3;\nLR=NPC;\nPC=PC+#r;\n;"
+    ], 
+    [
+        "if ([!]Pu) call #r15:2", 
+        "apply_extension(#r);\n#r=#r & ~0x3;\n;\nif ([!]Pu[0]) {\nLR=NPC;\nPC=PC+#r;\n;\n}"
+    ], 
+    [
+        "p[01]=cmp.eq(Rs,#-1); if([!]p[01].new) jump:<hint>#r9:2", 
+        "P[01]=(Rs==-1) ? 0xff : 0x00 if\r\n([!]P[01].new[0]) {\r\napply_extension(#r);\r\n#r=#r & ~0x3;\r\nPC=PC+#r;\r\n}"
+    ], 
+    [
+        "p[01]=cmp.eq(Rs,#U5); if([!]p[01].new) jump:<hint>#r9:2", 
+        "P[01]=(Rs==#U) ? 0xff : 0x00 if\r\n([!]P[01].new[0]) {\r\napply_extension(#r);\r\n#r=#r & ~0x3;\r\nPC=PC+#r;\r\n}"
+    ], 
+    [
+        "p[01]=cmp.eq(Rs,Rt); if([!]p[01].new) jump:<hint>#r9:2", 
+        "P[01]=(Rs==Rt) ? 0xff : 0x00 if\r\n([!]P[01].new[0]) {\r\napply_extension(#r);\r\n#r=#r & ~0x3;\r\nPC=PC+#r;\r\n}"
+    ], 
+    [
+        "p[01]=cmp.gt(Rs,#-1); if([!]p[01].new) jump:<hint>#r9:2", 
+        "P[01]=(Rs>-1) ? 0xff : 0x00 if ([!]P[01].new[0])\r\n{\r\napply_extension(#r);\r\n#r=#r & ~0x3;\r\nPC=PC+#r;\r\n}"
+    ], 
+    [
+        "p[01]=cmp.gt(Rs,#U5); if([!]p[01].new) jump:<hint>#r9:2", 
+        "P[01]=(Rs>#U) ? 0xff : 0x00 if ([!]P[01].new[0]){apply_extension(#r);\n#r=#r & ~0x3;\nPC=PC+#r;\n}"
+    ], 
+    [
+        "p[01]=cmp.gt(Rs,Rt); if([!]p[01].new) jump:<hint>#r9:2", 
+        "P[01]=(Rs>Rt) ? 0xff : 0x00 if ([!]P[01].new[0]){apply_extension(#r);\n#r=#r & ~0x3;\nPC=PC+#r;\n}"
+    ], 
+    [
+        "p[01]=cmp.gtu(Rs,#U5); if([!]p[01].new) jump:<hint>#r9:2", 
+        "P[01]=(Rs.uw[0]>#U) ? 0xff : 0x00 if([!]P[01].new[0]) {apply_extension(#r);\n#r=#r & ~0x3;\nPC=PC+#r;\n}"
+    ], 
+    [
+        "p[01]=cmp.gtu(Rs,Rt); if([!]p[01].new) jump:<hint>#r9:2", 
+        "P[01]=(Rs.uw[0]>Rt) ? 0xff : 0x00 if([!]P[01].new[0]) {apply_extension(#r);\n#r=#r & ~0x3;\nPC=PC+#r;\n}"
+    ], 
+    [
+        "p[01]=tstbit(Rs,#0); if([!]p[01].new) jump:<hint>#r9:2", 
+        "P[01]=(Rs & 1) ? 0xff : 0x00 if ([!]P[01].new[0]){apply_extension(#r);\n#r=#r & ~0x3;\nPC=PC+#r;\n}"
+    ], 
+    [
+        "if ([!]Pu) jump #r15:2", 
+        "Assembler mapped to: \"if ([!]Pu) \"\"jump\"\":nt\n\"\"#r15:2\""
+    ], 
+    [
+        "if ([!]Pu) jump:<hint> #r15:2", 
+        ";\nif ([!]Pu[0]) {\napply_extension(#r);\n#r=#r & ~0x3;\nPC=PC+#r;\n;\n}"
+    ], 
+    [
+        "jump #r22:2", 
+        "apply_extension(#r);\n#r=#r & ~0x3;\nPC=PC+#r;"
+    ], 
+    [
+        "if ([!]Pu.new) jump:<hint>#r15:2", 
+        "}{\nif([!]Pu.new[0]){\napply_extension(#r);\n#r=#r & ~0x3;\nPC=PC+#r;\n;\n}"
+    ], 
+    [
+        "if (Rs!=#0) jump:nt #r13:2", 
+        "if (Rs != 0) {\r\nPC=PC+#r;\r\n}"
+    ], 
+    [
+        "if (Rs!=#0) jump:t #r13:2", 
+        "if (Rs != 0) {\r\nPC=PC+#r;\r\n}"
+    ], 
+    [
+        "if (Rs<=#0) jump:nt #r13:2", 
+        "if (Rs<=0) {\r\nPC=PC+#r;\r\n}"
+    ], 
+    [
+        "if (Rs<=#0) jump:t #r13:2", 
+        "if (Rs<=0) {\r\nPC=PC+#r;\r\n}"
+    ], 
+    [
+        "if (Rs==#0) jump:nt #r13:2", 
+        "if (Rs == 0) {\r\nPC=PC+#r;\r\n}"
+    ], 
+    [
+        "if (Rs==#0) jump:t #r13:2", 
+        "if (Rs == 0) {\r\nPC=PC+#r;\r\n}"
+    ], 
+    [
+        "if (Rs>=#0) jump:nt #r13:2", 
+        "if (Rs>=0) {\r\nPC=PC+#r;\r\n}"
+    ], 
+    [
+        "if (Rs>=#0) jump:t #r13:2", 
+        "if (Rs>=0) {\r\nPC=PC+#r;\r\n}"
+    ], 
+    [
+        "Rd=#U6 ; jump #r9:2", 
+        "apply_extension(#r);\n#r=#r & ~0x3;\nRd=#U;\nPC=PC+#r;"
+    ], 
+    [
+        "Rd=Rs ; jump #r9:2", 
+        "apply_extension(#r);\n#r=#r & ~0x3;\nRd=Rs;\nPC=PC+#r;"
+    ], 
+    [
+        "Rdd=memd(Re=#U6)", 
+        "apply_extension(#U);\nEA=#U;\nRdd = *EA;\nRe=#U;"
+    ], 
+    [
+        "Rdd=memd(Rs+#s11:3)", 
+        "apply_extension(#s);\nEA=Rs+#s;\nRdd = *EA;"
+    ], 
+    [
+        "Rdd=memd(Rs+Rt<<#u2)", 
+        "EA=Rs+(Rt<<#u);\nRdd = *EA;"
+    ], 
+    [
+        "Rdd=memd(Rt<<#u2+#U6)", 
+        "apply_extension(#U);\nEA=#U+(Rt<<#u);\nRdd = *EA;"
+    ], 
+    [
+        "Rdd=memd(Rx++#s4:3)", 
+        "EA=Rx;\nRx=Rx+#s;\nRdd = *EA;"
+    ], 
+    [
+        "Rdd=memd(Rx++#s4:3:circ(Mu))", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,#s,MuV);\nRdd = *EA;"
+    ], 
+    [
+        "Rdd=memd(Rx++I:circ(Mu))", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,I<<3,MuV);\nRdd = *EA;"
+    ], 
+    [
+        "Rdd=memd(Rx++Mu)", 
+        "EA=Rx;\nRx=Rx+MuV;\nRdd = *EA;"
+    ], 
+    [
+        "Rdd=memd(Rx++Mu:brev)", 
+        "EA=Rx.h[1] | brev(Rx.h[0]);\nRx=Rx+MuV;\nRdd = *EA;"
+    ], 
+    [
+        "Rdd=memd(gp+#u16:3)", 
+        "apply_extension(#u);\nEA=(Constant_extended ? (0) : GP)+#u;\nRdd = *EA;"
+    ], 
+    [
+        "if ([!]Pt[.new]) Rdd=memd(#u6)", 
+        "apply_extension(#u);\nEA=#u;\nif ([!]Pt[.new][0]) {\nRdd = *EA;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pt[.new])Rdd=memd(Rs+#u6:3)", 
+        "apply_extension(#u);EA=Rs+#u;\nif ([!]Pt[.new][0]) {\nRdd = *EA;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pt[.new])Rdd=memd(Rx++#s4:3)", 
+        "EA=Rx;if([!]Pt[.new][0]){\nRx=Rx+#s;\nRdd = *EA;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])Rdd=memd(Rs+Rt<<#u2)", 
+        "EA=Rs+(Rt<<#u);if ([!]Pv[.new][0]) {\nRdd = *EA;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "Rd=memb(Re=#U6)", 
+        "apply_extension(#U);\nEA=#U;\nRd = *EA;\nRe=#U;"
+    ], 
+    [
+        "Rd=memb(Rs+#s11:0)", 
+        "apply_extension(#s);\nEA=Rs+#s;\nRd = *EA;"
+    ], 
+    [
+        "Rd=memb(Rs+Rt<<#u2)", 
+        "EA=Rs+(Rt<<#u);\nRd = *EA;"
+    ], 
+    [
+        "Rd=memb(Rt<<#u2+#U6)", 
+        "apply_extension(#U);\nEA=#U+(Rt<<#u);\nRd = *EA;"
+    ], 
+    [
+        "Rd=memb(Rx++#s4:0)", 
+        "EA=Rx;\nRx=Rx+#s;\nRd = *EA;"
+    ], 
+    [
+        "Rd=memb(Rx++#s4:0:circ(Mu))", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,#s,MuV);\nRd = *EA;"
+    ], 
+    [
+        "Rd=memb(Rx++I:circ(Mu))", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,I<<0,MuV);\nRd = *EA;"
+    ], 
+    [
+        "Rd=memb(Rx++Mu)", 
+        "EA=Rx;\nRx=Rx+MuV;\nRd = *EA;"
+    ], 
+    [
+        "Rd=memb(Rx++Mu:brev)", 
+        "EA=Rx.h[1] | brev(Rx.h[0]);\nRx=Rx+MuV;\nRd = *EA;"
+    ], 
+    [
+        "Rd=memb(gp+#u16:0)", 
+        "apply_extension(#u);\nEA=(Constant_extended ? (0) : GP)+#u;\nRd = *EA;"
+    ], 
+    [
+        "if ([!]Pt[.new]) Rd=memb(#u6)", 
+        "apply_extension(#u);\nEA=#u;\nif ([!]Pt[.new][0]) {\nRd = *EA;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pt[.new])Rd=memb(Rs+#u6:0)", 
+        "apply_extension(#u);EA=Rs+#u;\nif ([!]Pt[.new][0]) {\nRd = *EA;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pt[.new])Rd=memb(Rx++#s4:0)", 
+        "EA=Rx;if([!]Pt[.new][0]){\nRx=Rx+#s;\nRd = *EA;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])Rd=memb(Rs+Rt<<#u2)", 
+        "EA=Rs+(Rt<<#u);if ([!]Pv[.new][0]) {\nRd = *EA;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "Ryy=memb_fifo(Re=#U6)", 
+        "apply_extension(#U);\nEA=#U;\n{\ntmpV = *EA;\nRyy = (((size8u_t)Ryy)>>8)|(tmpV<<56);\n}\n;\nRe=#U;"
+    ], 
+    [
+        "Ryy=memb_fifo(Rs)", 
+        "Assembler mapped to: \"Ryy=memb_fifo\"\"(Rs+#0)\""
+    ], 
+    [
+        "Ryy=memb_fifo(Rs+#s11:0)", 
+        "apply_extension(#s);\nEA=Rs+#s;\n{\ntmpV = *EA;\nRyy = (((size8u_t)Ryy)>>8)|(tmpV<<56);\n}\n;"
+    ], 
+    [
+        "Ryy=memb_fifo(Rt<<#u2+#U6)", 
+        "apply_extension(#U);\nEA=#U+(Rt<<#u);\n{\ntmpV = *EA;\nRyy = (((size8u_t)Ryy)>>8)|(tmpV<<56);\n}\n;"
+    ], 
+    [
+        "Ryy=memb_fifo(Rx++#s4:0)", 
+        "EA=Rx;\nRx=Rx+#s;\n{\ntmpV = *EA;\nRyy = (((size8u_t)Ryy)>>8)|(tmpV<<56);\n}\n;"
+    ], 
+    [
+        "Ryy=memb_fifo(Rx++#s4:0:circ(Mu))", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,#s,MuV);\n{\ntmpV = *EA;\nRyy = (((size8u_t)Ryy)>>8)|(tmpV<<56);\n}\n;"
+    ], 
+    [
+        "Ryy=memb_fifo(Rx++I:circ(Mu))", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,I<<0,MuV);\n{\ntmpV = *EA;\nRyy = (((size8u_t)Ryy)>>8)|(tmpV<<56);\n}\n;"
+    ], 
+    [
+        "Ryy=memb_fifo(Rx++Mu)", 
+        "EA=Rx;\nRx=Rx+MuV;\n{\ntmpV = *EA;\nRyy = (((size8u_t)Ryy)>>8)|(tmpV<<56);\n}\n;"
+    ], 
+    [
+        "Ryy=memb_fifo(Rx++Mu:brev)", 
+        "EA=Rx.h[1] | brev(Rx.h[0]);\nRx=Rx+MuV;\n{\ntmpV = *EA;\nRyy = (((size8u_t)Ryy)>>8)|(tmpV<<56);\n}\n;"
+    ], 
+    [
+        "Ryy=memh_fifo(Re=#U6)", 
+        "apply_extension(#U);\r\nEA=#U;\r\n{\r\ntmpV = *EA;\r\nRyy = (((size8u_t)Ryy)>>16)|(tmpV<<48);\r\n}\r\n;\r\nRe=#U;"
+    ], 
+    [
+        "Ryy=memh_fifo(Rs)", 
+        "Assembler mapped to: \"Ryy=memh_fifo\"\"(Rs+#0)\""
+    ], 
+    [
+        "Ryy=memh_fifo(Rs+#s11:1)", 
+        "apply_extension(#s);\r\nEA=Rs+#s;\r\n{\r\ntmpV = *EA;\r\nRyy = (((size8u_t)Ryy)>>16)|(tmpV<<48);\r\n}\r\n;"
+    ], 
+    [
+        "Ryy=memh_fifo(Rt<<#u2+#U6)", 
+        "apply_extension(#U);\r\nEA=#U+(Rt<<#u);\r\n{\r\ntmpV = *EA;\r\nRyy = (((size8u_t)Ryy)>>16)|(tmpV<<48);\r\n}\r\n;"
+    ], 
+    [
+        "Ryy=memh_fifo(Rx++#s4:1)", 
+        "EA=Rx;\r\nRx=Rx+#s;\r\n{\r\ntmpV = *EA;\r\nRyy = (((size8u_t)Ryy)>>16)|(tmpV<<48);\r\n}\r\n;"
+    ], 
+    [
+        "Ryy=memh_fifo(Rx++#s4:1:circ(Mu))", 
+        "EA=Rx;\r\nRx=Rx=circ_add(Rx,#s,MuV);\r\n{\r\ntmpV = *EA;\r\nRyy = (((size8u_t)Ryy)>>16)|(tmpV<<48);\r\n}\r\n;"
+    ], 
+    [
+        "Ryy=memh_fifo(Rx++I:circ(Mu))", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,I<<1,MuV);\n{\ntmpV = *EA;\nRyy = (((size8u_t)Ryy)>>16)|(tmpV<<48);\n}\n;"
+    ], 
+    [
+        "Ryy=memh_fifo(Rx++Mu)", 
+        "EA=Rx;\nRx=Rx+MuV;\n{\ntmpV = *EA;\nRyy = (((size8u_t)Ryy)>>16)|(tmpV<<48);\n}\n;"
+    ], 
+    [
+        "Ryy=memh_fifo(Rx++Mu:brev)", 
+        "EA=Rx.h[1] | brev(Rx.h[0]);\nRx=Rx+MuV;\n{\ntmpV = *EA;\nRyy = (((size8u_t)Ryy)>>16)|(tmpV<<48);\n}\n;"
+    ], 
+    [
+        "Rd=memh(Re=#U6)", 
+        "apply_extension(#U);\nEA=#U;\nRd = *EA;\nRe=#U;"
+    ], 
+    [
+        "Rd=memh(Rs+#s11:1)", 
+        "apply_extension(#s);\nEA=Rs+#s;\nRd = *EA;"
+    ], 
+    [
+        "Rd=memh(Rs+Rt<<#u2)", 
+        "EA=Rs+(Rt<<#u);\nRd = *EA;"
+    ], 
+    [
+        "Rd=memh(Rt<<#u2+#U6)", 
+        "apply_extension(#U);\nEA=#U+(Rt<<#u);\nRd = *EA;"
+    ], 
+    [
+        "Rd=memh(Rx++#s4:1)", 
+        "EA=Rx;\nRx=Rx+#s;\nRd = *EA;"
+    ], 
+    [
+        "Rd=memh(Rx++#s4:1:circ(Mu))", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,#s,MuV);\nRd = *EA;"
+    ], 
+    [
+        "Rd=memh(Rx++I:circ(Mu))", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,I<<1,MuV);\nRd = *EA;"
+    ], 
+    [
+        "Rd=memh(Rx++Mu)", 
+        "EA=Rx;\nRx=Rx+MuV;\nRd = *EA;"
+    ], 
+    [
+        "Rd=memh(Rx++Mu:brev)", 
+        "EA=Rx.h[1] | brev(Rx.h[0]);\nRx=Rx+MuV;\nRd = *EA;"
+    ], 
+    [
+        "Rd=memh(gp+#u16:1)", 
+        "apply_extension(#u);\nEA=(Constant_extended ? (0) : GP)+#u;\nRd = *EA;"
+    ], 
+    [
+        "if ([!]Pt[.new]) Rd=memh(#u6)", 
+        "apply_extension(#u);\nEA=#u;\nif ([!]Pt[.new][0]) {\nRd = *EA;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pt[.new])Rd=memh(Rs+#u6:1)", 
+        "apply_extension(#u);EA=Rs+#u;\nif ([!]Pt[.new][0]) {\nRd = *EA;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pt[.new])Rd=memh(Rx++#s4:1)", 
+        "EA=Rx;if([!]Pt[.new][0]){\nRx=Rx+#s;\nRd = *EA;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])Rd=memh(Rs+Rt<<#u2)", 
+        "EA=Rs+(Rt<<#u);if ([!]Pv[.new][0]) {\nRd = *EA;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "Rd=memub(Re=#U6)", 
+        "apply_extension(#U);\nEA=#U;\nRd = *EA;\nRe=#U;"
+    ], 
+    [
+        "Rd=memub(Rs+#s11:0)", 
+        "apply_extension(#s);\nEA=Rs+#s;\nRd = *EA;"
+    ], 
+    [
+        "Rd=memub(Rs+Rt<<#u2)", 
+        "EA=Rs+(Rt<<#u);\nRd = *EA;"
+    ], 
+    [
+        "Rd=memub(Rt<<#u2+#U6)", 
+        "apply_extension(#U);\nEA=#U+(Rt<<#u);\nRd = *EA;"
+    ], 
+    [
+        "Rd=memub(Rx++#s4:0)", 
+        "EA=Rx;\nRx=Rx+#s;\nRd = *EA;"
+    ], 
+    [
+        "Rd=memub(Rx++#s4:0:circ(Mu))", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,#s,MuV);\nRd = *EA;"
+    ], 
+    [
+        "Rd=memub(Rx++I:circ(Mu))", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,I<<0,MuV);\nRd = *EA;"
+    ], 
+    [
+        "Rd=memub(Rx++Mu)", 
+        "EA=Rx;\nRx=Rx+MuV;\nRd = *EA;"
+    ], 
+    [
+        "Rd=memub(Rx++Mu:brev)", 
+        "EA=Rx.h[1] | brev(Rx.h[0]);\nRx=Rx+MuV;\nRd = *EA;"
+    ], 
+    [
+        "Rd=memub(gp+#u16:0)", 
+        "apply_extension(#u);\nEA=(Constant_extended ? (0) : GP)+#u;\nRd = *EA;"
+    ], 
+    [
+        "if ([!]Pt[.new]) Rd=memub(#u6)", 
+        "apply_extension(#u);\nEA=#u;\nif ([!]Pt[.new][0]) {\nRd = *EA;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pt[.new])Rd=memub(Rs+#u6:0)", 
+        "apply_extension(#u);EA=Rs+#u;\nif ([!]Pt[.new][0]) {\nRd = *EA;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pt[.new])Rd=memub(Rx++#s4:0)", 
+        "EA=Rx;if([!]Pt[.new][0]){\nRx=Rx+#s;\nRd = *EA;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])Rd=memub(Rs+Rt<<#u2)", 
+        "EA=Rs+(Rt<<#u);if ([!]Pv[.new][0]) {\nRd = *EA;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "Rd=memuh(Re=#U6)", 
+        "apply_extension(#U);\nEA=#U;\nRd = *EA;\nRe=#U;"
+    ], 
+    [
+        "Rd=memuh(Rs+#s11:1)", 
+        "apply_extension(#s);\nEA=Rs+#s;\nRd = *EA;"
+    ], 
+    [
+        "Rd=memuh(Rs+Rt<<#u2)", 
+        "EA=Rs+(Rt<<#u);\nRd = *EA;"
+    ], 
+    [
+        "Rd=memuh(Rt<<#u2+#U6)", 
+        "apply_extension(#U);\nEA=#U+(Rt<<#u);\nRd = *EA;"
+    ], 
+    [
+        "Rd=memuh(Rx++#s4:1)", 
+        "EA=Rx;\nRx=Rx+#s;\nRd = *EA;"
+    ], 
+    [
+        "Rd=memuh(Rx++#s4:1:circ(Mu))", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,#s,MuV);\nRd = *EA;"
+    ], 
+    [
+        "Rd=memuh(Rx++I:circ(Mu))", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,I<<1,MuV);\nRd = *EA;"
+    ], 
+    [
+        "Rd=memuh(Rx++Mu)", 
+        "EA=Rx;\nRx=Rx+MuV;\nRd = *EA;"
+    ], 
+    [
+        "Rd=memuh(Rx++Mu:brev)", 
+        "EA=Rx.h[1] | brev(Rx.h[0]);\nRx=Rx+MuV;\nRd = *EA;"
+    ], 
+    [
+        "Rd=memuh(gp+#u16:1)", 
+        "apply_extension(#u);\nEA=(Constant_extended ? (0) : GP)+#u;\nRd = *EA;"
+    ], 
+    [
+        "if ([!]Pt[.new]) Rd=memuh(#u6)", 
+        "apply_extension(#u);\nEA=#u;\nif ([!]Pt[.new][0]) {\nRd = *EA;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pt[.new])Rd=memuh(Rs+#u6:1)", 
+        "apply_extension(#u);EA=Rs+#u;\nif ([!]Pt[.new][0]) {\nRd = *EA;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pt[.new])Rd=memuh(Rx++#s4:1)", 
+        "EA=Rx;if([!]Pt[.new][0]){\nRx=Rx+#s;\nRd = *EA;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])Rd=memuh(Rs+Rt<<#u2)", 
+        "EA=Rs+(Rt<<#u);if ([!]Pv[.new][0]) {\nRd = *EA;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "Rd=memw(Re=#U6)", 
+        "apply_extension(#U);\nEA=#U;\nRd = *EA;\nRe=#U;"
+    ], 
+    [
+        "Rd=memw(Rs+#s11:2)", 
+        "apply_extension(#s);\nEA=Rs+#s;\nRd = *EA;"
+    ], 
+    [
+        "Rd=memw(Rs+Rt<<#u2)", 
+        "EA=Rs+(Rt<<#u);\nRd = *EA;"
+    ], 
+    [
+        "Rd=memw(Rt<<#u2+#U6)", 
+        "apply_extension(#U);\nEA=#U+(Rt<<#u);\nRd = *EA;"
+    ], 
+    [
+        "Rd=memw(Rx++#s4:2)", 
+        "EA=Rx;\nRx=Rx+#s;\nRd = *EA;"
+    ], 
+    [
+        "Rd=memw(Rx++#s4:2:circ(Mu))", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,#s,MuV);\nRd = *EA;"
+    ], 
+    [
+        "Rd=memw(Rx++I:circ(Mu))", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,I<<2,MuV);\nRd = *EA;"
+    ], 
+    [
+        "Rd=memw(Rx++Mu)", 
+        "EA=Rx;\nRx=Rx+MuV;\nRd = *EA;"
+    ], 
+    [
+        "Rd=memw(Rx++Mu:brev)", 
+        "EA=Rx.h[1] | brev(Rx.h[0]);\nRx=Rx+MuV;\nRd = *EA;"
+    ], 
+    [
+        "Rd=memw(gp+#u16:2)", 
+        "apply_extension(#u);\nEA=(Constant_extended ? (0) : GP)+#u;\nRd = *EA;"
+    ], 
+    [
+        "if ([!]Pt[.new]) Rd=memw(#u6)", 
+        "apply_extension(#u);\nEA=#u;\nif ([!]Pt[.new][0]) {\nRd = *EA;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pt[.new])Rd=memw(Rs+#u6:2)", 
+        "apply_extension(#u);EA=Rs+#u;\nif ([!]Pt[.new][0]) {\nRd = *EA;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pt[.new])Rd=memw(Rx++#s4:2)", 
+        "EA=Rx;if([!]Pt[.new][0]){\nRx=Rx+#s;\nRd = *EA;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])Rd=memw(Rs+Rt<<#u2)", 
+        "EA=Rs+(Rt<<#u);if ([!]Pv[.new][0]) {\nRd = *EA;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "Rdd=deallocframe(Rs):raw", 
+        "EA=Rs;\r\ntmp = *EA;\r\nRdd = frame_unscramble(tmp);\r\nSP=EA+8;"
+    ], 
+    [
+        "deallocframe", 
+        "Assembler mapped to:\r\n\"r31:30=deallocframe(r30):raw\""
+    ], 
+    [
+        "Rdd=dealloc_return(Rs):raw", 
+        "EA=Rs;\r\ntmp = *EA;\r\nRdd = frame_unscramble(tmp);\r\nSP=EA+8;\r\nPC=Rdd.w[1];"
+    ], 
+    [
+        "dealloc_return", 
+        "Assembler mapped to:\r\n\"r31:30=dealloc_return(r30):raw\""
+    ], 
+    [
+        "if ([!]Pv)Rdd=dealloc_return(Rs):raw", 
+        ";\r\nEA=Rs;\r\nif ([!]Pv[0]) {\r\ntmp = *EA;\r\nRdd = frame_unscramble(tmp);\r\nSP=EA+8;\r\nPC=Rdd.w[1];\r\n} else {\r\nNOP;\r\n}"
+    ], 
+    [
+        "if ([!]Pv) dealloc_return", 
+        "Assembler mapped to: \"if ([!]Pv\"\")\r\nr31:30=dealloc_return(r30)\"\":raw\""
+    ], 
+    [
+        "if ([!]Pv.new)Rdd=dealloc_return(Rs):nt:raw", 
+        ";\r\nEA=Rs;\r\nif ([!]Pv.new[0]) {\r\ntmp = *EA;\r\nRdd = frame_unscramble(tmp);\r\nSP=EA+8;\r\nPC=Rdd.w[1];\r\n} else {\r\nNOP;\r\n}"
+    ], 
+    [
+        "if ([!]Pv.new)Rdd=dealloc_return(Rs):t:raw", 
+        ";\r\nEA=Rs;\r\nif ([!]Pv.new[0]) {\r\ntmp = *EA;\r\nRdd = frame_unscramble(tmp);\r\nSP=EA+8;\r\nPC=Rdd.w[1];\r\n} else {\r\nNOP;\r\n}"
+    ], 
+    [
+        "if ([!]Pv.new)dealloc_return:nt", 
+        "Assembler mapped to: \"if ([!]Pv\"\".new\"\")\r\nr31:30=dealloc_return(r30)\"\":nt\"\":raw\""
+    ], 
+    [
+        "if ([!]Pv.new) dealloc_return:t", 
+        "Assembler mapped to: \"if ([!]Pv\"\".new\"\")\r\nr31:30=dealloc_return(r30)\"\":t\"\":raw\""
+    ], 
+    [
+        "Rd=membh(Re=#U6)", 
+        "apply_extension(#U);\nEA=#U;\n{\ntmpV = *EA;\nfor (i=0;i<2;i++) {\nRd.h[i]=tmpV.b[i];\n}\n}\n;\nRe=#U;"
+    ], 
+    [
+        "Rd=membh(Rs)", 
+        "Assembler mapped to: \"Rd=membh\"\"(Rs+#0)\""
+    ], 
+    [
+        "Rd=membh(Rs+#s11:1)", 
+        "apply_extension(#s);\nEA=Rs+#s;\n{\ntmpV = *EA;\nfor (i=0;i<2;i++) {\nRd.h[i]=tmpV.b[i];\n}\n}\n;"
+    ], 
+    [
+        "Rd=membh(Rt<<#u2+#U6)", 
+        "apply_extension(#U);\nEA=#U+(Rt<<#u);\n{\ntmpV = *EA;\nfor (i=0;i<2;i++) {\nRd.h[i]=tmpV.b[i];\n}\n}\n;"
+    ], 
+    [
+        "Rd=membh(Rx++#s4:1)", 
+        "EA=Rx;\nRx=Rx+#s;\n{\ntmpV = *EA;\nfor (i=0;i<2;i++) {\nRd.h[i]=tmpV.b[i];\n}\n}\n;"
+    ], 
+    [
+        "Rd=membh(Rx++#s4:1:circ(Mu))", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,#s,MuV);\n{\ntmpV = *EA;\nfor (i=0;i<2;i++) {\nRd.h[i]=tmpV.b[i];\n}\n}\n;"
+    ], 
+    [
+        "Rd=membh(Rx++I:circ(Mu))", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,I<<1,MuV);\n{\ntmpV = *EA;\nfor (i=0;i<2;i++) {\nRd.h[i]=tmpV.b[i];\n}\n}\n;"
+    ], 
+    [
+        "Rd=membh(Rx++Mu)", 
+        "EA=Rx;\nRx=Rx+MuV;\n{\ntmpV = *EA;\nfor (i=0;i<2;i++) {\nRd.h[i]=tmpV.b[i];\n}\n}\n;"
+    ], 
+    [
+        "Rd=membh(Rx++Mu:brev)", 
+        "EA=Rx.h[1] | brev(Rx.h[0]);\nRx=Rx+MuV;\n{\ntmpV = *EA;\nfor (i=0;i<2;i++) {\nRd.h[i]=tmpV.b[i];\n}\n}\n;"
+    ], 
+    [
+        "Rd=memubh(Re=#U6)", 
+        "apply_extension(#U);\nEA=#U;\n{\ntmpV = *EA;\nfor (i=0;i<2;i++) {\nRd.h[i]=tmpV.ub[i];\n}\n}\n;\nRe=#U;"
+    ], 
+    [
+        "Rd=memubh(Rs+#s11:1)", 
+        "apply_extension(#s);\nEA=Rs+#s;\n{\ntmpV = *EA;\nfor (i=0;i<2;i++) {\nRd.h[i]=tmpV.ub[i];\n}\n}\n;"
+    ], 
+    [
+        "Rd=memubh(Rt<<#u2+#U6)", 
+        "apply_extension(#U);\nEA=#U+(Rt<<#u);\n{\ntmpV = *EA;\nfor (i=0;i<2;i++) {\nRd.h[i]=tmpV.ub[i];\n}\n}\n;"
+    ], 
+    [
+        "Rd=memubh(Rx++#s4:1)", 
+        "EA=Rx;\nRx=Rx+#s;\n{\ntmpV = *EA;\nfor (i=0;i<2;i++) {\nRd.h[i]=tmpV.ub[i];\n}\n}\n;"
+    ], 
+    [
+        "Rd=memubh(Rx++#s4:1:circ(Mu))", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,#s,MuV);\n{\ntmpV = *EA;\nfor (i=0;i<2;i++) {\nRd.h[i]=tmpV.ub[i];\n}\n}\n;"
+    ], 
+    [
+        "Rd=memubh(Rx++I:circ(Mu))", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,I<<1,MuV);\n{\ntmpV = *EA;\nfor (i=0;i<2;i++) {\nRd.h[i]=tmpV.ub[i];\n}\n}\n;"
+    ], 
+    [
+        "Rd=memubh(Rx++Mu)", 
+        "EA=Rx;\nRx=Rx+MuV;\n{\ntmpV = *EA;\nfor (i=0;i<2;i++) {\nRd.h[i]=tmpV.ub[i];\n}\n}\n;"
+    ], 
+    [
+        "Rd=memubh(Rx++Mu:brev)", 
+        "EA=Rx.h[1] | brev(Rx.h[0]);\nRx=Rx+MuV;\n{\ntmpV = *EA;\nfor (i=0;i<2;i++) {\nRd.h[i]=tmpV.ub[i];\n}\n}\n;"
+    ], 
+    [
+        "Rdd=membh(Re=#U6)", 
+        "apply_extension(#U);\nEA=#U;\n{\ntmpV = *EA;\nfor (i=0;i<4;i++) {\nRdd.h[i]=tmpV.b[i];\n}\n}\n;\nRe=#U;"
+    ], 
+    [
+        "Rdd=membh(Rs)", 
+        "Assembler mapped to: \"Rdd=membh\"\"(Rs+#0)\""
+    ], 
+    [
+        "Rdd=membh(Rs+#s11:2)", 
+        "apply_extension(#s);\nEA=Rs+#s;\n{\ntmpV = *EA;\nfor (i=0;i<4;i++) {\nRdd.h[i]=tmpV.b[i];\n}\n}\n;"
+    ], 
+    [
+        "Rdd=membh(Rt<<#u2+#U6)", 
+        "apply_extension(#U);\nEA=#U+(Rt<<#u);\n{\ntmpV = *EA;\nfor (i=0;i<4;i++) {\nRdd.h[i]=tmpV.b[i];\n}\n}\n;"
+    ], 
+    [
+        "Rdd=membh(Rx++#s4:2)", 
+        "EA=Rx;\nRx=Rx+#s;\n{\ntmpV = *EA;\nfor (i=0;i<4;i++) {\nRdd.h[i]=tmpV.b[i];\n}\n}\n;"
+    ], 
+    [
+        "Rdd=membh(Rx++#s4:2:circ(Mu))", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,#s,MuV);\n{\ntmpV = *EA;\nfor (i=0;i<4;i++) {\nRdd.h[i]=tmpV.b[i];\n}\n}\n;"
+    ], 
+    [
+        "Rdd=membh(Rx++I:circ(Mu))", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,I<<2,MuV);\n{\ntmpV = *EA;\nfor (i=0;i<4;i++) {\nRdd.h[i]=tmpV.b[i];\n}\n}\n;"
+    ], 
+    [
+        "Rdd=membh(Rx++Mu)", 
+        "EA=Rx;\nRx=Rx+MuV;\n{\ntmpV = *EA;\nfor (i=0;i<4;i++) {\nRdd.h[i]=tmpV.b[i];\n}\n}\n;"
+    ], 
+    [
+        "Rdd=membh(Rx++Mu:brev)", 
+        "EA=Rx.h[1] | brev(Rx.h[0]);\nRx=Rx+MuV;\n{\ntmpV = *EA;\nfor (i=0;i<4;i++) {\nRdd.h[i]=tmpV.b[i];\n}\n}\n;"
+    ], 
+    [
+        "Rdd=memubh(Re=#U6)", 
+        "apply_extension(#U);\nEA=#U;\n{\ntmpV = *EA;\nfor (i=0;i<4;i++) {\nRdd.h[i]=tmpV.ub[i];\n}\n}\n;\nRe=#U;"
+    ], 
+    [
+        "Rdd=memubh(Rs+#s11:2)", 
+        "apply_extension(#s);\nEA=Rs+#s;\n{\ntmpV = *EA;\nfor (i=0;i<4;i++) {\nRdd.h[i]=tmpV.ub[i];\n}\n}\n;"
+    ], 
+    [
+        "Rdd=memubh(Rt<<#u2+#U6)", 
+        "apply_extension(#U);\nEA=#U+(Rt<<#u);\n{\ntmpV = *EA;\nfor (i=0;i<4;i++) {\nRdd.h[i]=tmpV.ub[i];\n}\n}\n;"
+    ], 
+    [
+        "Rdd=memubh(Rx++#s4:2)", 
+        "EA=Rx;\nRx=Rx+#s;\n{\ntmpV = *EA;\nfor (i=0;i<4;i++) {\nRdd.h[i]=tmpV.ub[i];\n}\n}\n;"
+    ], 
+    [
+        "Rdd=memubh(Rx++#s4:2:circ(Mu))", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,#s,MuV);\n{\ntmpV = *EA;\nfor (i=0;i<4;i++) {\nRdd.h[i]=tmpV.ub[i];\n}\n}\n;"
+    ], 
+    [
+        "Rdd=memubh(Rx++I:circ(Mu))", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,I<<2,MuV);\n{\ntmpV = *EA;\nfor (i=0;i<4;i++) {\nRdd.h[i]=tmpV.ub[i];\n}\n}\n;"
+    ], 
+    [
+        "Rdd=memubh(Rx++Mu)", 
+        "EA=Rx;\nRx=Rx+MuV;\n{\ntmpV = *EA;\nfor (i=0;i<4;i++) {\nRdd.h[i]=tmpV.ub[i];\n}\n}\n;"
+    ], 
+    [
+        "Rdd=memubh(Rx++Mu:brev)", 
+        "EA=Rx.h[1] | brev(Rx.h[0]);\nRx=Rx+MuV;\n{\ntmpV = *EA;\nfor (i=0;i<4;i++) {\nRdd.h[i]=tmpV.ub[i];\n}\n}\n;"
+    ], 
+    [
+        "memb(Rs+#u6:0)=clrbit(#U5)", 
+        "apply_extension(#u);\nEA=Rs+#u;\ntmp = *EA;\ntmp &= (~(1<<#U));\n*EA = tmp;"
+    ], 
+    [
+        "memb(Rs+#u6:0)=setbit(#U5)", 
+        "apply_extension(#u);\nEA=Rs+#u;\ntmp = *EA;\ntmp |= (1<<#U);\n*EA = tmp;"
+    ], 
+    [
+        "memb(Rs+#u6:0)[+-]=#U5", 
+        "apply_extension(#u);\nEA=Rs[+-]#u;\ntmp = *EA;\ntmp [+-]= #U;\n*EA = tmp;"
+    ], 
+    [
+        "memb(Rs+#u6:0)[+-|&]=Rt", 
+        "apply_extension(#u);\nEA=Rs+#u;\ntmp = *EA;\ntmp [+-|&]= Rt;\n*EA = tmp;"
+    ], 
+    [
+        "memh(Rs+#u6:1)=clrbit(#U5)", 
+        "apply_extension(#u);\nEA=Rs+#u;\ntmp = *EA;\ntmp &= (~(1<<#U));\n*EA = tmp;"
+    ], 
+    [
+        "memh(Rs+#u6:1)=setbit(#U5)", 
+        "apply_extension(#u);\nEA=Rs+#u;\ntmp = *EA;\ntmp |= (1<<#U);\n*EA = tmp;"
+    ], 
+    [
+        "memh(Rs+#u6:1)[+-]=#U5", 
+        "apply_extension(#u);\nEA=Rs[+-]#u;\ntmp = *EA;\ntmp [+-]= #U;\n*EA = tmp;"
+    ], 
+    [
+        "memh(Rs+#u6:1)[+-|&]=Rt", 
+        "apply_extension(#u);\nEA=Rs+#u;\ntmp = *EA;\ntmp [+-|&]= Rt;\n*EA = tmp;"
+    ], 
+    [
+        "memw(Rs+#u6:2)=clrbit(#U5)", 
+        "apply_extension(#u);\nEA=Rs+#u;\ntmp = *EA;\ntmp &= (~(1<<#U));\n*EA = tmp;"
+    ], 
+    [
+        "memw(Rs+#u6:2)=setbit(#U5)", 
+        "apply_extension(#u);\nEA=Rs+#u;\ntmp = *EA;\ntmp |= (1<<#U);\n*EA = tmp;"
+    ], 
+    [
+        "memw(Rs+#u6:2)[+-]=#U5", 
+        "apply_extension(#u);\nEA=Rs[+-]#u;\ntmp = *EA;\ntmp [+-]= #U;\n*EA = tmp;"
+    ], 
+    [
+        "memw(Rs+#u6:2)[+-|&]=Rt", 
+        "apply_extension(#u);\nEA=Rs+#u;\ntmp = *EA;\ntmp [+-|&]= Rt;\n*EA = tmp;"
+    ], 
+    [
+        "if ([!]cmp.eq(Ns.new,#-1))jump:<hint> #r9:2", 
+        ";\r\nif ((Ns.new[!]=(-1))) {\r\napply_extension(#r);\r\n#r=#r & ~0x3;\r\nPC=PC+#r;\r\n}"
+    ], 
+    [
+        "if ([!]cmp.eq(Ns.new,#U5))jump:<hint> #r9:2", 
+        ";\r\nif ((Ns.new[!]=(#U))) {\r\napply_extension(#r);\r\n#r=#r & ~0x3;\r\nPC=PC+#r;\r\n}"
+    ], 
+    [
+        "if ([!]cmp.eq(Ns.new,Rt))jump:<hint> #r9:2", 
+        ";\r\nif ((Ns.new[!]=Rt)) {\r\napply_extension(#r);\r\n#r=#r & ~0x3;\r\nPC=PC+#r;\r\n}"
+    ], 
+    [
+        "if ([!]cmp.gt(Ns.new,#-1))jump:<hint> #r9:2", 
+        ";\r\nif ([!](Ns.new>(-1))) {\r\napply_extension(#r);\r\n#r=#r & ~0x3;\r\nPC=PC+#r;\r\n}"
+    ], 
+    [
+        "if ([!]cmp.gt(Ns.new,#U5))jump:<hint> #r9:2", 
+        ";\r\nif ([!](Ns.new>(#U))) {\r\napply_extension(#r);\r\n#r=#r & ~0x3;\r\nPC=PC+#r;\r\n}"
+    ], 
+    [
+        "if ([!]cmp.gt(Ns.new,Rt))jump:<hint> #r9:2", 
+        ";\r\nif ([!](Ns.new>Rt)) {\r\napply_extension(#r);\r\n#r=#r & ~0x3;\r\nPC=PC+#r;\r\n}"
+    ], 
+    [
+        "if ([!]cmp.gt(Rt,Ns.new))jump:<hint> #r9:2", 
+        ";if ([!](Rt>Ns.new)) {\napply_extension(#r);\n#r=#r & ~0x3;\nPC=PC+#r;\n}"
+    ], 
+    [
+        "if ([!]cmp.gtu(Ns.new,#U5))jump:<hint> #r9:2", 
+        ";if ([!](Ns.new.uw[0]>(#U))) {\napply_extension(#r);\n#r=#r & ~0x3;\nPC=PC+#r;\n}"
+    ], 
+    [
+        "if ([!]cmp.gtu(Ns.new,Rt))jump:<hint> #r9:2", 
+        ";if ([!](Ns.new.uw[0]>Rt.uw[0])) {\napply_extension(#r);\n#r=#r & ~0x3;\nPC=PC+#r;\n}"
+    ], 
+    [
+        "if ([!]cmp.gtu(Rt,Ns.new))jump:<hint> #r9:2", 
+        ";if ([!](Rt.uw[0]>Ns.new.uw[0])) {\napply_extension(#r);\n#r=#r & ~0x3;\nPC=PC+#r;\n}"
+    ], 
+    [
+        "if ([!]tstbit(Ns.new,#0))jump:<hint> #r9:2", 
+        ";if ([!]((Ns.new) & 1)) {\napply_extension(#r);\n#r=#r & ~0x3;\nPC=PC+#r;\n}"
+    ], 
+    [
+        "memb(Re=#U6)=Nt.new", 
+        "apply_extension(#U);\r\nEA=#U;\r\n*EA = Nt.new&0xff;\r\nRe=#U;"
+    ], 
+    [
+        "memb(Rs+#s11:0)=Nt.new", 
+        "apply_extension(#s);\r\nEA=Rs+#s;\r\n*EA = Nt.new&0xff;"
+    ], 
+    [
+        "memb(Rs+Ru<<#u2)=Nt.new", 
+        "EA=Rs+(Ru<<#u);\r\n*EA = Nt.new&0xff;"
+    ], 
+    [
+        "memb(Ru<<#u2+#U6)=Nt.new", 
+        "apply_extension(#U);\r\nEA=#U+(Ru<<#u);\r\n*EA = Nt.new&0xff;"
+    ], 
+    [
+        "memb(Rx++#s4:0)=Nt.new", 
+        "EA=Rx;\r\nRx=Rx+#s;\r\n*EA = Nt.new&0xff;"
+    ], 
+    [
+        "memb(Rx++#s4:0:circ(Mu))=Nt.new", 
+        "EA=Rx;\r\nRx=Rx=circ_add(Rx,#s,MuV);\r\n*EA = Nt.new&0xff;"
+    ], 
+    [
+        "memb(Rx++I:circ(Mu))=Nt.new", 
+        "EA=Rx;\r\nRx=Rx=circ_add(Rx,I<<0,MuV);\r\n*EA = Nt.new&0xff;"
+    ], 
+    [
+        "memb(Rx++Mu)=Nt.new", 
+        "EA=Rx;\r\nRx=Rx+MuV;\r\n*EA = Nt.new&0xff;"
+    ], 
+    [
+        "memb(Rx++Mu:brev)=Nt.new", 
+        "EA=Rx.h[1] | brev(Rx.h[0]);\r\nRx=Rx+MuV;\r\n*EA = Nt.new&0xff;"
+    ], 
+    [
+        "memb(gp+#u16:0)=Nt.new", 
+        "apply_extension(#u);\r\nEA=(Constant_extended ? (0) : GP)+#u;\r\n*EA = Nt.new&0xff;"
+    ], 
+    [
+        "if ([!]Pv[.new])memb(#u6)=Nt.new", 
+        "apply_extension(#u);\r\nEA=#u;\r\nif ([!]Pv[.new][0]) {\r\n*EA = Nt[.new]&0xff;\r\n} else {\r\nNOP;\r\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])memb(Rs+#u6:0)=Nt.new", 
+        "apply_extension(#u);\r\nEA=Rs+#u;\r\nif ([!]Pv[.new][0]) {\r\n*EA = Nt[.new]&0xff;\r\n} else {\r\nNOP;\r\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])memb(Rs+Ru<<#u2)=Nt.new", 
+        "EA=Rs+(Ru<<#u);\r\nif ([!]Pv[.new][0]) {\r\n*EA = Nt[.new]&0xff;\r\n} else {\r\nNOP;\r\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])memb(Rx++#s4:0)=Nt.new", 
+        "EA=Rx;\r\nif ([!]Pv[.new][0]){\r\nRx=Rx+#s;\r\n*EA = Nt[.new]&0xff;\r\n} else {\r\nNOP;\r\n}"
+    ], 
+    [
+        "memh(Re=#U6)=Nt.new", 
+        "apply_extension(#U);\r\nEA=#U;\r\n*EA = Nt.new.h[0];\r\nRe=#U;"
+    ], 
+    [
+        "memh(Rs+#s11:1)=Nt.new", 
+        "apply_extension(#s);\r\nEA=Rs+#s;\r\n*EA = Nt.new.h[0];"
+    ], 
+    [
+        "memh(Rs+Ru<<#u2)=Nt.new", 
+        "EA=Rs+(Ru<<#u);\r\n*EA = Nt.new.h[0];"
+    ], 
+    [
+        "memh(Ru<<#u2+#U6)=Nt.new", 
+        "apply_extension(#U);\r\nEA=#U+(Ru<<#u);\r\n*EA = Nt.new.h[0];"
+    ], 
+    [
+        "memh(Rx++#s4:1)=Nt.new", 
+        "EA=Rx;\r\nRx=Rx+#s;\r\n*EA = Nt.new.h[0];"
+    ], 
+    [
+        "memh(Rx++#s4:1:circ(Mu))=Nt.new", 
+        "EA=Rx;\r\nRx=Rx=circ_add(Rx,#s,MuV);\r\n*EA = Nt.new.h[0];"
+    ], 
+    [
+        "memh(Rx++I:circ(Mu))=Nt.new", 
+        "EA=Rx;\r\nRx=Rx=circ_add(Rx,I<<1,MuV);\r\n*EA = Nt.new.h[0];"
+    ], 
+    [
+        "memh(Rx++Mu)=Nt.new", 
+        "EA=Rx;\r\nRx=Rx+MuV;\r\n*EA = Nt.new.h[0];"
+    ], 
+    [
+        "memh(Rx++Mu:brev)=Nt.new", 
+        "EA=Rx.h[1] | brev(Rx.h[0]);\r\nRx=Rx+MuV;\r\n*EA = Nt.new.h[0];"
+    ], 
+    [
+        "memh(gp+#u16:1)=Nt.new", 
+        "apply_extension(#u);\r\nEA=(Constant_extended ? (0) : GP)+#u;\r\n*EA = Nt.new.h[0];"
+    ], 
+    [
+        "if ([!]Pv[.new])memh(#u6)=Nt.new", 
+        "apply_extension(#u);\r\nEA=#u;\r\nif ([!]Pv[.new][0]) {\r\n*EA = Nt[.new].h[0];\r\n} else {\r\nNOP;\r\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])memh(Rs+#u6:1)=Nt.new", 
+        "apply_extension(#u);\r\nEA=Rs+#u;\r\nif ([!]Pv[.new][0]) {\r\n*EA = Nt[.new].h[0];\r\n} else {\r\nNOP;\r\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])memh(Rs+Ru<<#u2)=Nt.new", 
+        "EA=Rs+(Ru<<#u);\r\nif ([!]Pv[.new][0]) {\r\n*EA = Nt[.new].h[0];\r\n} else {\r\nNOP;\r\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])memh(Rx++#s4:1)=Nt.new", 
+        "EA=Rx;\r\nif ([!]Pv[.new][0]){\r\nRx=Rx+#s;\r\n*EA = Nt[.new].h[0];\r\n} else {\r\nNOP;\r\n}"
+    ], 
+    [
+        "memw(Re=#U6)=Nt.new", 
+        "apply_extension(#U);\r\nEA=#U;\r\n*EA = Nt.new;\r\nRe=#U;"
+    ], 
+    [
+        "memw(Rs+#s11:2)=Nt.new", 
+        "apply_extension(#s);\r\nEA=Rs+#s;\r\n*EA = Nt.new;"
+    ], 
+    [
+        "memw(Rs+Ru<<#u2)=Nt.new", 
+        "EA=Rs+(Ru<<#u);\r\n*EA = Nt.new;"
+    ], 
+    [
+        "memw(Ru<<#u2+#U6)=Nt.new", 
+        "apply_extension(#U);\r\nEA=#U+(Ru<<#u);\r\n*EA = Nt.new;"
+    ], 
+    [
+        "memw(Rx++#s4:2)=Nt.new", 
+        "EA=Rx;\r\nRx=Rx+#s;\r\n*EA = Nt.new;"
+    ], 
+    [
+        "memw(Rx++#s4:2:circ(Mu))=Nt.new", 
+        "EA=Rx;\r\nRx=Rx=circ_add(Rx,#s,MuV);\r\n*EA = Nt.new;"
+    ], 
+    [
+        "memw(Rx++I:circ(Mu))=Nt.new", 
+        "EA=Rx;\r\nRx=Rx=circ_add(Rx,I<<2,MuV);\r\n*EA = Nt.new;"
+    ], 
+    [
+        "memw(Rx++Mu)=Nt.new", 
+        "EA=Rx;\r\nRx=Rx+MuV;\r\n*EA = Nt.new;"
+    ], 
+    [
+        "memw(Rx++Mu:brev)=Nt.new", 
+        "EA=Rx.h[1] | brev(Rx.h[0]);\r\nRx=Rx+MuV;\r\n*EA = Nt.new;"
+    ], 
+    [
+        "memw(gp+#u16:2)=Nt.new", 
+        "apply_extension(#u);\r\nEA=(Constant_extended ? (0) : GP)+#u;\r\n*EA = Nt.new;"
+    ], 
+    [
+        "if ([!]Pv[.new])memw(#u6)=Nt.new", 
+        "apply_extension(#u);\r\nEA=#u;\r\nif ([!]Pv[.new][0]) {\r\n*EA = Nt[.new];\r\n} else {\r\nNOP;\r\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])memw(Rs+#u6:2)=Nt.new", 
+        "apply_extension(#u);\r\nEA=Rs+#u;\r\nif ([!]Pv[.new][0]) {\r\n*EA = Nt[.new];\r\n} else {\r\nNOP;\r\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])memw(Rs+Ru<<#u2)=Nt.new", 
+        "EA=Rs+(Ru<<#u);\r\nif ([!]Pv[.new][0]) {\r\n*EA = Nt[.new];\r\n} else {\r\nNOP;\r\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])memw(Rx++#s4:2)=Nt.new", 
+        "EA=Rx;\r\nif ([!]Pv[.new][0]){\r\nRx=Rx+#s;\r\n*EA = Nt[.new];\r\n} else {\r\nNOP;\r\n}"
+    ], 
+    [
+        "memd(Re=#U6)=Rtt", 
+        "apply_extension(#U);\nEA=#U;\n*EA = Rtt;\nRe=#U;"
+    ], 
+    [
+        "memd(Rs+#s11:3)=Rtt", 
+        "apply_extension(#s);\nEA=Rs+#s;\n*EA = Rtt;"
+    ], 
+    [
+        "memd(Rs+Ru<<#u2)=Rtt", 
+        "EA=Rs+(Ru<<#u);\n*EA = Rtt;"
+    ], 
+    [
+        "memd(Ru<<#u2+#U6)=Rtt", 
+        "apply_extension(#U);\nEA=#U+(Ru<<#u);\n*EA = Rtt;"
+    ], 
+    [
+        "memd(Rx++#s4:3)=Rtt", 
+        "EA=Rx;\nRx=Rx+#s;\n*EA = Rtt;"
+    ], 
+    [
+        "memd(Rx++#s4:3:circ(Mu))=Rtt", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,#s,MuV);\n*EA = Rtt;"
+    ], 
+    [
+        "memd(Rx++I:circ(Mu))=Rtt", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,I<<3,MuV);\n*EA = Rtt;"
+    ], 
+    [
+        "memd(Rx++Mu)=Rtt", 
+        "EA=Rx;\nRx=Rx+MuV;\n*EA = Rtt;"
+    ], 
+    [
+        "memd(Rx++Mu:brev)=Rtt", 
+        "EA=Rx.h[1] | brev(Rx.h[0]);\nRx=Rx+MuV;\n*EA = Rtt;"
+    ], 
+    [
+        "memd(gp+#u16:3)=Rtt", 
+        "apply_extension(#u);\nEA=(Constant_extended ? (0) : GP)+#u;\n*EA = Rtt;"
+    ], 
+    [
+        "if ([!]Pv[.new]) memd(#u6)=Rtt", 
+        "apply_extension(#u);\nEA=#u;\nif ([!]Pv[.new][0]) {\n*EA = Rtt;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])memd(Rs+#u6:3)=Rtt", 
+        "apply_extension(#u);EA=Rs+#u;\nif ([!]Pv[.new][0]) {\n*EA = Rtt;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])memd(Rs+Ru<<#u2)=Rtt", 
+        "EA=Rs+(Ru<<#u);if ([!]Pv[.new][0]) {\n*EA = Rtt;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])memd(Rx++#s4:3)=Rtt", 
+        "EA=Rx;if ([!]Pv[.new][0]){\nRx=Rx+#s;\n*EA = Rtt;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "memb(Re=#U6)=Rt", 
+        "apply_extension(#U);\nEA=#U;\n*EA = Rt&0xff;\nRe=#U;"
+    ], 
+    [
+        "memb(Rs+#s11:0)=Rt", 
+        "apply_extension(#s);\nEA=Rs+#s;\n*EA = Rt&0xff;"
+    ], 
+    [
+        "memb(Rs+#u6:0)=#S8", 
+        "EA=Rs+#u;\napply_extension(#S);\n*EA = #S;"
+    ], 
+    [
+        "memb(Rs+Ru<<#u2)=Rt", 
+        "EA=Rs+(Ru<<#u);\n*EA = Rt&0xff;"
+    ], 
+    [
+        "memb(Ru<<#u2+#U6)=Rt", 
+        "apply_extension(#U);\nEA=#U+(Ru<<#u);\n*EA = Rt&0xff;"
+    ], 
+    [
+        "memb(Rx++#s4:0)=Rt", 
+        "EA=Rx;\nRx=Rx+#s;\n*EA = Rt&0xff;"
+    ], 
+    [
+        "memb(Rx++#s4:0:circ(Mu))=Rt", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,#s,MuV);\n*EA = Rt&0xff;"
+    ], 
+    [
+        "memb(Rx++I:circ(Mu))=Rt", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,I<<0,MuV);\n*EA = Rt&0xff;"
+    ], 
+    [
+        "memb(Rx++Mu)=Rt", 
+        "EA=Rx;\nRx=Rx+MuV;\n*EA = Rt&0xff;"
+    ], 
+    [
+        "memb(Rx++Mu:brev)=Rt", 
+        "EA=Rx.h[1] | brev(Rx.h[0]);\nRx=Rx+MuV;\n*EA = Rt&0xff;"
+    ], 
+    [
+        "memb(gp+#u16:0)=Rt", 
+        "apply_extension(#u);\nEA=(Constant_extended ? (0) : GP)+#u;\n*EA = Rt&0xff;"
+    ], 
+    [
+        "if ([!]Pv[.new]) memb(#u6)=Rt", 
+        "apply_extension(#u);\nEA=#u;\nif ([!]Pv[.new][0]) {\n*EA = Rt&0xff;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])memb(Rs+#u6:0)=#S6", 
+        "EA=Rs+#u;if ([!]Pv[.new][0]){\napply_extension(#S);\n*EA = #S;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])memb(Rs+#u6:0)=Rt", 
+        "apply_extension(#u);EA=Rs+#u;\nif ([!]Pv[.new][0]) {\n*EA = Rt&0xff;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])memb(Rs+Ru<<#u2)=Rt", 
+        "EA=Rs+(Ru<<#u);if ([!]Pv[.new][0]) {\n*EA = Rt&0xff;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])memb(Rx++#s4:0)=Rt", 
+        "EA=Rx;if ([!]Pv[.new][0]){\nRx=Rx+#s;\n*EA = Rt&0xff;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "memh(Re=#U6)=Rt.H", 
+        "apply_extension(#U);\r\nEA=#U;\r\n*EA = Rt.h[1];\r\nRe=#U;"
+    ], 
+    [
+        "memh(Re=#U6)=Rt", 
+        "apply_extension(#U);\r\nEA=#U;\r\n*EA = Rt.h[0];\r\nRe=#U;"
+    ], 
+    [
+        "memh(Rs+#s11:1)=Rt.H", 
+        "apply_extension(#s);\r\nEA=Rs+#s;\r\n*EA = Rt.h[1];"
+    ], 
+    [
+        "memh(Rs+#s11:1)=Rt", 
+        "apply_extension(#s);\r\nEA=Rs+#s;\r\n*EA = Rt.h[0];"
+    ], 
+    [
+        "memh(Rs+#u6:1)=#S8", 
+        "EA=Rs+#u;\r\napply_extension(#S);\r\n*EA = #S;"
+    ], 
+    [
+        "memh(Rs+Ru<<#u2)=Rt.H", 
+        "EA=Rs+(Ru<<#u);\r\n*EA = Rt.h[1];"
+    ], 
+    [
+        "memh(Rs+Ru<<#u2)=Rt", 
+        "EA=Rs+(Ru<<#u);\r\n*EA = Rt.h[0];"
+    ], 
+    [
+        "memh(Ru<<#u2+#U6)=Rt.H", 
+        "apply_extension(#U);\r\nEA=#U+(Ru<<#u);\r\n*EA = Rt.h[1];"
+    ], 
+    [
+        "memh(Ru<<#u2+#U6)=Rt", 
+        "apply_extension(#U);\r\nEA=#U+(Ru<<#u);\r\n*EA = Rt.h[0];"
+    ], 
+    [
+        "memh(Rx++#s4:1)=Rt.H", 
+        "EA=Rx;\r\nRx=Rx+#s;\r\n*EA = Rt.h[1];"
+    ], 
+    [
+        "memh(Rx++#s4:1)=Rt", 
+        "EA=Rx;\r\nRx=Rx+#s;\r\n*EA = Rt.h[0];"
+    ], 
+    [
+        "memh(Rx++#s4:1:circ(Mu))=Rt.H", 
+        "EA=Rx;\r\nRx=Rx=circ_add(Rx,#s,MuV);\r\n*EA = Rt.h[1];"
+    ], 
+    [
+        "memh(Rx++#s4:1:circ(Mu))=Rt", 
+        "EA=Rx;\r\nRx=Rx=circ_add(Rx,#s,MuV);\r\n*EA = Rt.h[0];"
+    ], 
+    [
+        "memh(Rx++I:circ(Mu))=Rt.H", 
+        "EA=Rx;\r\nRx=Rx=circ_add(Rx,I<<1,MuV);\r\n*EA = Rt.h[1];"
+    ], 
+    [
+        "memh(Rx++I:circ(Mu))=Rt", 
+        "EA=Rx;\r\nRx=Rx=circ_add(Rx,I<<1,MuV);\r\n*EA = Rt.h[0];"
+    ], 
+    [
+        "memh(Rx++Mu)=Rt.H", 
+        "EA=Rx;\nRx=Rx+MuV;\n*EA = Rt.h[1];"
+    ], 
+    [
+        "memh(Rx++Mu)=Rt", 
+        "EA=Rx;\nRx=Rx+MuV;\n*EA = Rt.h[0];"
+    ], 
+    [
+        "memh(Rx++Mu:brev)=Rt.H", 
+        "EA=Rx.h[1] | brev(Rx.h[0]);\nRx=Rx+MuV;\n*EA = Rt.h[1];"
+    ], 
+    [
+        "memh(Rx++Mu:brev)=Rt", 
+        "EA=Rx.h[1] | brev(Rx.h[0]);\nRx=Rx+MuV;\n*EA = Rt.h[0];"
+    ], 
+    [
+        "memh(gp+#u16:1)=Rt.H", 
+        "apply_extension(#u);\nEA=(Constant_extended ? (0) : GP)+#u;\n*EA = Rt.h[1];"
+    ], 
+    [
+        "memh(gp+#u16:1)=Rt", 
+        "apply_extension(#u);\nEA=(Constant_extended ? (0) : GP)+#u;\n*EA = Rt.h[0];"
+    ], 
+    [
+        "if ([!]Pv[.new]) memh(#u6)=Rt.H", 
+        "apply_extension(#u);\r\nEA=#u;\r\nif ([!]Pv[.new][0]) {\r\n*EA = Rt.h[1];\r\n} else {\r\nNOP;\r\n}"
+    ], 
+    [
+        "if ([!]Pv[.new]) memh(#u6)=Rt", 
+        "apply_extension(#u);\r\nEA=#u;\r\nif ([!]Pv[.new][0]) {\r\n*EA = Rt.h[0];\r\n} else {\r\nNOP;\r\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])memh(Rs+#u6:1)=#S6", 
+        "EA=Rs+#u;\r\nif ([!]Pv[.new][0]){\r\napply_extension(#S);\r\n*EA = #S;\r\n} else {\r\nNOP;\r\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])memh(Rs+#u6:1)=Rt.H", 
+        "apply_extension(#u);\r\nEA=Rs+#u;\r\nif ([!]Pv[.new][0]) {\r\n*EA = Rt.h[1];\r\n} else {\r\nNOP;\r\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])memh(Rs+#u6:1)=Rt", 
+        "apply_extension(#u);\r\nEA=Rs+#u;\r\nif ([!]Pv[.new][0]) {\r\n*EA = Rt.h[0];\r\n} else {\r\nNOP;\r\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])memh(Rs+Ru<<#u2)=Rt.H", 
+        "EA=Rs+(Ru<<#u);\r\nif ([!]Pv[.new][0]) {\r\n*EA = Rt.h[1];\r\n} else {\r\nNOP;\r\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])memh(Rs+Ru<<#u2)=Rt", 
+        "EA=Rs+(Ru<<#u);\r\nif ([!]Pv[.new][0]) {\r\n*EA = Rt.h[0];\r\n} else {\r\nNOP;\r\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])memh(Rx++#s4:1)=Rt.H", 
+        "EA=Rx;if ([!]Pv[.new][0]){\nRx=Rx+#s;\n*EA = Rt.h[1];\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])memh(Rx++#s4:1)=Rt", 
+        "EA=Rx;if ([!]Pv[.new][0]){\nRx=Rx+#s;\n*EA = Rt.h[0];\n} else {\nNOP;\n}"
+    ], 
+    [
+        "memw(Re=#U6)=Rt", 
+        "apply_extension(#U);\nEA=#U;\n*EA = Rt;\nRe=#U;"
+    ], 
+    [
+        "memw(Rs+#s11:2)=Rt", 
+        "apply_extension(#s);\nEA=Rs+#s;\n*EA = Rt;"
+    ], 
+    [
+        "memw(Rs+#u6:2)=#S8", 
+        "EA=Rs+#u;\napply_extension(#S);\n*EA = #S;"
+    ], 
+    [
+        "memw(Rs+Ru<<#u2)=Rt", 
+        "EA=Rs+(Ru<<#u);\n*EA = Rt;"
+    ], 
+    [
+        "memw(Ru<<#u2+#U6)=Rt", 
+        "apply_extension(#U);\nEA=#U+(Ru<<#u);\n*EA = Rt;"
+    ], 
+    [
+        "memw(Rx++#s4:2)=Rt", 
+        "EA=Rx;\nRx=Rx+#s;\n*EA = Rt;"
+    ], 
+    [
+        "memw(Rx++#s4:2:circ(Mu))=Rt", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,#s,MuV);\n*EA = Rt;"
+    ], 
+    [
+        "memw(Rx++I:circ(Mu))=Rt", 
+        "EA=Rx;\nRx=Rx=circ_add(Rx,I<<2,MuV);\n*EA = Rt;"
+    ], 
+    [
+        "memw(Rx++Mu)=Rt", 
+        "EA=Rx;\nRx=Rx+MuV;\n*EA = Rt;"
+    ], 
+    [
+        "memw(Rx++Mu:brev)=Rt", 
+        "EA=Rx.h[1] | brev(Rx.h[0]);\nRx=Rx+MuV;\n*EA = Rt;"
+    ], 
+    [
+        "memw(gp+#u16:2)=Rt", 
+        "apply_extension(#u);\nEA=(Constant_extended ? (0) : GP)+#u;\n*EA = Rt;"
+    ], 
+    [
+        "if ([!]Pv[.new]) memw(#u6)=Rt", 
+        "apply_extension(#u);\nEA=#u;\nif ([!]Pv[.new][0]) {\n*EA = Rt;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])memw(Rs+#u6:2)=#S6", 
+        "EA=Rs+#u;if ([!]Pv[.new][0]){\napply_extension(#S);\n*EA = #S;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])memw(Rs+#u6:2)=Rt", 
+        "apply_extension(#u);EA=Rs+#u;\nif ([!]Pv[.new][0]) {\n*EA = Rt;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])memw(Rs+Ru<<#u2)=Rt", 
+        "EA=Rs+(Ru<<#u);if ([!]Pv[.new][0]) {\n*EA = Rt;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "if ([!]Pv[.new])memw(Rx++#s4:2)=Rt", 
+        "EA=Rx;if ([!]Pv[.new][0]){\nRx=Rx+#s;\n*EA = Rt;\n} else {\nNOP;\n}"
+    ], 
+    [
+        "allocframe(#u11:3)", 
+        "Assembler mapped to:\r\n\"allocframe(r29,#u11:3):raw\""
+    ], 
+    [
+        "allocframe(Rx,#u11:3):raw", 
+        "EA=Rx+-8;\r\n*EA = frame_scramble((LR << 32) | FP);\r\nFP=EA;\r\nframe_check_limit(EA-#u);\r\nRx = EA-#u;"
+    ], 
+    [
+        "Gd=Rs", 
+        "Gd=Rs;"
+    ], 
+    [
+        "Gdd=Rss", 
+        "Gdd=Rss;"
+    ], 
+    [
+        "Rd=Gs", 
+        "Rd=Gs;"
+    ], 
+    [
+        "Rdd=Gss", 
+        "Rdd=Gss;"
+    ], 
+    [
+        "ciad(Rs)", 
+        "IAD &= ~Rs;"
+    ], 
+    [
+        "crswap(Rx,sgp)", 
+        "Assembler mapped to: \"crswap(Rx,sgp0)\""
+    ], 
+    [
+        "crswap(Rx,sgp0)", 
+        "tmp = Rx;\nRx = SGP0;\nSGP0 = tmp;"
+    ], 
+    [
+        "crswap(Rx,sgp1)", 
+        "tmp = Rx;\nRx = SGP1;\nSGP1 = tmp;"
+    ], 
+    [
+        "crswap(Rxx,sgp1:0)", 
+        "tmp = Rxx;\nRxx=SGP;\nSGP = tmp;"
+    ], 
+    [
+        "cswi(Rs)", 
+        "IPEND &= ~Rs;"
+    ], 
+    [
+        "dckill", 
+        "dcache_inv_all();"
+    ], 
+    [
+        "Rd=dctagr(Rs)", 
+        "dcache_tag_read(Rs);"
+    ], 
+    [
+        "dccleanidx(Rs)", 
+        "dcache_clean_idx(Rs);"
+    ], 
+    [
+        "dccleaninvidx(Rs)", 
+        "dcache_clean_idx(Rs);\r\ndcache_inv_idx(Rs);"
+    ], 
+    [
+        "dcinvidx(Rs)", 
+        "dcache_inv_idx(Rs);"
+    ], 
+    [
+        "dctagw(Rs,Rt)", 
+        "dcache_tag_write(Rs,Rt);"
+    ], 
+    [
+        "Rd=getimask(Rs)", 
+        "Rd=IMASK[Rs&0x7];"
+    ], 
+    [
+        "k0lock", 
+        "if (can_aquire_k0_lock) {\nSYSCFG.K0LOCK = 1;\n} else {\nsleep_until_available;\n}"
+    ], 
+    [
+        "tlblock", 
+        "if (can_aquire_tlb_lock) {\nSYSCFG.TLBLOCK = 1;\n} else {\nsleep_until_available;\n}"
+    ], 
+    [
+        "k0unlock", 
+        "SYSCFG.K0LOCK = 0;"
+    ], 
+    [
+        "tlbunlock", 
+        "SYSCFG.TLBLOCK = 0;"
+    ], 
+    [
+        "Rd=iassignr(Rs)", 
+        "Rd=IASSIGNR(Rs);"
+    ], 
+    [
+        "iassignw(Rs)", 
+        "IASSIGNW(Rs);"
+    ], 
+    [
+        "Rd=icdatar(Rs)", 
+        "icache_data_read(Rs);"
+    ], 
+    [
+        "Rd=ictagr(Rs)", 
+        "icache_tag_read(Rs);"
+    ], 
+    [
+        "icinvidx(Rs)", 
+        "icache_inv_idx(Rs);"
+    ], 
+    [
+        "ickill", 
+        "icache_inv_all();"
+    ], 
+    [
+        "ictagw(Rs,Rt)", 
+        "icache_tag_write(Rs,Rt);"
+    ], 
+    [
+        "l2cleanidx(Rs)", 
+        "l2cache_clean_idx(Rs);"
+    ], 
+    [
+        "l2cleaninvidx(Rs)", 
+        "l2cache_clean_invalidate_idx(Rs);"
+    ], 
+    [
+        "l2invidx(Rs)", 
+        "l2cache_inv_idx(Rs);"
+    ], 
+    [
+        "l2gclean", 
+        "l2cache_global_clean();"
+    ], 
+    [
+        "l2gclean(Rtt)", 
+        "l2cache_global_clean_range(Rtt);"
+    ], 
+    [
+        "l2gcleaninv", 
+        "l2cache_global_clean_inv();"
+    ], 
+    [
+        "l2gcleaninv(Rtt)", 
+        "l2cache_global_clean_inv_range(Rtt);"
+    ], 
+    [
+        "l2gunlock", 
+        "l2cache_global_unlock();"
+    ], 
+    [
+        "l2kill", 
+        "l2cache_inv_all();"
+    ], 
+    [
+        "Pd=l2locka(Rs)", 
+        "EA=Rs;\nPd=l2locka(EA);"
+    ], 
+    [
+        "l2unlocka(Rs)", 
+        "EA=Rs;\nl2unlocka(EA);"
+    ], 
+    [
+        "Rd=l2tagr(Rs)", 
+        "l2cache_tag_read(Rs);"
+    ], 
+    [
+        "l2tagw(Rs,Rt)", 
+        "l2cache_tag_write(Rs,Rt);"
+    ], 
+    [
+        "Rd=memw_phys(Rs,Rt)", 
+        "Rd = *((Rs&0x7ff) | (Rt<<11));"
+    ], 
+    [
+        "nmi(Rs)", 
+        "Raise NMI on threads;"
+    ], 
+    [
+        "resume(Rs)", 
+        "resume(Rs);"
+    ], 
+    [
+        "rte", 
+        "SSR.SSR_EX = 0;\nPC=ELR;"
+    ], 
+    [
+        "setimask(Pt,Rs)", 
+        "PREDUSE_TIMING;\nIMASK[Pt&0x7]=Rs;"
+    ], 
+    [
+        "siad(Rs)", 
+        "IAD |= Rs;"
+    ], 
+    [
+        "start(Rs)", 
+        "start(Rs);"
+    ], 
+    [
+        "stop(Rs)", 
+        "if (!in_debug_mode) modectl[TNUM] = 0;\n;"
+    ], 
+    [
+        "swi(Rs)", 
+        "IPEND |= Rs;"
+    ], 
+    [
+        "Rd=ctlbw(Rss,Rt)", 
+        "if (CHECK_TLB_OVERLAP((1LL<<63) | Rss)) {\r\nRd=GET_OVERLAPPING_IDX((1LL<<63) | Rss);\r\n} else {\r\nTLB[Rt] = Rss;\r\nRd=0x80000000;\r\n}"
+    ], 
+    [
+        "Rd=tlboc(Rss)", 
+        "if (CHECK_TLB_OVERLAP((1LL<<63) | Rss)) {\r\nRd=GET_OVERLAPPING_IDX((1LL<<63) | Rss);\r\n} else {\r\nRd=0x80000000;\r\n}"
+    ], 
+    [
+        "Rd=tlbp(Rs)", 
+        "Rd=search_TLB(Rs);"
+    ], 
+    [
+        "Rdd=tlbr(Rs)", 
+        "Rdd = TLB[Rs];"
+    ], 
+    [
+        "tlbinvasid(Rs)", 
+        "for (i = 0; i < NUM_TLB_ENTRIES; i++) {\nif ((TLB[i].PTE_G == 0) && (TLB[i].PTE_ASID\n== Rs[26:20])) {\nTLB[i] = TLB[i] & ~(1ULL << 63);\n}\n}"
+    ], 
+    [
+        "tlbw(Rss,Rt)", 
+        "TLB[Rt] = Rss;"
+    ], 
+    [
+        "Rd=Ss", 
+        "Rd=Ss;"
+    ], 
+    [
+        "Rdd=Sss", 
+        "Rdd=Sss;"
+    ], 
+    [
+        "Sd=Rs", 
+        "Sd=Rs;"
+    ], 
+    [
+        "Sdd=Rss", 
+        "Sdd=Rss;"
+    ], 
+    [
+        "Rd=memw_locked(Rs)", 
+        "EA=Rs;\nRd = *EA;"
+    ], 
+    [
+        "Rdd=memd_locked(Rs)", 
+        "EA=Rs;\nRdd = *EA;"
+    ], 
+    [
+        "memd_locked(Rs,Pd)=Rtt", 
+        "EA=Rs;\nif (lock_valid) {\n*EA = Rtt;\nPd = 0xff;\nlock_valid = 0;\n} else {\nPd = 0;\n}"
+    ], 
+    [
+        "memw_locked(Rs,Pd)=Rt", 
+        "EA=Rs;\nif (lock_valid) {\n*EA = Rt;\nPd = 0xff;\nlock_valid = 0;\n} else {\nPd = 0;\n}"
+    ], 
+    [
+        "dczeroa(Rs)", 
+        "EA=Rs;\ndcache_zero_addr(EA);"
+    ], 
+    [
+        "barrier", 
+        "memory_barrier;"
+    ], 
+    [
+        "brkpt", 
+        "Enter Debug mode;"
+    ], 
+    [
+        "dcfetch(Rs)", 
+        "Assembler mapped to: \"dcfetch(Rs+#0)\""
+    ], 
+    [
+        "dcfetch(Rs+#u11:3)", 
+        "EA=Rs+#u;\ndcache_fetch(EA);"
+    ], 
+    [
+        "dccleana(Rs)", 
+        "EA=Rs;\ndcache_clean_addr(EA);"
+    ], 
+    [
+        "dccleaninva(Rs)", 
+        "EA=Rs;\ndcache_cleaninv_addr(EA);"
+    ], 
+    [
+        "dcinva(Rs)", 
+        "EA=Rs;\ndcache_cleaninv_addr(EA);"
+    ], 
+    [
+        "icinva(Rs)", 
+        "EA=Rs;\nicache_inv_addr(EA);"
+    ], 
+    [
+        "isync", 
+        "instruction_sync;"
+    ], 
+    [
+        "l2fetch(Rs,Rt)", 
+        "l2fetch(Rs,INFO);"
+    ], 
+    [
+        "l2fetch(Rs,Rtt)", 
+        "l2fetch(Rs,INFO);"
+    ], 
+    [
+        "pause(#u8)", 
+        "Pause for #u cycles;"
+    ], 
+    [
+        "syncht", 
+        "memory_synch;"
+    ], 
+    [
+        "trace(Rs)", 
+        "Send value to ETM trace;"
+    ], 
+    [
+        "trap0(#u8)", 
+        "SSR.CAUSE = #u;\nTRAP \"0\";"
+    ], 
+    [
+        "trap1(#u8)", 
+        "Assembler mapped to: \"trap1(R0,#u8)\""
+    ], 
+    [
+        "trap1(Rx,#u8)", 
+        "if (!can_handle_trap1_virtinsn(#u)) {\nSSR.CAUSE = #u;\nTRAP \"1\";\n} else if (#u == 1) {\nVMRTE;\n} else if (#u == 3) {\nVMSETIE;\n} else if (#u == 4) {\nVMGETIE;\n} else if (#u == 6) {\nVMSPSWAP;"
+    ], 
+    [
+        "wait(Rs)", 
+        "if (!in_debug_mode) modectl[(TNUM+16)] = 1;\n;"
+    ], 
+    [
+        "Rdd=abs(Rss)", 
+        "Rdd = ABS(Rss);"
+    ], 
+    [
+        "Rd=abs(Rs)[:sat]", 
+        "Rd = [sat_32](ABS(sxt32->64(Rs)));"
+    ], 
+    [
+        "Rd=add(Rs,add(Ru,#s6))", 
+        "Rd = Rs + Ru + apply_extension(#s);"
+    ], 
+    [
+        "Rd=add(Rs,sub(#s6,Ru))", 
+        "Rd = Rs - Ru + apply_extension(#s);"
+    ], 
+    [
+        "Rx+=add(Rs,#s8)", 
+        "apply_extension(#s);\nRx=Rx + Rs + #s;"
+    ], 
+    [
+        "Rx+=add(Rs,Rt)", 
+        "Rx=Rx + Rs + Rt;"
+    ], 
+    [
+        "Rx-=add(Rs,#s8)", 
+        "apply_extension(#s);\nRx=Rx - (Rs + #s);"
+    ], 
+    [
+        "Rx-=add(Rs,Rt)", 
+        "Rx=Rx - (Rs + Rt);"
+    ], 
+    [
+        "Rd=add(Rs,Rt):sat:deprecated", 
+        "Rd=sat_32(Rs+Rt);"
+    ], 
+    [
+        "Rdd=add(Rs,Rtt)", 
+        "if (\"Rs & 1\") {\r\nAssembler mapped to:\r\n\"Rdd=add(Rss,Rtt):raw:hi\";\r\n} else {\r\nAssembler mapped to:\r\n\"Rdd=add(Rss,Rtt):raw:lo\";\r\n}"
+    ], 
+    [
+        "Rdd=add(Rss,Rtt)", 
+        "Rdd=Rss+Rtt;"
+    ], 
+    [
+        "Rdd=add(Rss,Rtt):raw:hi", 
+        "Rdd=Rtt+sxt32->64(Rss.w[1]);"
+    ], 
+    [
+        "Rdd=add(Rss,Rtt):raw:lo", 
+        "Rdd=Rtt+sxt32->64(Rss.w[0]);"
+    ], 
+    [
+        "Rdd=add(Rss,Rtt):sat", 
+        "Rdd=sat64(Rss+Rtt);"
+    ], 
+    [
+        "Rd=add(Rt.L,Rs.[HL])[:sat]", 
+        "Rd=[sat_16](Rt.h[0]+Rs.h[01]);"
+    ], 
+    [
+        "Rd=add(Rt.[HL],Rs.[HL])[:sat]:<<16", 
+        "Rd=([sat_16](Rt.h[01]+Rs.h[01]))<<16;"
+    ], 
+    [
+        "Rdd=add(Rss,Rtt,Px):carry", 
+        "PREDUSE_TIMING;\nRdd = Rss + Rtt + Px[0];\nPx = carry_from_add(Rss,Rtt,Px[0]) ? 0xff : 0x00;"
+    ], 
+    [
+        "Rdd=sub(Rss,Rtt,Px):carry", 
+        "PREDUSE_TIMING;\nRdd = Rss + ~Rtt + Px[0];\nPx = carry_from_add(Rss,~Rtt,Px[0]) ? 0xff : 0x00;"
+    ], 
+    [
+        "Rdd=and(Rss,Rtt)", 
+        "Rdd=Rss&Rtt;"
+    ], 
+    [
+        "Rdd=and(Rtt,~Rss)", 
+        "Rdd = (Rtt & ~Rss);"
+    ], 
+    [
+        "Rdd=not(Rss)", 
+        "Rdd=~Rss;"
+    ], 
+    [
+        "Rdd=or(Rss,Rtt)", 
+        "Rdd=Rss|Rtt;"
+    ], 
+    [
+        "Rdd=or(Rtt,~Rss)", 
+        "Rdd = (Rtt | ~Rss);"
+    ], 
+    [
+        "Rdd=xor(Rss,Rtt)", 
+        "Rdd=Rss^Rtt;"
+    ], 
+    [
+        "Rxx^=xor(Rss,Rtt)", 
+        "Rxx^=Rss^Rtt;"
+    ], 
+    [
+        "Rx=or(Ru,and(Rx,#s10))", 
+        "Rx = Ru | (Rx & apply_extension(#s));"
+    ], 
+    [
+        "Rx[&|^]=and(Rs,Rt)", 
+        "Rx [|&^]= (Rs [|&^] Rt);"
+    ], 
+    [
+        "Rx[&|^]=and(Rs,~Rt)", 
+        "Rx [|&^]= (Rs [|&^] ~Rt);"
+    ], 
+    [
+        "Rx[&|^]=or(Rs,Rt)", 
+        "Rx [|&^]= (Rs [|&^] Rt);"
+    ], 
+    [
+        "Rx[&|^]=xor(Rs,Rt)", 
+        "Rx[|&^]=Rs[|&^]Rt;"
+    ], 
+    [
+        "Rx|=and(Rs,#s10)", 
+        "Rx = Rx | (Rs & apply_extension(#s));"
+    ], 
+    [
+        "Rx|=or(Rs,#s10)", 
+        "Rx = Rx | (Rs | apply_extension(#s));"
+    ], 
+    [
+        "Rd=max(Rs,Rt)", 
+        "Rd = max(Rs,Rt);"
+    ], 
+    [
+        "Rd=maxu(Rs,Rt)", 
+        "Rd = max(Rs.uw[0],Rt.uw[0]);"
+    ], 
+    [
+        "Rdd=max(Rss,Rtt)", 
+        "Rdd = max(Rss,Rtt);"
+    ], 
+    [
+        "Rdd=maxu(Rss,Rtt)", 
+        "Rdd = max(Rss.u64,Rtt.u64);"
+    ], 
+    [
+        "Rd=min(Rt,Rs)", 
+        "Rd = min(Rt,Rs);"
+    ], 
+    [
+        "Rd=minu(Rt,Rs)", 
+        "Rd = min(Rt.uw[0],Rs.uw[0]);"
+    ], 
+    [
+        "Rdd=min(Rtt,Rss)", 
+        "Rdd = min(Rtt,Rss);"
+    ], 
+    [
+        "Rdd=minu(Rtt,Rss)", 
+        "Rdd = min(Rtt.u64,Rss.u64);"
+    ], 
+    [
+        "Rd=modwrap(Rs,Rt)", 
+        "if (Rs < 0) {\nRd = Rs + Rt.uw[0];\n} else if (Rs.uw[0] >= Rt.uw[0]) {\nRd = Rs - Rt.uw[0];\n} else {\nRd = Rs;\n}"
+    ], 
+    [
+        "Rd=neg(Rs):sat", 
+        "Rd = sat_32(-Rs.s64);"
+    ], 
+    [
+        "Rdd=neg(Rss)", 
+        "Rdd = -Rss;"
+    ], 
+    [
+        "Rd=cround(Rs,#u5)", 
+        "Rd = (#u==0)?Rs:convround(Rs,2**(#u-1))>>#u;"
+    ], 
+    [
+        "Rd=cround(Rs,Rt)", 
+        "Rd = (zxt5->32(Rt)==0)?Rs:convround(Rs,2**(zxt5->32(Rt)-\r\n1))>>zxt5->32(Rt);"
+    ], 
+    [
+        "Rd=round(Rs,#u5)[:sat]", 
+        "Rd = ([sat_32]((#u==0)?(Rs):round(Rs,2**(#u-1))))>>#u;"
+    ], 
+    [
+        "Rd=round(Rs,Rt)[:sat]", 
+        "Rd = ([sat_32]((zxt5-\r\n>32(Rt)==0)?(Rs):round(Rs,2**(zxt5->32(Rt)-1))))>>zxt5-\r\n>32(Rt);"
+    ], 
+    [
+        "Rd=round(Rss):sat", 
+        "tmp=sat64(Rss+0x080000000ULL);\r\nRd = tmp.w[1];"
+    ], 
+    [
+        "Rd=sub(Rt,Rs):sat:deprecated", 
+        "Rd=sat_32(Rt - Rs);"
+    ], 
+    [
+        "Rdd=sub(Rtt,Rss)", 
+        "Rdd=Rtt-Rss;"
+    ], 
+    [
+        "Rx+=sub(Rt,Rs)", 
+        "Rx=Rx + Rt - Rs;"
+    ], 
+    [
+        "Rd=sub(Rt.L,Rs.[HL])[:sat]", 
+        "Rd=[sat_16](Rt.h[0]-Rs.h[01]);"
+    ], 
+    [
+        "Rd=sub(Rt.[HL],Rs.[HL])[:sat]:<<16", 
+        "Rd=([sat_16](Rt.h[01]-Rs.h[01]))<<16;"
+    ], 
+    [
+        "Rdd=sxtw(Rs)", 
+        "Rdd = sxt32->64(Rs);"
+    ], 
+    [
+        "Rdd=vabsh(Rss)", 
+        "for (i=0;i<4;i++) {\nRdd.h[i]=ABS(Rss.h[i]);\n}"
+    ], 
+    [
+        "Rdd=vabsh(Rss):sat", 
+        "for (i=0;i<4;i++) {\nRdd.h[i]=sat_16(ABS(Rss.h[i]));\n}"
+    ], 
+    [
+        "Rdd=vabsw(Rss)", 
+        "for (i=0;i<2;i++) {\nRdd.w[i]=ABS(Rss.w[i]);\n}"
+    ], 
+    [
+        "Rdd=vabsw(Rss):sat", 
+        "for (i=0;i<2;i++) {\nRdd.w[i]=sat_32(ABS(Rss.w[i]));\n}"
+    ], 
+    [
+        "Rdd=vabsdiffb(Rtt,Rss)", 
+        "for (i=0;i<8;i++) {\nRdd.b[i]=ABS(Rtt.b[i] - Rss.b[i]);\n}"
+    ], 
+    [
+        "Rdd=vabsdiffub(Rtt,Rss)", 
+        "for (i=0;i<8;i++) {\nRdd.b[i]=ABS(Rtt.ub[i] - Rss.ub[i]);\n}"
+    ], 
+    [
+        "Rdd=vabsdiffh(Rtt,Rss)", 
+        "for (i=0;i<4;i++) {\nRdd.h[i]=ABS(Rtt.h[i] - Rss.h[i]);\n}"
+    ], 
+    [
+        "Rdd=vabsdiffw(Rtt,Rss)", 
+        "for (i=0;i<2;i++) {\nRdd.w[i]=ABS(Rtt.w[i] - Rss.w[i]);\n}"
+    ], 
+    [
+        "Rxx,Pe=vacsh(Rss,Rtt)", 
+        "for (i = 0; i < 4; i++) {\nxv = (int) Rxx.h[i];\nsv = (int) Rss.h[i];\ntv = (int) Rtt.h[i];\nxv = xv + tv;\nsv = sv - tv;\nPe.i*2 = (xv > sv);\nPe.i*2+1 = (xv > sv);\nRxx.h[i]=sat_16(max(xv,sv));\n}"
+    ], 
+    [
+        "Rdd=vaddh(Rss,Rtt)[:sat]", 
+        "for (i=0;i<4;i++) {\nRdd.h[i]=[sat_16](Rss.h[i]+Rtt.h[i]);\n}"
+    ], 
+    [
+        "Rdd=vadduh(Rss,Rtt):sat", 
+        "for (i=0;i<4;i++) {\nRdd.h[i]=usat_16(Rss.uh[i]+Rtt.uh[i]);\n}"
+    ], 
+    [
+        "Rd=vaddhub(Rss,Rtt):sat", 
+        "for (i=0;i<4;i++) {\nRd.b[i]=usat_8(Rss.h[i]+Rtt.h[i]);\n}"
+    ], 
+    [
+        "Rdd=vraddub(Rss,Rtt)", 
+        "Rdd = 0;\nfor (i=0;i<4;i++) {\nRdd.w[0]=(Rdd.w[0] + (Rss.ub[i]+Rtt.ub[i]));\n}\nfor (i=4;i<8;i++) {\nRdd.w[1]=(Rdd.w[1] + (Rss.ub[i]+Rtt.ub[i]));\n}"
+    ], 
+    [
+        "Rxx+=vraddub(Rss,Rtt)", 
+        "for (i = 0; i < 4; i++) {\nRxx.w[0]=(Rxx.w[0] + (Rss.ub[i]+Rtt.ub[i]));\n}\nfor (i = 4; i < 8; i++) {\nRxx.w[1]=(Rxx.w[1] + (Rss.ub[i]+Rtt.ub[i]));\n}"
+    ], 
+    [
+        "Rd=vraddh(Rss,Rtt)", 
+        "Rd = 0;\nfor (i=0;i<4;i++) {\nRd += (Rss.h[i]+Rtt.h[i]);\n}"
+    ], 
+    [
+        "Rd=vradduh(Rss,Rtt)", 
+        "Rd = 0;\nfor (i=0;i<4;i++) {\nRd += (Rss.uh[i]+Rtt.uh[i]);\n}"
+    ], 
+    [
+        "Rdd=vaddb(Rss,Rtt)", 
+        "Assembler mapped to: \"Rdd=vaddub(Rss,Rtt)\""
+    ], 
+    [
+        "Rdd=vaddub(Rss,Rtt)[:sat]", 
+        "for (i = 0; i < 8; i++) {\nRdd.b[i]=[usat_8](Rss.ub[i]+Rtt.ub[i]);\n}"
+    ], 
+    [
+        "Rdd=vaddw(Rss,Rtt)[:sat]", 
+        "for (i=0;i<2;i++) {\nRdd.w[i]=[sat_32](Rss.w[i]+Rtt.w[i]);\n}"
+    ], 
+    [
+        "Rdd=vavgh(Rss,Rtt)", 
+        "for (i=0;i<4;i++) {\r\nRdd.h[i]=(Rss.h[i]+Rtt.h[i])>>1;\r\n}"
+    ], 
+    [
+        "Rdd=vavgh(Rss,Rtt):crnd", 
+        "for (i=0;i<4;i++) {\r\nRdd.h[i]=convround(Rss.h[i]+Rtt.h[i])>>1;\r\n}"
+    ], 
+    [
+        "Rdd=vavgh(Rss,Rtt):rnd", 
+        "for (i=0;i<4;i++) {\r\nRdd.h[i]=(Rss.h[i]+Rtt.h[i]+1)>>1;\r\n}"
+    ], 
+    [
+        "Rdd=vavguh(Rss,Rtt)", 
+        "for (i=0;i<4;i++) {\r\nRdd.h[i]=(Rss.uh[i]+Rtt.uh[i])>>1;\r\n}"
+    ], 
+    [
+        "Rdd=vavguh(Rss,Rtt):rnd", 
+        "for (i=0;i<4;i++) {\r\nRdd.h[i]=(Rss.uh[i]+Rtt.uh[i]+1)>>1;\r\n}"
+    ], 
+    [
+        "Rdd=vnavgh(Rtt,Rss)", 
+        "for (i=0;i<4;i++) {\r\nRdd.h[i]=(Rtt.h[i]-Rss.h[i])>>1;\r\n}"
+    ], 
+    [
+        "Rdd=vnavgh(Rtt,Rss):crnd:sat", 
+        "for (i=0;i<4;i++) {\r\nRdd.h[i]=sat_16(convround(Rtt.h[i]-\r\nRss.h[i])>>1);\r\n}"
+    ], 
+    [
+        "Rdd=vnavgh(Rtt,Rss):rnd:sat", 
+        "for (i=0;i<4;i++) {\r\nRdd.h[i]=sat_16((Rtt.h[i]-Rss.h[i]+1)>>1);\r\n}"
+    ], 
+    [
+        "Rdd=vavgub(Rss,Rtt)", 
+        "for (i = 0; i < 8; i++) {\nRdd.b[i]=((Rss.ub[i] + Rtt.ub[i])>>1);\n}"
+    ], 
+    [
+        "Rdd=vavgub(Rss,Rtt):rnd", 
+        "for (i = 0; i < 8; i++) {\nRdd.b[i]=((Rss.ub[i]+Rtt.ub[i]+1)>>1);\n}"
+    ], 
+    [
+        "Rdd=vavguw(Rss,Rtt)[:rnd]", 
+        "for (i=0;i<2;i++) {\r\nRdd.w[i]=(zxt32->33(Rss.uw[i])+zxt32-\r\n>33(Rtt.uw[i])+1)>>1;\r\n}"
+    ], 
+    [
+        "Rdd=vavgw(Rss,Rtt):crnd", 
+        "for (i=0;i<2;i++) {\r\nRdd.w[i]=(convround(sxt32->33(Rss.w[i])+sxt32-\r\n>33(Rtt.w[i]))>>1);\r\n}"
+    ], 
+    [
+        "Rdd=vavgw(Rss,Rtt)[:rnd]", 
+        "for (i=0;i<2;i++) {\r\nRdd.w[i]=(sxt32->33(Rss.w[i])+sxt32-\r\n>33(Rtt.w[i])+1)>>1;\r\n}"
+    ], 
+    [
+        "Rdd=vnavgw(Rtt,Rss)", 
+        "for (i=0;i<2;i++) {\r\nRdd.w[i]=(sxt32->33(Rtt.w[i])-sxt32-\r\n>33(Rss.w[i]))>>1;\r\n}"
+    ], 
+    [
+        "Rdd=vnavgw(Rtt,Rss):crnd:sat", 
+        "for (i=0;i<2;i++) {\r\nRdd.w[i]=sat_32(convround(sxt32->33(Rtt.w[i])-\r\nsxt32->33(Rss.w[i]))>>1);\r\n}"
+    ], 
+    [
+        "Rdd=vnavgw(Rtt,Rss):rnd:sat", 
+        "for (i=0;i<2;i++) {\r\nRdd.w[i]=sat_32((sxt32->33(Rtt.w[i])-sxt32-\r\n>33(Rss.w[i])+1)>>1);\r\n}"
+    ], 
+    [
+        "Rdd=vcnegh(Rss,Rt)", 
+        "for (i = 0; i < 4; i++) {\nif (Rt.i) {\nRdd.h[i]=sat_16(-Rss.h[i]);\n} else {\nRdd.h[i]=Rss.h[i];\n}\n}"
+    ], 
+    [
+        "Rxx+=vrcnegh(Rss,Rt)", 
+        "for (i = 0; i < 4; i++) {\nif (Rt.i) {\nRxx += -Rss.h[i];\n} else {\nRxx += Rss.h[i];\n}\n}"
+    ], 
+    [
+        "Rdd=vmaxb(Rtt,Rss)", 
+        "for (i = 0; i < 8; i++) {\nRdd.b[i]=max(Rtt.b[i],Rss.b[i]);\n}"
+    ], 
+    [
+        "Rdd=vmaxub(Rtt,Rss)", 
+        "for (i = 0; i < 8; i++) {\nRdd.b[i]=max(Rtt.ub[i],Rss.ub[i]);\n}"
+    ], 
+    [
+        "Rdd=vmaxh(Rtt,Rss)", 
+        "for (i = 0; i < 4; i++) {\nRdd.h[i]=max(Rtt.h[i],Rss.h[i]);\n}"
+    ], 
+    [
+        "Rdd=vmaxuh(Rtt,Rss)", 
+        "for (i = 0; i < 4; i++) {\nRdd.h[i]=max(Rtt.uh[i],Rss.uh[i]);\n}"
+    ], 
+    [
+        "Rxx=vrmaxh(Rss,Ru)", 
+        "max = Rxx.h[0];\naddr = Rxx.w[1];\nfor (i = 0; i < 4; i++) {\nif (max < Rss.h[i]) {\nmax = Rss.h[i];\naddr = Ru | i<<1;\n}\n}\nRxx.w[0]=max;\nRxx.w[1]=addr;"
+    ], 
+    [
+        "Rxx=vrmaxuh(Rss,Ru)", 
+        "max = Rxx.uh[0];\naddr = Rxx.w[1];\nfor (i = 0; i < 4; i++) {\nif (max < Rss.uh[i]) {\nmax = Rss.uh[i];\naddr = Ru | i<<1;\n}\n}\nRxx.w[0]=max;\nRxx.w[1]=addr;"
+    ], 
+    [
+        "Rxx=vrmaxuw(Rss,Ru)", 
+        "max = Rxx.uw[0];\naddr = Rxx.w[1];\nfor (i = 0; i < 2; i++) {\nif (max < Rss.uw[i]) {\nmax = Rss.uw[i];\naddr = Ru | i<<2;\n}\n}\nRxx.w[0]=max;\nRxx.w[1]=addr;"
+    ], 
+    [
+        "Rxx=vrmaxw(Rss,Ru)", 
+        "max = Rxx.w[0];\naddr = Rxx.w[1];\nfor (i = 0; i < 2; i++) {\nif (max < Rss.w[i]) {\nmax = Rss.w[i];\naddr = Ru | i<<2;\n}\n}\nRxx.w[0]=max;\nRxx.w[1]=addr;"
+    ], 
+    [
+        "Rdd=vmaxuw(Rtt,Rss)", 
+        "for (i = 0; i < 2; i++) {\nRdd.w[i]=max(Rtt.uw[i],Rss.uw[i]);\n}"
+    ], 
+    [
+        "Rdd=vmaxw(Rtt,Rss)", 
+        "for (i = 0; i < 2; i++) {\nRdd.w[i]=max(Rtt.w[i],Rss.w[i]);\n}"
+    ], 
+    [
+        "Rdd,Pe=vminub(Rtt,Rss)", 
+        "for (i = 0; i < 8; i++) {\nPe.i = (Rtt.ub[i] > Rss.ub[i]);\nRdd.b[i]=min(Rtt.ub[i],Rss.ub[i]);\n}"
+    ], 
+    [
+        "Rdd=vminb(Rtt,Rss)", 
+        "for (i = 0; i < 8; i++) {\nRdd.b[i]=min(Rtt.b[i],Rss.b[i]);\n}"
+    ], 
+    [
+        "Rdd=vminub(Rtt,Rss)", 
+        "for (i = 0; i < 8; i++) {\nRdd.b[i]=min(Rtt.ub[i],Rss.ub[i]);\n}"
+    ], 
+    [
+        "Rdd=vminh(Rtt,Rss)", 
+        "for (i = 0; i < 4; i++) {\nRdd.h[i]=min(Rtt.h[i],Rss.h[i]);\n}"
+    ], 
+    [
+        "Rdd=vminuh(Rtt,Rss)", 
+        "for (i = 0; i < 4; i++) {\nRdd.h[i]=min(Rtt.uh[i],Rss.uh[i]);\n}"
+    ], 
+    [
+        "Rxx=vrminh(Rss,Ru)", 
+        "min = Rxx.h[0];\naddr = Rxx.w[1];\nfor (i = 0; i < 4; i++) {\nif (min > Rss.h[i]) {\nmin = Rss.h[i];\naddr = Ru | i<<1;\n}\n}\nRxx.w[0]=min;\nRxx.w[1]=addr;"
+    ], 
+    [
+        "Rxx=vrminuh(Rss,Ru)", 
+        "min = Rxx.uh[0];\naddr = Rxx.w[1];\nfor (i = 0; i < 4; i++) {\nif (min > Rss.uh[i]) {\nmin = Rss.uh[i];\naddr = Ru | i<<1;\n}\n}\nRxx.w[0]=min;\nRxx.w[1]=addr;"
+    ], 
+    [
+        "Rxx=vrminuw(Rss,Ru)", 
+        "min = Rxx.uw[0];\naddr = Rxx.w[1];\nfor (i = 0; i < 2; i++) {\nif (min > Rss.uw[i]) {\nmin = Rss.uw[i];\naddr = Ru | i<<2;\n}\n}\nRxx.w[0]=min;\nRxx.w[1]=addr;"
+    ], 
+    [
+        "Rxx=vrminw(Rss,Ru)", 
+        "min = Rxx.w[0];\naddr = Rxx.w[1];\nfor (i = 0; i < 2; i++) {\nif (min > Rss.w[i]) {\nmin = Rss.w[i];\naddr = Ru | i<<2;\n}\n}\nRxx.w[0]=min;\nRxx.w[1]=addr;"
+    ], 
+    [
+        "Rdd=vminuw(Rtt,Rss)", 
+        "for (i = 0; i < 2; i++) {\nRdd.w[i]=min(Rtt.uw[i],Rss.uw[i]);\n}"
+    ], 
+    [
+        "Rdd=vminw(Rtt,Rss)", 
+        "for (i = 0; i < 2; i++) {\nRdd.w[i]=min(Rtt.w[i],Rss.w[i]);\n}"
+    ], 
+    [
+        "Rdd=vrsadub(Rss,Rtt)", 
+        "Rdd = 0;\nfor (i = 0; i < 4; i++) {\nRdd.w[0]=(Rdd.w[0] + ABS((Rss.ub[i] -\nRtt.ub[i])));\n}\nfor (i = 4; i < 8; i++) {\nRdd.w[1]=(Rdd.w[1] + ABS((Rss.ub[i] -\nRtt.ub[i])));\n}"
+    ], 
+    [
+        "Rxx+=vrsadub(Rss,Rtt)", 
+        "for (i = 0; i < 4; i++) {\nRxx.w[0]=(Rxx.w[0] + ABS((Rss.ub[i] -\nRtt.ub[i])));\n}\nfor (i = 4; i < 8; i++) {\nRxx.w[1]=(Rxx.w[1] + ABS((Rss.ub[i] -\nRtt.ub[i])));\n}"
+    ], 
+    [
+        "Rdd=vsubh(Rtt,Rss)[:sat]", 
+        "for (i=0;i<4;i++) {\nRdd.h[i]=[sat_16](Rtt.h[i]-Rss.h[i]);\n}"
+    ], 
+    [
+        "Rdd=vsubuh(Rtt,Rss):sat", 
+        "for (i=0;i<4;i++) {\nRdd.h[i]=usat_16(Rtt.uh[i]-Rss.uh[i]);\n}"
+    ], 
+    [
+        "Rdd=vsubb(Rss,Rtt)", 
+        "Assembler mapped to: \"Rdd=vsubub(Rss,Rtt)\""
+    ], 
+    [
+        "Rdd=vsubub(Rtt,Rss)[:sat]", 
+        "for (i = 0; i < 8; i++) {\nRdd.b[i]=[usat_8](Rtt.ub[i]-Rss.ub[i]);\n}"
+    ], 
+    [
+        "Rdd=vsubw(Rtt,Rss)[:sat]", 
+        "for (i=0;i<2;i++) {\nRdd.w[i]=[sat_32](Rtt.w[i]-Rss.w[i]);\n}"
+    ], 
+    [
+        "Rd=add(clb(Rs),#s6)", 
+        "Rd =\r\n(max(count_leading_ones(Rs),count_leading_ones(~Rs)))+#s;"
+    ], 
+    [
+        "Rd=add(clb(Rss),#s6)", 
+        "Rd =\r\n(max(count_leading_ones(Rss),count_leading_ones(~Rss)))+#s\r\n;"
+    ], 
+    [
+        "Rd=cl0(Rs)", 
+        "Rd = count_leading_ones(~Rs);"
+    ], 
+    [
+        "Rd=cl0(Rss)", 
+        "Rd = count_leading_ones(~Rss);"
+    ], 
+    [
+        "Rd=cl1(Rs)", 
+        "Rd = count_leading_ones(Rs);"
+    ], 
+    [
+        "Rd=cl1(Rss)", 
+        "Rd = count_leading_ones(Rss);"
+    ], 
+    [
+        "Rd=clb(Rs)", 
+        "Rd = max(count_leading_ones(Rs),count_leading_ones(~Rs));"
+    ], 
+    [
+        "Rd=clb(Rss)", 
+        "Rd =\r\nmax(count_leading_ones(Rss),count_leading_ones(~Rss));"
+    ], 
+    [
+        "Rd=normamt(Rs)", 
+        "if (Rs == 0) {\r\nRd = 0;\r\n} else {\r\nRd =\r\n(max(count_leading_ones(Rs),count_leading_ones(~Rs)))-1;\r\n}"
+    ], 
+    [
+        "Rd=normamt(Rss)", 
+        "if (Rss == 0) {\r\nRd = 0;\r\n} else {\r\nRd =\r\n(max(count_leading_ones(Rss),count_leading_ones(~Rss)))-1;\r\n}"
+    ], 
+    [
+        "Rd=popcount(Rss)", 
+        "Rd = count_ones(Rss);"
+    ], 
+    [
+        "Rd=ct0(Rs)", 
+        "Rd = count_leading_ones(~reverse_bits(Rs));"
+    ], 
+    [
+        "Rd=ct0(Rss)", 
+        "Rd = count_leading_ones(~reverse_bits(Rss));"
+    ], 
+    [
+        "Rd=ct1(Rs)", 
+        "Rd = count_leading_ones(reverse_bits(Rs));"
+    ], 
+    [
+        "Rd=ct1(Rss)", 
+        "Rd = count_leading_ones(reverse_bits(Rss));"
+    ], 
+    [
+        "Rd=extract(Rs,#u5,#U5)", 
+        "width=#u;\noffset=#U;\nRd = sxtwidth->32((Rs >> offset));"
+    ], 
+    [
+        "Rd=extract(Rs,Rtt)", 
+        "width=zxt6->32((Rtt.w[1]));\noffset=sxt7->32((Rtt.w[0]));\nRd = sxtwidth->64((offset>0)?(zxt32->64(zxt32-\n>64(Rs))>>>offset):(zxt32->64(zxt32->64(Rs))<<offset));"
+    ], 
+    [
+        "Rd=extractu(Rs,#u5,#U5)", 
+        "width=#u;\noffset=#U;\nRd = zxtwidth->32((Rs >> offset));"
+    ], 
+    [
+        "Rd=extractu(Rs,Rtt)", 
+        "width=zxt6->32((Rtt.w[1]));\noffset=sxt7->32((Rtt.w[0]));\nRd = zxtwidth->64((offset>0)?(zxt32->64(zxt32-\n>64(Rs))>>>offset):(zxt32->64(zxt32->64(Rs))<<offset));"
+    ], 
+    [
+        "Rdd=extract(Rss,#u6,#U6)", 
+        "width=#u;\noffset=#U;\nRdd = sxtwidth->64((Rss >> offset));"
+    ], 
+    [
+        "Rdd=extract(Rss,Rtt)", 
+        "width=zxt6->32((Rtt.w[1]));\noffset=sxt7->32((Rtt.w[0]));\nRdd = sxtwidth-\n>64((offset>0)?(Rss>>>offset):(Rss<<offset));"
+    ], 
+    [
+        "Rdd=extractu(Rss,#u6,#U6)", 
+        "width=#u;\noffset=#U;\nRdd = zxtwidth->64((Rss >> offset));"
+    ], 
+    [
+        "Rdd=extractu(Rss,Rtt)", 
+        "width=zxt6->32((Rtt.w[1]));\noffset=sxt7->32((Rtt.w[0]));\nRdd = zxtwidth-\n>64((offset>0)?(Rss>>>offset):(Rss<<offset));"
+    ], 
+    [
+        "Rx=insert(Rs,#u5,#U5)", 
+        "width=#u;\noffset=#U;\nRx &= ~(((1<<width)-1)<<offset);\nRx |= ((Rs & ((1<<width)-1)) << offset);"
+    ], 
+    [
+        "Rx=insert(Rs,Rtt)", 
+        "width=zxt6->32((Rtt.w[1]));\noffset=sxt7->32((Rtt.w[0]));\nmask = ((1<<width)-1);\nif (offset < 0) {\nRx = 0;\n} else {\nRx &= ~(mask<<offset);\nRx |= ((Rs & mask) << offset);\n}"
+    ], 
+    [
+        "Rxx=insert(Rss,#u6,#U6)", 
+        "width=#u;\noffset=#U;\nRxx &= ~(((1<<width)-1)<<offset);\nRxx |= ((Rss & ((1<<width)-1)) << offset);"
+    ], 
+    [
+        "Rxx=insert(Rss,Rtt)", 
+        "width=zxt6->32((Rtt.w[1]));\noffset=sxt7->32((Rtt.w[0]));\nmask = ((1<<width)-1);\nif (offset < 0) {\nRxx = 0;\n} else {\nRxx &= ~(mask<<offset);\nRxx |= ((Rss & mask) << offset);\n}"
+    ], 
+    [
+        "Rdd=deinterleave(Rss)", 
+        "Rdd = deinterleave(ODD,EVEN);"
+    ], 
+    [
+        "Rdd=interleave(Rss)", 
+        "Rdd = interleave(Rss.w[1],Rss.w[0]);"
+    ], 
+    [
+        "Rdd=lfs(Rss,Rtt)", 
+        "Rdd = (Rss.u64 >> 1) | ((1&count_ones(Rss &\nRtt)).u64<<63) ;"
+    ], 
+    [
+        "Rd=parity(Rs,Rt)", 
+        "Rd = 1&count_ones(Rs & Rt);"
+    ], 
+    [
+        "Rd=parity(Rss,Rtt)", 
+        "Rd = 1&count_ones(Rss & Rtt);"
+    ], 
+    [
+        "Rd=brev(Rs)", 
+        "Rd = reverse_bits(Rs);"
+    ], 
+    [
+        "Rdd=brev(Rss)", 
+        "Rdd = reverse_bits(Rss);"
+    ], 
+    [
+        "Rd=clrbit(Rs,#u5)", 
+        "Rd = (Rs & (~(1<<#u)));"
+    ], 
+    [
+        "Rd=clrbit(Rs,Rt)", 
+        "Rd = (Rs & (~((sxt7->32(Rt)>0)?(zxt32->64(1)<<sxt7-\n>32(Rt)):(zxt32->64(1)>>>sxt7->32(Rt)))));"
+    ], 
+    [
+        "Rd=setbit(Rs,#u5)", 
+        "Rd = (Rs | (1<<#u));"
+    ], 
+    [
+        "Rd=setbit(Rs,Rt)", 
+        "Rd = (Rs | (sxt7->32(Rt)>0)?(zxt32->64(1)<<sxt7-\n>32(Rt)):(zxt32->64(1)>>>sxt7->32(Rt)));"
+    ], 
+    [
+        "Rd=togglebit(Rs,#u5)", 
+        "Rd = (Rs ^ (1<<#u));"
+    ], 
+    [
+        "Rd=togglebit(Rs,Rt)", 
+        "Rd = (Rs ^ (sxt7->32(Rt)>0)?(zxt32->64(1)<<sxt7-\n>32(Rt)):(zxt32->64(1)>>>sxt7->32(Rt)));"
+    ], 
+    [
+        "Rdd=bitsplit(Rs,#u5)", 
+        "Rdd.w[1]=(Rs>>#u);\nRdd.w[0]=zxt#u->32(Rs);"
+    ], 
+    [
+        "Rdd=bitsplit(Rs,Rt)", 
+        "shamt = zxt5->32(Rt);\nRdd.w[1]=(Rs>>shamt);\nRdd.w[0]=zxtshamt->32(Rs);"
+    ], 
+    [
+        "Rx=tableidxb(Rs,#u4,#S6):raw", 
+        "width=#u;\noffset=#S;\nfield = Rs[(width+offset-1):offset];\nRx[(width-1+0):0]=field;"
+    ], 
+    [
+        "Rx=tableidxb(Rs,#u4,#U5)", 
+        "Assembler mapped to:\n\"Rx=tableidxb(Rs,#u4,#U5):raw\""
+    ], 
+    [
+        "Rx=tableidxd(Rs,#u4,#S6):raw", 
+        "width=#u;\noffset=#S+3;\nfield = Rs[(width+offset-1):offset];\nRx[(width-1+3):3]=field;"
+    ], 
+    [
+        "Rx=tableidxd(Rs,#u4,#U5)", 
+        "Assembler mapped to: \"Rx=tableidxd(Rs,#u4,#U5-\n3):raw\""
+    ], 
+    [
+        "Rx=tableidxh(Rs,#u4,#S6):raw", 
+        "width=#u;\noffset=#S+1;\nfield = Rs[(width+offset-1):offset];\nRx[(width-1+1):1]=field;"
+    ], 
+    [
+        "Rx=tableidxh(Rs,#u4,#U5)", 
+        "Assembler mapped to: \"Rx=tableidxh(Rs,#u4,#U5-\n1):raw\""
+    ], 
+    [
+        "Rx=tableidxw(Rs,#u4,#S6):raw", 
+        "width=#u;\noffset=#S+2;\nfield = Rs[(width+offset-1):offset];\nRx[(width-1+2):2]=field;"
+    ], 
+    [
+        "Rx=tableidxw(Rs,#u4,#U5)", 
+        "Assembler mapped to: \"Rx=tableidxw(Rs,#u4,#U5-\n2):raw\""
+    ], 
+    [
+        "Rdd=vxaddsubh(Rss,Rtt):rnd:>>1:sat", 
+        "Rdd.h[0]=sat_16((Rss.h[0]+Rtt.h[1]+1)>>1);Rdd.h[1]=sat_16((Rss.h[1]-Rtt.h[0]+1)>>1);\nRdd.h[2]=sat_16((Rss.h[2]+Rtt.h[3]+1)>>1);\nRdd.h[3]=sat_16((Rss.h[3]-Rtt.h[2]+1)>>1);"
+    ], 
+    [
+        "Rdd=vxaddsubh(Rss,Rtt):sat", 
+        "Rdd.h[0]=sat_16(Rss.h[0]+Rtt.h[1]);\nRdd.h[1]=sat_16(Rss.h[1]-Rtt.h[0]);\nRdd.h[2]=sat_16(Rss.h[2]+Rtt.h[3]);\nRdd.h[3]=sat_16(Rss.h[3]-Rtt.h[2]);"
+    ], 
+    [
+        "Rdd=vxsubaddh(Rss,Rtt):rnd:>>1:sat", 
+        "Rdd.h[0]=sat_16((Rss.h[0]-Rtt.h[1]+1)>>1);Rdd.h[1]=sat_16((Rss.h[1]+Rtt.h[0]+1)>>1);\nRdd.h[2]=sat_16((Rss.h[2]-Rtt.h[3]+1)>>1);\nRdd.h[3]=sat_16((Rss.h[3]+Rtt.h[2]+1)>>1);"
+    ], 
+    [
+        "Rdd=vxsubaddh(Rss,Rtt):sat", 
+        "Rdd.h[0]=sat_16(Rss.h[0]-Rtt.h[1]);\nRdd.h[1]=sat_16(Rss.h[1]+Rtt.h[0]);\nRdd.h[2]=sat_16(Rss.h[2]-Rtt.h[3]);\nRdd.h[3]=sat_16(Rss.h[3]+Rtt.h[2]);"
+    ], 
+    [
+        "Rdd=vxaddsubw(Rss,Rtt):sat", 
+        "Rdd.w[0]=sat_32(Rss.w[0]+Rtt.w[1]);\nRdd.w[1]=sat_32(Rss.w[1]-Rtt.w[0]);"
+    ], 
+    [
+        "Rdd=vxsubaddw(Rss,Rtt):sat", 
+        "Rdd.w[0]=sat_32(Rss.w[0]-Rtt.w[1]);\nRdd.w[1]=sat_32(Rss.w[1]+Rtt.w[0]);"
+    ], 
+    [
+        "Rdd=cmpy(Rs,Rt)[:<<1]:sat", 
+        "Rdd.w[1]=sat_32((Rs.h[1] * Rt.h[0])[<<1] +\n(Rs.h[0] * Rt.h[1])[<<1]);\nRdd.w[0]=sat_32((Rs.h[0] * Rt.h[0])[<<1] -\n(Rs.h[1] * Rt.h[1])[<<1]);"
+    ], 
+    [
+        "Rdd=cmpy(Rs,Rt*)[:<<1]:sat", 
+        "Rdd.w[1]=sat_32((Rs.h[1] * Rt.h[0])[<<1] -\n(Rs.h[0] * Rt.h[1])[<<1]);\nRdd.w[0]=sat_32((Rs.h[0] * Rt.h[0])[<<1] +\n(Rs.h[1] * Rt.h[1])[<<1]);"
+    ], 
+    [
+        "Rxx+=cmpy(Rs,Rt)[:<<1]:sat", 
+        "Rxx.w[1]=sat_32(Rxx.w[1] + (Rs.h[1] *\r\nRt.h[0])[<<1] + (Rs.h[0] * Rt.h[1])[<<1]);\r\nRxx.w[0]=sat_32(Rxx.w[0] + (Rs.h[0] *\r\nRt.h[0])[<<1] - (Rs.h[1] * Rt.h[1])[<<1]);"
+    ], 
+    [
+        "Rxx+=cmpy(Rs,Rt*)[:<<1]:sat", 
+        "Rxx.w[1]=sat_32(Rxx.w[1] + (Rs.h[1] *\r\nRt.h[0])[<<1] - (Rs.h[0] * Rt.h[1])[<<1]);\r\nRxx.w[0]=sat_32(Rxx.w[0] + (Rs.h[0] *\r\nRt.h[0])[<<1] + (Rs.h[1] * Rt.h[1])[<<1]);"
+    ], 
+    [
+        "Rxx-=cmpy(Rs,Rt)[:<<1]:sat", 
+        "Rxx.w[1]=sat_32(Rxx.w[1] - ((Rs.h[1] *\r\nRt.h[0])[<<1] + (Rs.h[0] * Rt.h[1])[<<1]));\r\nRxx.w[0]=sat_32(Rxx.w[0] - ((Rs.h[0] *\r\nRt.h[0])[<<1] - (Rs.h[1] * Rt.h[1])[<<1]));"
+    ], 
+    [
+        "Rxx-=cmpy(Rs,Rt*)[:<<1]:sat", 
+        "Rxx.w[1]=sat_32(Rxx.w[1] - ((Rs.h[1] *\r\nRt.h[0])[<<1] - (Rs.h[0] * Rt.h[1])[<<1]));\r\nRxx.w[0]=sat_32(Rxx.w[0] - ((Rs.h[0] *\r\nRt.h[0])[<<1] + (Rs.h[1] * Rt.h[1])[<<1]));"
+    ], 
+    [
+        "Rdd=cmpyi(Rs,Rt)", 
+        "Rdd = (Rs.h[1] * Rt.h[0]) + (Rs.h[0] * Rt.h[1]);"
+    ], 
+    [
+        "Rdd=cmpyr(Rs,Rt)", 
+        "Rdd = (Rs.h[0] * Rt.h[0]) - (Rs.h[1] * Rt.h[1]);"
+    ], 
+    [
+        "Rxx+=cmpyi(Rs,Rt)", 
+        "Rxx = Rxx + (Rs.h[1] * Rt.h[0]) + (Rs.h[0] * Rt.h[1]);"
+    ], 
+    [
+        "Rxx+=cmpyr(Rs,Rt)", 
+        "Rxx = Rxx + (Rs.h[0] * Rt.h[0]) - (Rs.h[1] * Rt.h[1]);"
+    ], 
+    [
+        "Rd=cmpy(Rs,Rt)[:<<1]:rnd:sat", 
+        "Rd.h[1]=(sat_32((Rs.h[1] * Rt.h[0])[<<1] +\n(Rs.h[0] * Rt.h[1])[<<1] + 0x8000)).h[1];\nRd.h[0]=(sat_32((Rs.h[0] * Rt.h[0])[<<1] -\n(Rs.h[1] * Rt.h[1])[<<1] + 0x8000)).h[1];"
+    ], 
+    [
+        "Rd=cmpy(Rs,Rt*)[:<<1]:rnd:sat", 
+        "Rd.h[1]=(sat_32((Rs.h[1] * Rt.h[0])[<<1] -\n(Rs.h[0] * Rt.h[1])[<<1] + 0x8000)).h[1];\nRd.h[0]=(sat_32((Rs.h[0] * Rt.h[0])[<<1] +\n(Rs.h[1] * Rt.h[1])[<<1] + 0x8000)).h[1];"
+    ], 
+    [
+        "Rd=cmpyiwh(Rss,Rt):<<1:rnd:sat", 
+        "Rd = sat_32(( (Rss.w[0] * Rt.h[1]) + (Rss.w[1] *\r\nRt.h[0]) + 0x4000)>>15);"
+    ], 
+    [
+        "Rd=cmpyiwh(Rss,Rt*):<<1:rnd:sat", 
+        "Rd = sat_32(( (Rss.w[1] * Rt.h[0]) - (Rss.w[0] *\r\nRt.h[1]) + 0x4000)>>15);"
+    ], 
+    [
+        "Rd=cmpyrwh(Rss,Rt):<<1:rnd:sat", 
+        "Rd = sat_32(( (Rss.w[0] * Rt.h[0]) - (Rss.w[1] *\r\nRt.h[1]) + 0x4000)>>15);"
+    ], 
+    [
+        "Rd=cmpyrwh(Rss,Rt*):<<1:rnd:sat", 
+        "Rd = sat_32(( (Rss.w[0] * Rt.h[0]) + (Rss.w[1] *\r\nRt.h[1]) + 0x4000)>>15);"
+    ], 
+    [
+        "Rdd=vcmpyi(Rss,Rtt)[:<<1]:sat", 
+        "Rdd.w[0]=sat_32((Rss.h[1] * Rtt.h[0]) +\n(Rss.h[0] * Rtt.h[1])[<<1]);\nRdd.w[1]=sat_32((Rss.h[3] * Rtt.h[2]) +\n(Rss.h[2] * Rtt.h[3])[<<1]);"
+    ], 
+    [
+        "Rdd=vcmpyr(Rss,Rtt)[:<<1]:sat", 
+        "Rdd.w[0]=sat_32((Rss.h[0] * Rtt.h[0]) -\n(Rss.h[1] * Rtt.h[1])[<<1]);\nRdd.w[1]=sat_32((Rss.h[2] * Rtt.h[2]) -\n(Rss.h[3] * Rtt.h[3])[<<1]);"
+    ], 
+    [
+        "Rxx+=vcmpyi(Rss,Rtt):sat", 
+        "Rxx.w[0]=sat_32(Rxx.w[0] + (Rss.h[1] * Rtt.h[0])\n+ (Rss.h[0] * Rtt.h[1])<<0);\nRxx.w[1]=sat_32(Rxx.w[1] + (Rss.h[3] * Rtt.h[2])\n+ (Rss.h[2] * Rtt.h[3])<<0);"
+    ], 
+    [
+        "Rxx+=vcmpyr(Rss,Rtt):sat", 
+        "Rxx.w[0]=sat_32(Rxx.w[0] + (Rss.h[0] * Rtt.h[0])\n- (Rss.h[1] * Rtt.h[1])<<0);\nRxx.w[1]=sat_32(Rxx.w[1] + (Rss.h[2] * Rtt.h[2])\n- (Rss.h[3] * Rtt.h[3])<<0);"
+    ], 
+    [
+        "Rdd=vconj(Rss):sat", 
+        "Rdd.h[1]=sat_16(-Rss.h[1]);\nRdd.h[0]=Rss.h[0];\nRdd.h[3]=sat_16(-Rss.h[3]);\nRdd.h[2]=Rss.h[2];"
+    ], 
+    [
+        "Rdd=vcrotate(Rss,Rt)", 
+        "tmp = Rt[1:0];\r\nif (tmp == 0) {\r\nRdd.h[0]=Rss.h[0];\r\nRdd.h[1]=Rss.h[1];\r\n} else if (tmp == 1) {\r\nRdd.h[0]=Rss.h[1];\r\nRdd.h[1]=sat_16(-Rss.h[0]);\r\n} else if (tmp == 2) {\r\nRdd.h[0]=sat_16(-Rss.h[1]);\r\nRdd.h[1]=Rss.h[0];\r\n} else {\r\nRdd.h[0]=sat_16(-Rss.h[0]);\r\nRdd.h[1]=sat_16(-Rss.h[1]);\r\n}\r\ntmp = Rt[3:2];\r\nif (tmp == 0) {\r\nRdd.h[2]=Rss.h[2];\r\nRdd.h[3]=Rss.h[3];\r\n} else if (tmp == 1) {\r\nRdd.h[2]=Rss.h[3];\r\nRdd.h[3]=sat_16(-Rss.h[2]);\r\n} else if (tmp == 2) {\r\nRdd.h[2]=sat_16(-Rss.h[3]);\r\nRdd.h[3]=Rss.h[2];\r\n} else {\r\nRdd.h[2]=sat_16(-Rss.h[2]);\r\nRdd.h[3]=sat_16(-Rss.h[3]);\r\n}"
+    ], 
+    [
+        "Rdd=vrcmpyi(Rss,Rtt)", 
+        "Rdd = (Rss.h[1] * Rtt.h[0]) + (Rss.h[0] *\nRtt.h[1]) + (Rss.h[3] * Rtt.h[2]) + (Rss.h[2] *\nRtt.h[3]);"
+    ], 
+    [
+        "Rdd=vrcmpyi(Rss,Rtt*)", 
+        "Rdd = (Rss.h[1] * Rtt.h[0]) - (Rss.h[0] *\nRtt.h[1]) + (Rss.h[3] * Rtt.h[2]) - (Rss.h[2] *\nRtt.h[3]);"
+    ], 
+    [
+        "Rdd=vrcmpyr(Rss,Rtt)", 
+        "Rdd = (Rss.h[0] * Rtt.h[0]) - (Rss.h[1] *\nRtt.h[1]) + (Rss.h[2] * Rtt.h[2]) - (Rss.h[3] *\nRtt.h[3]);"
+    ], 
+    [
+        "Rdd=vrcmpyr(Rss,Rtt*)", 
+        "Rdd = (Rss.h[0] * Rtt.h[0]) + (Rss.h[1] *\nRtt.h[1]) + (Rss.h[2] * Rtt.h[2]) + (Rss.h[3] *\nRtt.h[3]);"
+    ], 
+    [
+        "Rxx+=vrcmpyi(Rss,Rtt)", 
+        "Rxx = Rxx + (Rss.h[1] * Rtt.h[0]) + (Rss.h[0] *\nRtt.h[1]) + (Rss.h[3] * Rtt.h[2]) + (Rss.h[2] *\nRtt.h[3]);"
+    ], 
+    [
+        "Rxx+=vrcmpyi(Rss,Rtt*)", 
+        "Rxx = Rxx + (Rss.h[1] * Rtt.h[0]) - (Rss.h[0] *\nRtt.h[1]) + (Rss.h[3] * Rtt.h[2]) - (Rss.h[2] *\nRtt.h[3]);"
+    ], 
+    [
+        "Rxx+=vrcmpyr(Rss,Rtt)", 
+        "Rxx = Rxx + (Rss.h[0] * Rtt.h[0]) - (Rss.h[1] *\nRtt.h[1]) + (Rss.h[2] * Rtt.h[2]) - (Rss.h[3] *\nRtt.h[3]);"
+    ], 
+    [
+        "Rxx+=vrcmpyr(Rss,Rtt*)", 
+        "Rxx = Rxx + (Rss.h[0] * Rtt.h[0]) + (Rss.h[1] *\nRtt.h[1]) + (Rss.h[2] * Rtt.h[2]) + (Rss.h[3] *\nRtt.h[3]);"
+    ], 
+    [
+        "Rdd=vrcmpys(Rss,Rt):<<1:sat", 
+        "if (\"Rt & 1\") {\nAssembler mapped to:\n\"Rdd=vrcmpys(Rss,Rtt):<<1:sat:raw:hi\";\n} else {\nAssembler mapped to:\n\"Rdd=vrcmpys(Rss,Rtt):<<1:sat:raw:lo\";\n}"
+    ], 
+    [
+        "Rdd=vrcmpys(Rss,Rtt):<<1:sat:raw:hi", 
+        "Rdd.w[1]=sat_32((Rss.h[1] * Rtt.w[1].h[0])<<1+ (Rss.h[3] * Rtt.w[1].h[1])<<1);\nRdd.w[0]=sat_32((Rss.h[0] * Rtt.w[1].h[0])<<1\n+ (Rss.h[2] * Rtt.w[1].h[1])<<1);"
+    ], 
+    [
+        "Rdd=vrcmpys(Rss,Rtt):<<1:sat:raw:lo", 
+        "Rdd.w[1]=sat_32((Rss.h[1] * Rtt.w[0].h[0])<<1+ (Rss.h[3] * Rtt.w[0].h[1])<<1);\nRdd.w[0]=sat_32((Rss.h[0] * Rtt.w[0].h[0])<<1\n+ (Rss.h[2] * Rtt.w[0].h[1])<<1);"
+    ], 
+    [
+        "Rxx+=vrcmpys(Rss,Rt):<<1:sat", 
+        "if (\"Rt & 1\") {\nAssembler mapped to:\n\"Rxx+=vrcmpys(Rss,Rtt):<<1:sat:raw:hi\";\n} else {\nAssembler mapped to:\n\"Rxx+=vrcmpys(Rss,Rtt):<<1:sat:raw:lo\";\n}"
+    ], 
+    [
+        "Rxx+=vrcmpys(Rss,Rtt):<<1:sat:raw:hi", 
+        "Rxx.w[1]=sat_32(Rxx.w[1] + (Rss.h[1] *Rtt.w[1].h[0])<<1 + (Rss.h[3] *\nRtt.w[1].h[1])<<1);\nRxx.w[0]=sat_32(Rxx.w[0] + (Rss.h[0] *\nRtt.w[1].h[0])<<1 + (Rss.h[2] *\nRtt.w[1].h[1])<<1);"
+    ], 
+    [
+        "Rxx+=vrcmpys(Rss,Rtt):<<1:sat:raw:lo", 
+        "Rxx.w[1]=sat_32(Rxx.w[1] + (Rss.h[1] *Rtt.w[0].h[0])<<1 + (Rss.h[3] *\nRtt.w[0].h[1])<<1);\nRxx.w[0]=sat_32(Rxx.w[0] + (Rss.h[0] *\nRtt.w[0].h[0])<<1 + (Rss.h[2] *\nRtt.w[0].h[1])<<1);"
+    ], 
+    [
+        "Rd=vrcmpys(Rss,Rt):<<1:rnd:sat", 
+        "if (\"Rt & 1\") {\nAssembler mapped to:\n\"Rd=vrcmpys(Rss,Rtt):<<1:rnd:sat:raw:hi\";\n} else {\nAssembler mapped to:\n\"Rd=vrcmpys(Rss,Rtt):<<1:rnd:sat:raw:lo\";\n}"
+    ], 
+    [
+        "Rd=vrcmpys(Rss,Rtt):<<1:rnd:sat:raw:hi", 
+        "Rd.h[1]=sat_32((Rss.h[1] * Rtt.w[1].h[0])<<1 +(Rss.h[3] * Rtt.w[1].h[1])<<1 + 0x8000).h[1];\nRd.h[0]=sat_32((Rss.h[0] * Rtt.w[1].h[0])<<1 +\n(Rss.h[2] * Rtt.w[1].h[1])<<1 + 0x8000).h[1];"
+    ], 
+    [
+        "Rd=vrcmpys(Rss,Rtt):<<1:rnd:sat:raw:lo", 
+        "Rd.h[1]=sat_32((Rss.h[1] * Rtt.w[0].h[0])<<1 +(Rss.h[3] * Rtt.w[0].h[1])<<1 + 0x8000).h[1];\nRd.h[0]=sat_32((Rss.h[0] * Rtt.w[0].h[0])<<1 +\n(Rss.h[2] * Rtt.w[0].h[1])<<1 + 0x8000).h[1];"
+    ], 
+    [
+        "Rdd=vrcrotate(Rss,Rt,#u2)", 
+        "sumr = 0;\nsumi = 0;\ncontrol = Rt.ub[#u];\nfor (i = 0; i < 8; i += 2) {\ntmpr = Rss.b[i];\ntmpi = Rss.b[i+1];\nswitch (control & 3) {\ncase 0: sumr += tmpr;\nsumi += tmpi;\nbreak;\ncase 1: sumr += tmpi;\nsumi -= tmpr;\nbreak;\ncase 2: sumr -= tmpi;\nsumi += tmpr;\nbreak;\ncase 3: sumr -= tmpr;\nsumi -= tmpi;\nbreak;\n}\ncontrol = control >> 2;\n}\nRdd.w[0]=sumr;\nRdd.w[1]=sumi;"
+    ], 
+    [
+        "Rxx+=vrcrotate(Rss,Rt,#u2)", 
+        "sumr = 0;\nsumi = 0;\ncontrol = Rt.ub[#u];\nfor (i = 0; i < 8; i += 2) {\ntmpr = Rss.b[i];\ntmpi = Rss.b[i+1];\nswitch (control & 3) {\ncase 0: sumr += tmpr;\nsumi += tmpi;\nbreak;\ncase 1: sumr += tmpi;\nsumi -= tmpr;\nbreak;\ncase 2: sumr -= tmpi;\nsumi += tmpr;\nbreak;\ncase 3: sumr -= tmpr;\nsumi -= tmpi;\nbreak;\n}\ncontrol = control >> 2;\n}\nRxx.w[0]=Rxx.w[0] + sumr;\nRxx.w[1]=Rxx.w[1] + sumi;"
+    ], 
+    [
+        "Rd=sfadd(Rs,Rt)", 
+        "Rd=Rs+Rt;"
+    ], 
+    [
+        "Pd=dfclass(Rss,#u5)", 
+        "Pd = 0;\nclass = fpclassify(Rss);\nif (#u.0 && (class == FP_ZERO)) Pd = 0xff;\nif (#u.1 && (class == FP_NORMAL)) Pd = 0xff;\nif (#u.2 && (class == FP_SUBNORMAL)) Pd = 0xff;\nif (#u.3 && (class == FP_INFINITE)) Pd = 0xff;\nif (#u.4 && (class == FP_NAN)) Pd = 0xff;\ncancel_flags();"
+    ], 
+    [
+        "Pd=sfclass(Rs,#u5)", 
+        "Pd = 0;\nclass = fpclassify(Rs);\nif (#u.0 && (class == FP_ZERO)) Pd = 0xff;\nif (#u.1 && (class == FP_NORMAL)) Pd = 0xff;\nif (#u.2 && (class == FP_SUBNORMAL)) Pd = 0xff;\nif (#u.3 && (class == FP_INFINITE)) Pd = 0xff;\nif (#u.4 && (class == FP_NAN)) Pd = 0xff;\ncancel_flags();"
+    ], 
+    [
+        "Pd=dfcmp.eq(Rss,Rtt)", 
+        "Pd=Rss==Rtt ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=dfcmp.ge(Rss,Rtt)", 
+        "Pd=Rss>=Rtt ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=dfcmp.gt(Rss,Rtt)", 
+        "Pd=Rss>Rtt ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=dfcmp.uo(Rss,Rtt)", 
+        "Pd=isunordered(Rss,Rtt) ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=sfcmp.eq(Rs,Rt)", 
+        "Pd=Rs==Rt ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=sfcmp.ge(Rs,Rt)", 
+        "Pd=Rs>=Rt ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=sfcmp.gt(Rs,Rt)", 
+        "Pd=Rs>Rt ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=sfcmp.uo(Rs,Rt)", 
+        "Pd=isunordered(Rs,Rt) ? 0xff : 0x00;"
+    ], 
+    [
+        "Rd=convert_df2sf(Rss)", 
+        "Rd = conv_df_to_sf(Rss);"
+    ], 
+    [
+        "Rdd=convert_sf2df(Rs)", 
+        "Rdd = conv_sf_to_df(Rs);"
+    ], 
+    [
+        "Rd=convert_d2sf(Rss)", 
+        "Rd = conv_8s_to_sf(Rss.s64);"
+    ], 
+    [
+        "Rd=convert_ud2sf(Rss)", 
+        "Rd = conv_8u_to_sf(Rss.u64);"
+    ], 
+    [
+        "Rd=convert_uw2sf(Rs)", 
+        "Rd = conv_4u_to_sf(Rs.uw[0]);"
+    ], 
+    [
+        "Rd=convert_w2sf(Rs)", 
+        "Rd = conv_4s_to_sf(Rs.s32);"
+    ], 
+    [
+        "Rdd=convert_d2df(Rss)", 
+        "Rdd = conv_8s_to_df(Rss.s64);"
+    ], 
+    [
+        "Rdd=convert_ud2df(Rss)", 
+        "Rdd = conv_8u_to_df(Rss.u64);"
+    ], 
+    [
+        "Rdd=convert_uw2df(Rs)", 
+        "Rdd = conv_4u_to_df(Rs.uw[0]);"
+    ], 
+    [
+        "Rdd=convert_w2df(Rs)", 
+        "Rdd = conv_4s_to_df(Rs.s32);"
+    ], 
+    [
+        "Rd=convert_df2uw(Rss)", 
+        "Rd = conv_df_to_4u(Rss).uw[0];"
+    ], 
+    [
+        "Rd=convert_df2uw(Rss):chop", 
+        "round_to_zero();\r\nRd = conv_df_to_4u(Rss).uw[0];"
+    ], 
+    [
+        "Rd=convert_df2w(Rss)", 
+        "Rd = conv_df_to_4s(Rss).s32;"
+    ], 
+    [
+        "Rd=convert_df2w(Rss):chop", 
+        "round_to_zero();\r\nRd = conv_df_to_4s(Rss).s32;"
+    ], 
+    [
+        "Rd=convert_sf2uw(Rs)", 
+        "Rd = conv_sf_to_4u(Rs).uw[0];"
+    ], 
+    [
+        "Rd=convert_sf2uw(Rs):chop", 
+        "round_to_zero();\r\nRd = conv_sf_to_4u(Rs).uw[0];"
+    ], 
+    [
+        "Rd=convert_sf2w(Rs)", 
+        "Rd = conv_sf_to_4s(Rs).s32;"
+    ], 
+    [
+        "Rd=convert_sf2w(Rs):chop", 
+        "round_to_zero();\r\nRd = conv_sf_to_4s(Rs).s32;"
+    ], 
+    [
+        "Rdd=convert_df2d(Rss)", 
+        "Rdd = conv_df_to_8s(Rss).s64;"
+    ], 
+    [
+        "Rdd=convert_df2d(Rss):chop", 
+        "round_to_zero();\r\nRdd = conv_df_to_8s(Rss).s64;"
+    ], 
+    [
+        "Rdd=convert_df2ud(Rss)", 
+        "Rdd = conv_df_to_8u(Rss).u64;"
+    ], 
+    [
+        "Rdd=convert_df2ud(Rss):chop", 
+        "round_to_zero();\r\nRdd = conv_df_to_8u(Rss).u64;"
+    ], 
+    [
+        "Rdd=convert_sf2d(Rs)", 
+        "Rdd = conv_sf_to_8s(Rs).s64;"
+    ], 
+    [
+        "Rdd=convert_sf2d(Rs):chop", 
+        "round_to_zero();\r\nRdd = conv_sf_to_8s(Rs).s64;"
+    ], 
+    [
+        "Rdd=convert_sf2ud(Rs)", 
+        "Rdd = conv_sf_to_8u(Rs).u64;"
+    ], 
+    [
+        "Rdd=convert_sf2ud(Rs):chop", 
+        "round_to_zero();\r\nRdd = conv_sf_to_8u(Rs).u64;"
+    ], 
+    [
+        "Rd=sffixupd(Rs,Rt)", 
+        "(Rs,Rt,Rd,adjust)=recip_common(Rs,Rt);\nRd = Rt;"
+    ], 
+    [
+        "Rd=sffixupn(Rs,Rt)", 
+        "(Rs,Rt,Rd,adjust)=recip_common(Rs,Rt);\nRd = Rs;"
+    ], 
+    [
+        "Rd=sffixupr(Rs)", 
+        "(Rs,Rd,adjust)=invsqrt_common(Rs);\nRd = Rs;"
+    ], 
+    [
+        "Rx+=sfmpy(Rs,Rt)", 
+        "Rx=fmaf(Rs,Rt,Rx);"
+    ], 
+    [
+        "Rx-=sfmpy(Rs,Rt)", 
+        "Rx=fmaf(-Rs,Rt,Rx);"
+    ], 
+    [
+        "Rx+=sfmpy(Rs,Rt,Pu):scale", 
+        "PREDUSE_TIMING;\nif (isnan(Rx) || isnan(Rs) || isnan(Rt)) Rx = NaN;\n;\ntmp=fmaf(Rs,Rt,Rx) * 2**(Pu);\nif (!((Rx == 0.0) && is_true_zero(Rs*Rt))) Rx = tmp;"
+    ], 
+    [
+        "Rd,Pe=sfinvsqrta(Rs)", 
+        "if ((Rs,Rd,adjust)=invsqrt_common(Rs)) {\nPe = adjust;\nidx = (Rs >> 17) & 0x7f;\nmant = (invsqrt_lut[idx] << 15);\nexp = 127 - ((exponent(Rs) - 127) >> 1) - 1;\nRd = -1**Rs.31 * 1.MANT * 2**(exp-BIAS);\n}"
+    ], 
+    [
+        "Rx+=sfmpy(Rs,Rt):lib", 
+        "round_to_nearest();\ninfminusinf = ((isinf(Rx)) && (isinf(Rs*Rt)) && (Rs ^\nRx ^ Rt.31 != 0));\ninfinp = (isinf(Rx)) || (isinf(Rt)) || (isinf(Rs));\nif (isnan(Rx) || isnan(Rs) || isnan(Rt)) Rx = NaN;\n;\ntmp=fmaf(Rs,Rt,Rx);\nif (!((Rx == 0.0) && is_true_zero(Rs*Rt))) Rx = tmp;\ncancel_flags();\nif (isinf(Rx) && !infinp) Rx = Rx - 1;\nif (infminusinf) Rx = 0;"
+    ], 
+    [
+        "Rx-=sfmpy(Rs,Rt):lib", 
+        "round_to_nearest();\ninfminusinf = ((isinf(Rx)) && (isinf(Rs*Rt)) && (Rs ^\nRx ^ Rt.31 == 0));\ninfinp = (isinf(Rx)) || (isinf(Rt)) || (isinf(Rs));\nif (isnan(Rx) || isnan(Rs) || isnan(Rt)) Rx = NaN;\n;\ntmp=fmaf(-Rs,Rt,Rx);\nif (!((Rx == 0.0) && is_true_zero(Rs*Rt))) Rx = tmp;\ncancel_flags();\nif (isinf(Rx) && !infinp) Rx = Rx - 1;\nif (infminusinf) Rx = 0;"
+    ], 
+    [
+        "Rd=sfmake(#u10):neg", 
+        "Rd = (127 - 6) << 23;\nRd += (#u << 17);\nRd |= (1 << 31);"
+    ], 
+    [
+        "Rd=sfmake(#u10):pos", 
+        "Rd = (127 - 6) << 23;\nRd += #u << 17;"
+    ], 
+    [
+        "Rdd=dfmake(#u10):neg", 
+        "Rdd = (1023ULL - 6) << 52;\nRdd += (#u) << 46;\nRdd |= ((1ULL) << 63);"
+    ], 
+    [
+        "Rdd=dfmake(#u10):pos", 
+        "Rdd = (1023ULL - 6) << 52;\nRdd += (#u) << 46;"
+    ], 
+    [
+        "Rd=sfmax(Rs,Rt)", 
+        "Rd = fmaxf(Rs,Rt);"
+    ], 
+    [
+        "Rd=sfmin(Rs,Rt)", 
+        "Rd = fmin(Rs,Rt);"
+    ], 
+    [
+        "Rd=sfmpy(Rs,Rt)", 
+        "Rd=Rs*Rt;"
+    ], 
+    [
+        "Rd,Pe=sfrecipa(Rs,Rt)", 
+        "if ((Rs,Rt,Rd,adjust)=recip_common(Rs,Rt)) {\nPe = adjust;\nidx = (Rt >> 16) & 0x7f;\nmant = (recip_lut[idx] << 15) | 1;\nexp = 127 - (exponent(Rt) - 127) - 1;\nRd = -1**Rt.31 * 1.MANT * 2**(exp-BIAS);\n}"
+    ], 
+    [
+        "Rd=sfsub(Rs,Rt)", 
+        "Rd=Rs-Rt;"
+    ], 
+    [
+        "Rd=+mpyi(Rs,#u8)", 
+        "apply_extension(#u);\r\nRd=Rs*#u;"
+    ], 
+    [
+        "Rd=-mpyi(Rs,#u8)", 
+        "Rd=Rs*-#u;"
+    ], 
+    [
+        "Rd=add(#u6,mpyi(Rs,#U6))", 
+        "apply_extension(#u);\r\nRd = #u + Rs*#U;"
+    ], 
+    [
+        "Rd=add(#u6,mpyi(Rs,Rt))", 
+        "apply_extension(#u);\r\nRd = #u + Rs*Rt;"
+    ], 
+    [
+        "Rd=add(Ru,mpyi(#u6:2,Rs))", 
+        "Rd = Ru + Rs*#u;"
+    ], 
+    [
+        "Rd=add(Ru,mpyi(Rs,#u6))", 
+        "apply_extension(#u);\r\nRd = Ru + Rs*#u;"
+    ], 
+    [
+        "Rd=mpyi(Rs,#m9)", 
+        "if (\"((#m9<0) && (#m9>-256))\") {\r\nAssembler mapped to: \"Rd=-mpyi(Rs,#m9*(-\r\n1))\";\r\n} else {\r\nAssembler mapped to: \"Rd=+mpyi(Rs,#m9)\";\r\n}"
+    ], 
+    [
+        "Rd=mpyi(Rs,Rt)", 
+        "Rd=Rs*Rt;"
+    ], 
+    [
+        "Rd=mpyui(Rs,Rt)", 
+        "Assembler mapped to: \"Rd=mpyi(Rs,Rt)\""
+    ], 
+    [
+        "Rx+=mpyi(Rs,#u8)", 
+        "apply_extension(#u);\nRx=Rx + (Rs*#u);"
+    ], 
+    [
+        "Rx+=mpyi(Rs,Rt)", 
+        "Rx=Rx + Rs*Rt;"
+    ], 
+    [
+        "Rx-=mpyi(Rs,#u8)", 
+        "apply_extension(#u);\nRx=Rx - (Rs*#u);"
+    ], 
+    [
+        "Ry=add(Ru,mpyi(Ry,Rs))", 
+        "Ry = Ru + Rs*Ry;"
+    ], 
+    [
+        "Rdd=vmpyweh(Rss,Rtt)[:<<1]:rnd:sat", 
+        "Rdd.w[1]=sat_32(((Rss.w[1] *\nRtt.h[2])[<<1]+0x8000)>>16);\nRdd.w[0]=sat_32(((Rss.w[0] *\nRtt.h[0])[<<1]+0x8000)>>16);"
+    ], 
+    [
+        "Rdd=vmpyweh(Rss,Rtt)[:<<1]:sat", 
+        "Rdd.w[1]=sat_32(((Rss.w[1] *\nRtt.h[2])[<<1])>>16);\nRdd.w[0]=sat_32(((Rss.w[0] *\nRtt.h[0])[<<1])>>16);"
+    ], 
+    [
+        "Rdd=vmpywoh(Rss,Rtt)[:<<1]:rnd:sat", 
+        "Rdd.w[1]=sat_32(((Rss.w[1] *\nRtt.h[3])[<<1]+0x8000)>>16);\nRdd.w[0]=sat_32(((Rss.w[0] *\nRtt.h[1])[<<1]+0x8000)>>16);"
+    ], 
+    [
+        "Rdd=vmpywoh(Rss,Rtt)[:<<1]:sat", 
+        "Rdd.w[1]=sat_32(((Rss.w[1] *\nRtt.h[3])[<<1])>>16);\nRdd.w[0]=sat_32(((Rss.w[0] *\nRtt.h[1])[<<1])>>16);"
+    ], 
+    [
+        "Rxx+=vmpyweh(Rss,Rtt)[:<<1]:rnd:sat", 
+        "Rxx.w[1]=sat_32(Rxx.w[1] + (((Rss.w[1] *\nRtt.h[2])[<<1]+0x8000)>>16));\nRxx.w[0]=sat_32(Rxx.w[0] + (((Rss.w[0] *\nRtt.h[0])[<<1]+0x8000)>>16));"
+    ], 
+    [
+        "Rxx+=vmpyweh(Rss,Rtt)[:<<1]:sat", 
+        "Rxx.w[1]=sat_32(Rxx.w[1] + (((Rss.w[1] *\nRtt.h[2])[<<1])>>16));\nRxx.w[0]=sat_32(Rxx.w[0] + (((Rss.w[0] *\nRtt.h[0])[<<1])>>16));"
+    ], 
+    [
+        "Rxx+=vmpywoh(Rss,Rtt)[:<<1]:rnd:sat", 
+        "Rxx.w[1]=sat_32(Rxx.w[1] + (((Rss.w[1] *\nRtt.h[3])[<<1]+0x8000)>>16));\nRxx.w[0]=sat_32(Rxx.w[0] + (((Rss.w[0] *\nRtt.h[1])[<<1]+0x8000)>>16 ));"
+    ], 
+    [
+        "Rxx+=vmpywoh(Rss,Rtt)[:<<1]:sat", 
+        "Rxx.w[1]=sat_32(Rxx.w[1] + (((Rss.w[1] *\nRtt.h[3])[<<1])>>16));\nRxx.w[0]=sat_32(Rxx.w[0] + (((Rss.w[0] *\nRtt.h[1])[<<1])>>16 ));"
+    ], 
+    [
+        "Rdd=vmpyweuh(Rss,Rtt)[:<<1]:rnd:sat", 
+        "Rdd.w[1]=sat_32(((Rss.w[1] *\r\nRtt.uh[2])[<<1]+0x8000)>>16);\r\nRdd.w[0]=sat_32(((Rss.w[0] *\r\nRtt.uh[0])[<<1]+0x8000)>>16);"
+    ], 
+    [
+        "Rdd=vmpyweuh(Rss,Rtt)[:<<1]:sat", 
+        "Rdd.w[1]=sat_32(((Rss.w[1] *\nRtt.uh[2])[<<1])>>16);\nRdd.w[0]=sat_32(((Rss.w[0] *\nRtt.uh[0])[<<1])>>16);"
+    ], 
+    [
+        "Rdd=vmpywouh(Rss,Rtt)[:<<1]:rnd:sat", 
+        "Rdd.w[1]=sat_32(((Rss.w[1] *\nRtt.uh[3])[<<1]+0x8000)>>16);\nRdd.w[0]=sat_32(((Rss.w[0] *\nRtt.uh[1])[<<1]+0x8000)>>16);"
+    ], 
+    [
+        "Rdd=vmpywouh(Rss,Rtt)[:<<1]:sat", 
+        "Rdd.w[1]=sat_32(((Rss.w[1] *\nRtt.uh[3])[<<1])>>16);\nRdd.w[0]=sat_32(((Rss.w[0] *\nRtt.uh[1])[<<1])>>16);"
+    ], 
+    [
+        "Rxx+=vmpyweuh(Rss,Rtt)[:<<1]:rnd:sat", 
+        "Rxx.w[1]=sat_32(Rxx.w[1] + (((Rss.w[1] *\nRtt.uh[2])[<<1]+0x8000)>>16));\nRxx.w[0]=sat_32(Rxx.w[0] + (((Rss.w[0] *\nRtt.uh[0])[<<1]+0x8000)>>16));"
+    ], 
+    [
+        "Rxx+=vmpyweuh(Rss,Rtt)[:<<1]:sat", 
+        "Rxx.w[1]=sat_32(Rxx.w[1] + (((Rss.w[1] *\nRtt.uh[2])[<<1])>>16));\nRxx.w[0]=sat_32(Rxx.w[0] + (((Rss.w[0] *\nRtt.uh[0])[<<1])>>16));"
+    ], 
+    [
+        "Rxx+=vmpywouh(Rss,Rtt)[:<<1]:rnd:sat", 
+        "Rxx.w[1]=sat_32(Rxx.w[1] + (((Rss.w[1] *\nRtt.uh[3])[<<1]+0x8000)>>16));\nRxx.w[0]=sat_32(Rxx.w[0] + (((Rss.w[0] *\nRtt.uh[1])[<<1]+0x8000)>>16 ));"
+    ], 
+    [
+        "Rxx+=vmpywouh(Rss,Rtt)[:<<1]:sat", 
+        "Rxx.w[1]=sat_32(Rxx.w[1] + (((Rss.w[1] *\nRtt.uh[3])[<<1])>>16));\nRxx.w[0]=sat_32(Rxx.w[0] + (((Rss.w[0] *\nRtt.uh[1])[<<1])>>16 ));"
+    ], 
+    [
+        "Rd=mpy(Rs.[HL],Rt.[HL])[:<<1][:rnd][:sat]", 
+        "Rd=[sat_32]([round]((Rs.h[01] * Rt.h[01])[<<1]));\""
+    ], 
+    [
+        "Rdd=mpy(Rs.[HL],Rt.[HL])[:<<1][:rnd]", 
+        "Rdd=[round]((Rs.h[01] * Rt.h[01])[<<1]);"
+    ], 
+    [
+        "Rx+=mpy(Rs.[HL],Rt.[HL])[:<<1][:sat]", 
+        "Rx=[sat_32](Rx+ (Rs.h[01] * Rt.h[01])[<<1]);"
+    ], 
+    [
+        "Rx-=mpy(Rs.[HL],Rt.[HL])[:<<1][:sat]", 
+        "Rx=[sat_32](Rx- (Rs.h[01] * Rt.h[01])[<<1]);"
+    ], 
+    [
+        "Rxx+=mpy(Rs.[HL],Rt.[HL])[:<<1]", 
+        "Rxx=Rxx+ (Rs.h[01] * Rt.h[01])[<<1];"
+    ], 
+    [
+        "Rxx-=mpy(Rs.[HL],Rt.[HL])[:<<1]", 
+        "Rxx=Rxx- (Rs.h[01] * Rt.h[01])[<<1];"
+    ], 
+    [
+        "Rd=mpyu(Rs.[HL],Rt.[HL])[:<<1]", 
+        "Rd=(Rs.uh[01] * Rt.uh[01])[<<1];"
+    ], 
+    [
+        "Rdd=mpyu(Rs.[HL],Rt.[HL])[:<<1]", 
+        "Rdd=(Rs.uh[01] * Rt.uh[01])[<<1];"
+    ], 
+    [
+        "Rx+=mpyu(Rs.[HL],Rt.[HL])[:<<1]", 
+        "Rx=Rx+ (Rs.uh[01] * Rt.uh[01])[<<1];"
+    ], 
+    [
+        "Rx-=mpyu(Rs.[HL],Rt.[HL])[:<<1]", 
+        "Rx=Rx- (Rs.uh[01] * Rt.uh[01])[<<1];"
+    ], 
+    [
+        "Rxx+=mpyu(Rs.[HL],Rt.[HL])[:<<1]", 
+        "Rxx=Rxx+ (Rs.uh[01] * Rt.uh[01])[<<1];"
+    ], 
+    [
+        "Rxx-=mpyu(Rs.[HL],Rt.[HL])[:<<1]", 
+        "Rxx=Rxx- (Rs.uh[01] * Rt.uh[01])[<<1];"
+    ], 
+    [
+        "Rdd=pmpyw(Rs,Rt)", 
+        "x = Rs.uw[0];\r\ny = Rt.uw[0];\r\nprod = 0;\r\nfor(i=0; i < 32; i++) {\r\nif((y >> i) & 1) prod ^= (x << i);\r\n}\r\nRdd = prod;"
+    ], 
+    [
+        "Rxx^=pmpyw(Rs,Rt)", 
+        "x = Rs.uw[0];\r\ny = Rt.uw[0];\r\nprod = 0;\r\nfor(i=0; i < 32; i++) {\r\nif((y >> i) & 1) prod ^= (x << i);\r\n}\r\nRxx ^= prod;"
+    ], 
+    [
+        "Rdd=vrmpyweh(Rss,Rtt)[:<<1]", 
+        "Rdd = (Rss.w[1] * Rtt.h[2])[<<1] + (Rss.w[0] *\r\nRtt.h[0])[<<1];"
+    ], 
+    [
+        "Rdd=vrmpywoh(Rss,Rtt)[:<<1]", 
+        "Rdd = (Rss.w[1] * Rtt.h[3])[<<1] + (Rss.w[0] *\r\nRtt.h[1])[<<1];"
+    ], 
+    [
+        "Rxx+=vrmpyweh(Rss,Rtt)[:<<1]", 
+        "Rxx += (Rss.w[1] * Rtt.h[2])[<<1] + (Rss.w[0] *\r\nRtt.h[0])[<<1];"
+    ], 
+    [
+        "Rxx+=vrmpywoh(Rss,Rtt)[:<<1]", 
+        "Rxx += (Rss.w[1] * Rtt.h[3])[<<1] + (Rss.w[0] *\r\nRtt.h[1])[<<1];"
+    ], 
+    [
+        "Rd=mpy(Rs,Rt.H):<<1:rnd:sat", 
+        "Rd = sat_32(((Rs * Rt.h[1])<<1+0x8000)>>16);"
+    ], 
+    [
+        "Rd=mpy(Rs,Rt.H):<<1:sat", 
+        "Rd = sat_32(((Rs * Rt.h[1])<<1)>>16);"
+    ], 
+    [
+        "Rd=mpy(Rs,Rt.L):<<1:rnd:sat", 
+        "Rd = sat_32(((Rs * Rt.h[0])<<1+0x8000)>>16);"
+    ], 
+    [
+        "Rd=mpy(Rs,Rt.L):<<1:sat", 
+        "Rd = sat_32(((Rs * Rt.h[0])<<1)>>16);"
+    ], 
+    [
+        "Rd=mpy(Rs,Rt)", 
+        "Rd=(Rs * Rt)>>32;"
+    ], 
+    [
+        "Rd=mpy(Rs,Rt):<<1", 
+        "Rd=(Rs * Rt)>>31;"
+    ], 
+    [
+        "Rd=mpy(Rs,Rt):<<1:sat", 
+        "Rd=sat_32((Rs * Rt)>>31);"
+    ], 
+    [
+        "Rd=mpy(Rs,Rt):rnd", 
+        "Rd=((Rs * Rt)+0x80000000)>>32;"
+    ], 
+    [
+        "Rd=mpysu(Rs,Rt)", 
+        "Rd=(Rs * Rt.uw[0])>>32;"
+    ], 
+    [
+        "Rd=mpyu(Rs,Rt)", 
+        "Rd=(Rs.uw[0] * Rt.uw[0])>>32;"
+    ], 
+    [
+        "Rx+=mpy(Rs,Rt):<<1:sat", 
+        "Rx=sat_32((Rx) + ((Rs * Rt)>>31));"
+    ], 
+    [
+        "Rx-=mpy(Rs,Rt):<<1:sat", 
+        "Rx=sat_32((Rx) - ((Rs * Rt)>>31));"
+    ], 
+    [
+        "Rdd=mpy(Rs,Rt)", 
+        "Rdd=(Rs * Rt);"
+    ], 
+    [
+        "Rdd=mpyu(Rs,Rt)", 
+        "Rdd=(Rs.uw[0] * Rt.uw[0]);"
+    ], 
+    [
+        "Rxx[+-]=mpy(Rs,Rt)", 
+        "Rxx= Rxx[+-](Rs * Rt);"
+    ], 
+    [
+        "Rxx[+-]=mpyu(Rs,Rt)", 
+        "Rxx= Rxx[+-](Rs.uw[0] * Rt.uw[0]);"
+    ], 
+    [
+        "Rdd=vdmpy(Rss,Rtt):<<1:sat", 
+        "Rdd.w[0]=sat_32((Rss.h[0] * Rtt.h[0])<<1 +\n(Rss.h[1] * Rtt.h[1])<<1);\nRdd.w[1]=sat_32((Rss.h[2] * Rtt.h[2])<<1 +\n(Rss.h[3] * Rtt.h[3])<<1);"
+    ], 
+    [
+        "Rdd=vdmpy(Rss,Rtt):sat", 
+        "Rdd.w[0]=sat_32((Rss.h[0] * Rtt.h[0])<<0 +\n(Rss.h[1] * Rtt.h[1])<<0);\nRdd.w[1]=sat_32((Rss.h[2] * Rtt.h[2])<<0 +\n(Rss.h[3] * Rtt.h[3])<<0);"
+    ], 
+    [
+        "Rxx+=vdmpy(Rss,Rtt):<<1:sat", 
+        "Rxx.w[0]=sat_32(Rxx.w[0] + (Rss.h[0] *\nRtt.h[0])<<1 + (Rss.h[1] * Rtt.h[1])<<1);\nRxx.w[1]=sat_32(Rxx.w[1] + (Rss.h[2] *\nRtt.h[2])<<1 + (Rss.h[3] * Rtt.h[3])<<1);"
+    ], 
+    [
+        "Rxx+=vdmpy(Rss,Rtt):sat", 
+        "Rxx.w[0]=sat_32(Rxx.w[0] + (Rss.h[0] *\nRtt.h[0])<<0 + (Rss.h[1] * Rtt.h[1])<<0);\nRxx.w[1]=sat_32(Rxx.w[1] + (Rss.h[2] *\nRtt.h[2])<<0 + (Rss.h[3] * Rtt.h[3])<<0);"
+    ], 
+    [
+        "Rd=vdmpy(Rss,Rtt)[:<<1]:rnd:sat", 
+        "Rd.h[0]=(sat_32((Rss.h[0] * Rtt.h[0])[<<1] +\n(Rss.h[1] * Rtt.h[1])[<<1] + 0x8000)).h[1];\nRd.h[1]=(sat_32((Rss.h[2] * Rtt.h[2])[<<1] +\n(Rss.h[3] * Rtt.h[3])[<<1] + 0x8000)).h[1];"
+    ], 
+    [
+        "Rdd=vrmpybsu(Rss,Rtt)", 
+        "Rdd.w[0]=((Rss.b[0] * Rtt.ub[0]) + (Rss.b[1] *\nRtt.ub[1]) + (Rss.b[2] * Rtt.ub[2]) + (Rss.b[3]\n* Rtt.ub[3]));\nRdd.w[1]=((Rss.b[4] * Rtt.ub[4]) + (Rss.b[5] *\nRtt.ub[5]) + (Rss.b[6] * Rtt.ub[6]) + (Rss.b[7]\n* Rtt.ub[7]));"
+    ], 
+    [
+        "Rdd=vrmpybu(Rss,Rtt)", 
+        "Rdd.w[0]=((Rss.ub[0] * Rtt.ub[0]) + (Rss.ub[1] *\nRtt.ub[1]) + (Rss.ub[2] * Rtt.ub[2]) +\n(Rss.ub[3] * Rtt.ub[3]));\nRdd.w[1]=((Rss.ub[4] * Rtt.ub[4]) + (Rss.ub[5] *\nRtt.ub[5]) + (Rss.ub[6] * Rtt.ub[6]) +\n(Rss.ub[7] * Rtt.ub[7]));"
+    ], 
+    [
+        "Rxx+=vrmpybsu(Rss,Rtt)", 
+        "Rxx.w[0]=(Rxx.w[0] + (Rss.b[0] * Rtt.ub[0]) +\n(Rss.b[1] * Rtt.ub[1]) + (Rss.b[2] * Rtt.ub[2])\n+ (Rss.b[3] * Rtt.ub[3]));\nRxx.w[1]=(Rxx.w[1] + (Rss.b[4] * Rtt.ub[4]) +\n(Rss.b[5] * Rtt.ub[5]) + (Rss.b[6] * Rtt.ub[6])\n+ (Rss.b[7] * Rtt.ub[7]));"
+    ], 
+    [
+        "Rxx+=vrmpybu(Rss,Rtt)", 
+        "Rxx.w[0]=(Rxx.w[0] + (Rss.ub[0] * Rtt.ub[0]) +\n(Rss.ub[1] * Rtt.ub[1]) + (Rss.ub[2] *\nRtt.ub[2]) + (Rss.ub[3] * Rtt.ub[3]));\nRxx.w[1]=(Rxx.w[1] + (Rss.ub[4] * Rtt.ub[4]) +\n(Rss.ub[5] * Rtt.ub[5]) + (Rss.ub[6] *\nRtt.ub[6]) + (Rss.ub[7] * Rtt.ub[7]));"
+    ], 
+    [
+        "Rdd=vdmpybsu(Rss,Rtt):sat", 
+        "Rdd.h[0]=sat_16(((Rss.b[0] * Rtt.ub[0]) +\n(Rss.b[1] * Rtt.ub[1])));\nRdd.h[1]=sat_16(((Rss.b[2] * Rtt.ub[2]) +\n(Rss.b[3] * Rtt.ub[3])));\nRdd.h[2]=sat_16(((Rss.b[4] * Rtt.ub[4]) +\n(Rss.b[5] * Rtt.ub[5])));\nRdd.h[3]=sat_16(((Rss.b[6] * Rtt.ub[6]) +\n(Rss.b[7] * Rtt.ub[7])));"
+    ], 
+    [
+        "Rxx+=vdmpybsu(Rss,Rtt):sat", 
+        "Rxx.h[0]=sat_16((Rxx.h[0] + (Rss.b[0] *\nRtt.ub[0]) + (Rss.b[1] * Rtt.ub[1])));\nRxx.h[1]=sat_16((Rxx.h[1] + (Rss.b[2] *\nRtt.ub[2]) + (Rss.b[3] * Rtt.ub[3])));\nRxx.h[2]=sat_16((Rxx.h[2] + (Rss.b[4] *\nRtt.ub[4]) + (Rss.b[5] * Rtt.ub[5])));\nRxx.h[3]=sat_16((Rxx.h[3] + (Rss.b[6] *\nRtt.ub[6]) + (Rss.b[7] * Rtt.ub[7])));"
+    ], 
+    [
+        "Rdd=vmpyeh(Rss,Rtt):<<1:sat", 
+        "Rdd.w[0]=sat_32((Rss.h[0] * Rtt.h[0])<<1);\nRdd.w[1]=sat_32((Rss.h[2] * Rtt.h[2])<<1);"
+    ], 
+    [
+        "Rdd=vmpyeh(Rss,Rtt):sat", 
+        "Rdd.w[0]=sat_32((Rss.h[0] * Rtt.h[0])<<0);\nRdd.w[1]=sat_32((Rss.h[2] * Rtt.h[2])<<0);"
+    ], 
+    [
+        "Rxx+=vmpyeh(Rss,Rtt)", 
+        "Rxx.w[0]=Rxx.w[0] + (Rss.h[0] * Rtt.h[0]);\nRxx.w[1]=Rxx.w[1] + (Rss.h[2] * Rtt.h[2]);"
+    ], 
+    [
+        "Rxx+=vmpyeh(Rss,Rtt):<<1:sat", 
+        "Rxx.w[0]=sat_32(Rxx.w[0] + (Rss.h[0] *\nRtt.h[0])<<1);\nRxx.w[1]=sat_32(Rxx.w[1] + (Rss.h[2] *\nRtt.h[2])<<1);"
+    ], 
+    [
+        "Rxx+=vmpyeh(Rss,Rtt):sat", 
+        "Rxx.w[0]=sat_32(Rxx.w[0] + (Rss.h[0] *\nRtt.h[0])<<0);\nRxx.w[1]=sat_32(Rxx.w[1] + (Rss.h[2] *\nRtt.h[2])<<0);"
+    ], 
+    [
+        "Rdd=vmpyh(Rs,Rt)[:<<1]:sat", 
+        "Rdd.w[0]=sat_32((Rs.h[0] * Rt.h[0])[<<1]);\nRdd.w[1]=sat_32((Rs.h[1] * Rt.h[1])[<<1]);"
+    ], 
+    [
+        "Rxx+=vmpyh(Rs,Rt)", 
+        "Rxx.w[0]=Rxx.w[0] + (Rs.h[0] * Rt.h[0]);\nRxx.w[1]=Rxx.w[1] + (Rs.h[1] * Rt.h[1]);"
+    ], 
+    [
+        "Rxx+=vmpyh(Rs,Rt)[:<<1]:sat", 
+        "Rxx.w[0]=sat_32(Rxx.w[0] + (Rs.h[0] *\nRt.h[0])[<<1]);\nRxx.w[1]=sat_32(Rxx.w[1] + (Rs.h[1] *\nRt.h[1])[<<1]);"
+    ], 
+    [
+        "Rd=vmpyh(Rs,Rt)[:<<1]:rnd:sat", 
+        "Rd.h[1]=(sat_32((Rs.h[1] * Rt.h[1])[<<1] +\n0x8000)).h[1];\nRd.h[0]=(sat_32((Rs.h[0] * Rt.h[0])[<<1] +\n0x8000)).h[1];"
+    ], 
+    [
+        "Rdd=vmpyhsu(Rs,Rt)[:<<1]:sat", 
+        "Rdd.w[0]=sat_32((Rs.h[0] * Rt.uh[0])[<<1]);\nRdd.w[1]=sat_32((Rs.h[1] * Rt.uh[1])[<<1]);"
+    ], 
+    [
+        "Rxx+=vmpyhsu(Rs,Rt)[:<<1]:sat", 
+        "Rxx.w[0]=sat_32(Rxx.w[0] + (Rs.h[0] *\nRt.uh[0])[<<1]);\nRxx.w[1]=sat_32(Rxx.w[1] + (Rs.h[1] *\nRt.uh[1])[<<1]);"
+    ], 
+    [
+        "Rdd=vrmpyh(Rss,Rtt)", 
+        "Rdd = (Rss.h[0] * Rtt.h[0]) + (Rss.h[1] *\nRtt.h[1]) + (Rss.h[2] * Rtt.h[2]) + (Rss.h[3] *\nRtt.h[3]);"
+    ], 
+    [
+        "Rxx+=vrmpyh(Rss,Rtt)", 
+        "Rxx = Rxx + (Rss.h[0] * Rtt.h[0]) + (Rss.h[1] *\nRtt.h[1]) + (Rss.h[2] * Rtt.h[2]) + (Rss.h[3] *\nRtt.h[3]);"
+    ], 
+    [
+        "Rdd=vmpybsu(Rs,Rt)", 
+        "Rdd.h[0]=((Rs.b[0] * Rt.ub[0]));\nRdd.h[1]=((Rs.b[1] * Rt.ub[1]));\nRdd.h[2]=((Rs.b[2] * Rt.ub[2]));\nRdd.h[3]=((Rs.b[3] * Rt.ub[3]));"
+    ], 
+    [
+        "Rdd=vmpybu(Rs,Rt)", 
+        "Rdd.h[0]=((Rs.ub[0] * Rt.ub[0]));\nRdd.h[1]=((Rs.ub[1] * Rt.ub[1]));\nRdd.h[2]=((Rs.ub[2] * Rt.ub[2]));\nRdd.h[3]=((Rs.ub[3] * Rt.ub[3]));"
+    ], 
+    [
+        "Rxx+=vmpybsu(Rs,Rt)", 
+        "Rxx.h[0]=(Rxx.h[0]+(Rs.b[0] * Rt.ub[0]));\nRxx.h[1]=(Rxx.h[1]+(Rs.b[1] * Rt.ub[1]));\nRxx.h[2]=(Rxx.h[2]+(Rs.b[2] * Rt.ub[2]));\nRxx.h[3]=(Rxx.h[3]+(Rs.b[3] * Rt.ub[3]));"
+    ], 
+    [
+        "Rxx+=vmpybu(Rs,Rt)", 
+        "Rxx.h[0]=(Rxx.h[0]+(Rs.ub[0] * Rt.ub[0]));\nRxx.h[1]=(Rxx.h[1]+(Rs.ub[1] * Rt.ub[1]));\nRxx.h[2]=(Rxx.h[2]+(Rs.ub[2] * Rt.ub[2]));\nRxx.h[3]=(Rxx.h[3]+(Rs.ub[3] * Rt.ub[3]));"
+    ], 
+    [
+        "Rdd=vpmpyh(Rs,Rt)", 
+        "x0 = Rs.uh[0];\nx1 = Rs.uh[1];\ny0 = Rt.uh[0];\ny1 = Rt.uh[1];\nprod0 = prod1 = 0;\nfor(i=0; i < 16; i++) {\nif((y0 >> i) & 1) prod0 ^= (x0 << i);\nif((y1 >> i) & 1) prod1 ^= (x1 << i);\n}\nRdd.h[0]=prod0.uh[0];\nRdd.h[1]=prod1.uh[0];\nRdd.h[2]=prod0.uh[1];\nRdd.h[3]=prod1.uh[1];"
+    ], 
+    [
+        "Rxx^=vpmpyh(Rs,Rt)", 
+        "x0 = Rs.uh[0];\nx1 = Rs.uh[1];\ny0 = Rt.uh[0];\ny1 = Rt.uh[1];\nprod0 = prod1 = 0;\nfor(i=0; i < 16; i++) {\nif((y0 >> i) & 1) prod0 ^= (x0 << i);\nif((y1 >> i) & 1) prod1 ^= (x1 << i);\n}\nRxx.h[0]=Rxx.uh[0] ^ prod0.uh[0];\nRxx.h[1]=Rxx.uh[1] ^ prod1.uh[0];\nRxx.h[2]=Rxx.uh[2] ^ prod0.uh[1];\nRxx.h[3]=Rxx.uh[3] ^ prod1.uh[1];"
+    ], 
+    [
+        "Rdd=decbin(Rss,Rtt)", 
+        "state = Rtt.w[1][5:0];\nvalMPS = Rtt.w[1][8:8];\nbitpos = Rtt.w[0][4:0];\nrange = Rss.w[0];\noffset = Rss.w[1];\nrange <<= bitpos;\noffset <<= bitpos;\nrLPS = rLPS_table_64x4[state][ (range >>29)&3];\nrLPS = rLPS << 23;\nrMPS= (range&0xff800000) - rLPS;\nif (offset < rMPS) {\nRdd = AC_next_state_MPS_64[state];\nRdd[8:8]=valMPS;\nRdd[31:23]=(rMPS>>23);\nRdd.w[1]=offset;\nP0=valMPS;\n} else {\nRdd = AC_next_state_LPS_64[state];\nRdd[8:8]=((!state)?(1-valMPS):(valMPS));\nRdd[31:23]=(rLPS>>23);\nRdd.w[1]=(offset-rMPS);\nP0=(valMPS^1);\n}"
+    ], 
+    [
+        "Rd=sat(Rss)", 
+        "Rd = sat_32(Rss);"
+    ], 
+    [
+        "Rd=satb(Rs)", 
+        "Rd = sat_8(Rs);"
+    ], 
+    [
+        "Rd=sath(Rs)", 
+        "Rd = sat_16(Rs);"
+    ], 
+    [
+        "Rd=satub(Rs)", 
+        "Rd = usat_8(Rs);"
+    ], 
+    [
+        "Rd=satuh(Rs)", 
+        "Rd = usat_16(Rs);"
+    ], 
+    [
+        "Rd=swiz(Rs)", 
+        "Rd.b[0]=Rs.b[3];\nRd.b[1]=Rs.b[2];\nRd.b[2]=Rs.b[1];\nRd.b[3]=Rs.b[0];"
+    ], 
+    [
+        "Rdd=valignb(Rtt,Rss,#u3)", 
+        "Rdd = (Rss >>> #u*8)|(Rtt << ((8-#u)*8));"
+    ], 
+    [
+        "Rdd=valignb(Rtt,Rss,Pu)", 
+        "PREDUSE_TIMING;\nRdd = Rss >>> (Pu&0x7)*8|(Rtt << (8-(Pu&0x7))*8);\n"
+    ], 
+    [
+        "Rd=vrndwh(Rss)", 
+        "for (i=0;i<2;i++) {\r\nRd.h[i]=(Rss.w[i]+0x08000).h[1];\r\n}"
+    ], 
+    [
+        "Rd=vrndwh(Rss):sat", 
+        "for (i=0;i<2;i++) {\r\nRd.h[i]=sat_32(Rss.w[i]+0x08000).h[1];\r\n}"
+    ], 
+    [
+        "Rd=vsathb(Rs)", 
+        "Rd.b[0]=sat_8(Rs.h[0]);\r\nRd.b[1]=sat_8(Rs.h[1]);\r\nRd.b[2]=0;\r\nRd.b[3]=0;"
+    ], 
+    [
+        "Rd=vsathb(Rss)", 
+        "for (i=0;i<4;i++) {\r\nRd.b[i]=sat_8(Rss.h[i]);\r\n}"
+    ], 
+    [
+        "Rd=vsathub(Rs)", 
+        "Rd.b[0]=usat_8(Rs.h[0]);\nRd.b[1]=usat_8(Rs.h[1]);\nRd.b[2]=0;\nRd.b[3]=0;"
+    ], 
+    [
+        "Rd=vsathub(Rss)", 
+        "for (i=0;i<4;i++) {\nRd.b[i]=usat_8(Rss.h[i]);\n}"
+    ], 
+    [
+        "Rd=vsatwh(Rss)", 
+        "for (i=0;i<2;i++) {\nRd.h[i]=sat_16(Rss.w[i]);\n}"
+    ], 
+    [
+        "Rd=vsatwuh(Rss)", 
+        "for (i=0;i<2;i++) {\nRd.h[i]=usat_16(Rss.w[i]);\n}"
+    ], 
+    [
+        "Rdd=vsathb(Rss)", 
+        "for (i=0;i<4;i++) {\nRdd.h[i]=sat_8(Rss.h[i]);\n}"
+    ], 
+    [
+        "Rdd=vsathub(Rss)", 
+        "for (i=0;i<4;i++) {\nRdd.h[i]=usat_8(Rss.h[i]);\n}"
+    ], 
+    [
+        "Rdd=vsatwh(Rss)", 
+        "for (i=0;i<2;i++) {\nRdd.w[i]=sat_16(Rss.w[i]);\n}"
+    ], 
+    [
+        "Rdd=vsatwuh(Rss)", 
+        "for (i=0;i<2;i++) {\nRdd.w[i]=usat_16(Rss.w[i]);\n}"
+    ], 
+    [
+        "Rdd=shuffeb(Rss,Rtt)", 
+        "for (i=0;i<4;i++) {\nRdd.b[i*2]=Rtt.b[i*2];\nRdd.b[i*2+1]=Rss.b[i*2];\n}"
+    ], 
+    [
+        "Rdd=shuffeh(Rss,Rtt)", 
+        "for (i=0;i<2;i++) {\nRdd.h[i*2]=Rtt.h[i*2];\nRdd.h[i*2+1]=Rss.h[i*2];\n}"
+    ], 
+    [
+        "Rdd=shuffob(Rtt,Rss)", 
+        "for (i=0;i<4;i++) {\nRdd.b[i*2]=Rss.b[i*2+1];\nRdd.b[i*2+1]=Rtt.b[i*2+1];\n}"
+    ], 
+    [
+        "Rdd=shuffoh(Rtt,Rss)", 
+        "for (i=0;i<2;i++) {\nRdd.h[i*2]=Rss.h[i*2+1];\nRdd.h[i*2+1]=Rtt.h[i*2+1];\n}"
+    ], 
+    [
+        "Rd=vsplatb(Rs)", 
+        "for (i=0;i<4;i++) {\nRd.b[i]=Rs.b[0];\n}"
+    ], 
+    [
+        "Rdd=vsplatb(Rs)", 
+        "for (i=0;i<8;i++) {\nRdd.b[i]=Rs.b[0];\n}"
+    ], 
+    [
+        "Rdd=vsplath(Rs)", 
+        "for (i=0;i<4;i++) {\nRdd.h[i]=Rs.h[0];\n}"
+    ], 
+    [
+        "Rdd=vspliceb(Rss,Rtt,#u3)", 
+        "Rdd = Rtt << #u*8 | zxt#u*8->64(Rss);"
+    ], 
+    [
+        "Rdd=vspliceb(Rss,Rtt,Pu)", 
+        "PREDUSE_TIMING;\nRdd = Rtt << (Pu&7)*8 | zxt(Pu&7)*8->64(Rss);"
+    ], 
+    [
+        "Rdd=vsxtbh(Rs)", 
+        "for (i=0;i<4;i++) {\nRdd.h[i]=Rs.b[i];\n}"
+    ], 
+    [
+        "Rdd=vsxthw(Rs)", 
+        "for (i=0;i<2;i++) {\nRdd.w[i]=Rs.h[i];\n}"
+    ], 
+    [
+        "Rd=vtrunehb(Rss)", 
+        "for (i=0;i<4;i++) {\r\nRd.b[i]=Rss.b[i*2];\r\n}"
+    ], 
+    [
+        "Rd=vtrunohb(Rss)", 
+        "for (i=0;i<4;i++) {\r\nRd.b[i]=Rss.b[i*2+1];\r\n}"
+    ], 
+    [
+        "Rdd=vtrunehb(Rss,Rtt)", 
+        "for (i=0;i<4;i++) {\r\nRdd.b[i]=Rtt.b[i*2];\r\nRdd.b[i+4]=Rss.b[i*2];\r\n}"
+    ], 
+    [
+        "Rdd=vtrunewh(Rss,Rtt)", 
+        "Rdd.h[0]=Rtt.h[0];\r\nRdd.h[1]=Rtt.h[2];\r\nRdd.h[2]=Rss.h[0];\r\nRdd.h[3]=Rss.h[2];"
+    ], 
+    [
+        "Rdd=vtrunohb(Rss,Rtt)", 
+        "for (i=0;i<4;i++) {\r\nRdd.b[i]=Rtt.b[i*2+1];\r\nRdd.b[i+4]=Rss.b[i*2+1];\r\n}"
+    ], 
+    [
+        "Rdd=vtrunowh(Rss,Rtt)", 
+        "Rdd.h[0]=Rtt.h[1];\nRdd.h[1]=Rtt.h[3];\nRdd.h[2]=Rss.h[1];\nRdd.h[3]=Rss.h[3];"
+    ], 
+    [
+        "Rdd=vzxtbh(Rs)", 
+        "for (i=0;i<4;i++) {\nRdd.h[i]=Rs.ub[i];\n}"
+    ], 
+    [
+        "Rdd=vzxthw(Rs)", 
+        "for (i=0;i<2;i++) {\nRdd.w[i]=Rs.uh[i];\n}"
+    ], 
+    [
+        "Pd=boundscheck(Rs,Rtt)", 
+        "if (\"Rs & 1\") {\nAssembler mapped to:\n\"Pd=boundscheck(Rss,Rtt):raw:hi\";\n} else {\nAssembler mapped to:\n\"Pd=boundscheck(Rss,Rtt):raw:lo\";\n}"
+    ], 
+    [
+        "Pd=boundscheck(Rss,Rtt):raw:hi", 
+        "src = Rss.uw[1];\nPd = (src.uw[0] >= Rtt.uw[0]) && (src.uw[0] <\nRtt.uw[1]) ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=boundscheck(Rss,Rtt):raw:lo", 
+        "src = Rss.uw[0];\nPd = (src.uw[0] >= Rtt.uw[0]) && (src.uw[0] <\nRtt.uw[1]) ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=cmpb.eq(Rs,#u8)", 
+        "Pd=Rs.ub[0] == #u ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=cmpb.eq(Rs,Rt)", 
+        "Pd=Rs.b[0] == Rt.b[0] ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=cmpb.gt(Rs,#s8)", 
+        "Pd=Rs.b[0] > #s ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=cmpb.gt(Rs,Rt)", 
+        "Pd=Rs.b[0] > Rt.b[0] ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=cmpb.gtu(Rs,#u7)", 
+        "apply_extension(#u);\nPd=Rs.ub[0] > #u.uw[0] ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=cmpb.gtu(Rs,Rt)", 
+        "Pd=Rs.ub[0] > Rt.ub[0] ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=cmph.eq(Rs,#s8)", 
+        "apply_extension(#s);\nPd=Rs.h[0] == #s ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=cmph.eq(Rs,Rt)", 
+        "Pd=Rs.h[0] == Rt.h[0] ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=cmph.gt(Rs,#s8)", 
+        "apply_extension(#s);\nPd=Rs.h[0] > #s ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=cmph.gt(Rs,Rt)", 
+        "Pd=Rs.h[0] > Rt.h[0] ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=cmph.gtu(Rs,#u7)", 
+        "apply_extension(#u);\nPd=Rs.uh[0] > #u.uw[0] ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=cmph.gtu(Rs,Rt)", 
+        "Pd=Rs.uh[0] > Rt.uh[0] ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=cmp.eq(Rss,Rtt)", 
+        "Pd=Rss==Rtt ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=cmp.gt(Rss,Rtt)", 
+        "Pd=Rss>Rtt ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=cmp.gtu(Rss,Rtt)", 
+        "Pd=Rss.u64>Rtt.u64 ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=[!]bitsclr(Rs,#u6)", 
+        "Pd=(Rs&#u)[!]=0 ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=[!]bitsclr(Rs,Rt)", 
+        "Pd=(Rs&Rt)[!]=0 ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=[!]bitsset(Rs,Rt)", 
+        "Pd=(Rs&Rt)[!]=Rt ? 0xff : 0x00;"
+    ], 
+    [
+        "Rdd=mask(Pt)", 
+        "PREDUSE_TIMING;\nfor (i = 0; i < 8; i++) {\nRdd.b[i]=(Pt.i?(0xff):(0x00));\n}"
+    ], 
+    [
+        "Pd=tlbmatch(Rss,Rt)", 
+        "MASK = 0x07ffffff;\nTLBLO = Rss.uw[0];\nTLBHI = Rss.uw[1];\nSIZE =\nmin(6,count_leading_ones(~reverse_bits(TLBLO)));\nMASK &= (0xffffffff << 2*SIZE);\nPd = TLBHI.31 && ((TLBHI & MASK) == (Rt & MASK))\n? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=Rs", 
+        "Pd = Rs.ub[0];"
+    ], 
+    [
+        "Rd=Ps", 
+        "PREDUSE_TIMING;\nRd = zxt8->32(Ps);"
+    ], 
+    [
+        "Pd=[!]tstbit(Rs,#u5)", 
+        "Pd = (Rs & (1<<#u)) == 0 ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=[!]tstbit(Rs,Rt)", 
+        "Pd = (zxt32->64(Rs) & (sxt7->32(Rt)>0)?(zxt32-\n>64(1)<<sxt7->32(Rt)):(zxt32->64(1)>>>sxt7->32(Rt)))\n== 0 ? 0xff : 0x00;"
+    ], 
+    [
+        "Pd=vcmph.eq(Rss,#s8)", 
+        "for (i = 0; i < 4; i++) {\nPd.i*2 = (Rss.h[i] == #s);\nPd.i*2+1 = (Rss.h[i] == #s);\n}"
+    ], 
+    [
+        "Pd=vcmph.eq(Rss,Rtt)", 
+        "for (i = 0; i < 4; i++) {\nPd.i*2 = (Rss.h[i] == Rtt.h[i]);\nPd.i*2+1 = (Rss.h[i] == Rtt.h[i]);\n}"
+    ], 
+    [
+        "Pd=vcmph.gt(Rss,#s8)", 
+        "for (i = 0; i < 4; i++) {\nPd.i*2 = (Rss.h[i] > #s);\nPd.i*2+1 = (Rss.h[i] > #s);\n}"
+    ], 
+    [
+        "Pd=vcmph.gt(Rss,Rtt)", 
+        "for (i = 0; i < 4; i++) {\nPd.i*2 = (Rss.h[i] > Rtt.h[i]);\nPd.i*2+1 = (Rss.h[i] > Rtt.h[i]);\n}"
+    ], 
+    [
+        "Pd=vcmph.gtu(Rss,#u7)", 
+        "for (i = 0; i < 4; i++) {\nPd.i*2 = (Rss.uh[i] > #u);\nPd.i*2+1 = (Rss.uh[i] > #u);\n}"
+    ], 
+    [
+        "Pd=vcmph.gtu(Rss,Rtt)", 
+        "for (i = 0; i < 4; i++) {\nPd.i*2 = (Rss.uh[i] > Rtt.uh[i]);\nPd.i*2+1 = (Rss.uh[i] > Rtt.uh[i]);\n}"
+    ], 
+    [
+        "Pd=!any8(vcmpb.eq(Rss,Rtt))", 
+        "Pd = 0;\nfor (i = 0; i < 8; i++) {\nif (Rss.b[i] == Rtt.b[i]) Pd = 0xff;\n}\nPd = ~Pd;"
+    ], 
+    [
+        "Pd=any8(vcmpb.eq(Rss,Rtt))", 
+        "Pd = 0;\nfor (i = 0; i < 8; i++) {\nif (Rss.b[i] == Rtt.b[i]) Pd = 0xff;\n}"
+    ], 
+    [
+        "Pd=vcmpb.eq(Rss,#u8)", 
+        "for (i = 0; i < 8; i++) {\nPd.i = (Rss.ub[i] == #u);\n}"
+    ], 
+    [
+        "Pd=vcmpb.eq(Rss,Rtt)", 
+        "for (i = 0; i < 8; i++) {\nPd.i = (Rss.b[i] == Rtt.b[i]);\n}"
+    ], 
+    [
+        "Pd=vcmpb.gt(Rss,#s8)", 
+        "for (i = 0; i < 8; i++) {\nPd.i = (Rss.b[i] > #s);\n}"
+    ], 
+    [
+        "Pd=vcmpb.gt(Rss,Rtt)", 
+        "for (i = 0; i < 8; i++) {\nPd.i = (Rss.b[i] > Rtt.b[i]);\n}"
+    ], 
+    [
+        "Pd=vcmpb.gtu(Rss,#u7)", 
+        "for (i = 0; i < 8; i++) {\nPd.i = (Rss.ub[i] > #u);\n}"
+    ], 
+    [
+        "Pd=vcmpb.gtu(Rss,Rtt)", 
+        "for (i = 0; i < 8; i++) {\nPd.i = (Rss.ub[i] > Rtt.ub[i]);\n}"
+    ], 
+    [
+        "Pd=vcmpw.eq(Rss,#s8)", 
+        "Pd[3:0] = (Rss.w[0]==#s);\nPd[7:4] = (Rss.w[1]==#s);"
+    ], 
+    [
+        "Pd=vcmpw.eq(Rss,Rtt)", 
+        "Pd[3:0] = (Rss.w[0]==Rtt.w[0]);\nPd[7:4] = (Rss.w[1]==Rtt.w[1]);"
+    ], 
+    [
+        "Pd=vcmpw.gt(Rss,#s8)", 
+        "Pd[3:0] = (Rss.w[0]>#s);\nPd[7:4] = (Rss.w[1]>#s);"
+    ], 
+    [
+        "Pd=vcmpw.gt(Rss,Rtt)", 
+        "Pd[3:0] = (Rss.w[0]>Rtt.w[0]);\nPd[7:4] = (Rss.w[1]>Rtt.w[1]);"
+    ], 
+    [
+        "Pd=vcmpw.gtu(Rss,#u7)", 
+        "Pd[3:0] = (Rss.uw[0]>#u);\nPd[7:4] = (Rss.uw[1]>#u);"
+    ], 
+    [
+        "Pd=vcmpw.gtu(Rss,Rtt)", 
+        "Pd[3:0] = (Rss.uw[0]>Rtt.uw[0]);\nPd[7:4] = (Rss.uw[1]>Rtt.uw[1]);"
+    ], 
+    [
+        "Rd=vitpack(Ps,Pt)", 
+        "PREDUSE_TIMING;\nRd = (Ps&0x55) | (Pt&0xAA);"
+    ], 
+    [
+        "Rdd=vmux(Pu,Rss,Rtt)", 
+        "PREDUSE_TIMING;\nfor (i = 0; i < 8; i++) {\nRdd.b[i]=(Pu.i?(Rss.b[i]):(Rtt.b[i]));\n}"
+    ], 
+    [
+        "Rd=asl(Rs,#u5)", 
+        "Rd = Rs << #u;"
+    ], 
+    [
+        "Rd=asr(Rs,#u5)", 
+        "Rd = Rs >> #u;"
+    ], 
+    [
+        "Rd=lsr(Rs,#u5)", 
+        "Rd = Rs >>> #u;"
+    ], 
+    [
+        "Rd=rol(Rs,#u5)", 
+        "Rd = Rs <<R #u;"
+    ], 
+    [
+        "Rdd=asl(Rss,#u6)", 
+        "Rdd = Rss << #u;"
+    ], 
+    [
+        "Rdd=asr(Rss,#u6)", 
+        "Rdd = Rss >> #u;"
+    ], 
+    [
+        "Rdd=lsr(Rss,#u6)", 
+        "Rdd = Rss >>> #u;"
+    ], 
+    [
+        "Rdd=rol(Rss,#u6)", 
+        "Rdd = Rss <<R #u;"
+    ], 
+    [
+        "Rx=add(#u8,asl(Rx,#U5))", 
+        "Rx=apply_extension(#u)+(Rx<<#U);"
+    ], 
+    [
+        "Rx=add(#u8,lsr(Rx,#U5))", 
+        "Rx=apply_extension(#u)+(((unsigned int)Rx)>>#U);"
+    ], 
+    [
+        "Rx=sub(#u8,asl(Rx,#U5))", 
+        "Rx=apply_extension(#u)-(Rx<<#U);"
+    ], 
+    [
+        "Rx=sub(#u8,lsr(Rx,#U5))", 
+        "Rx=apply_extension(#u)-(((unsigned int)Rx)>>#U);"
+    ], 
+    [
+        "Rx[+-]=asl(Rs,#u5)", 
+        "Rx = Rx [+-] Rs << #u;"
+    ], 
+    [
+        "Rx[+-]=asr(Rs,#u5)", 
+        "Rx = Rx [+-] Rs >> #u;"
+    ], 
+    [
+        "Rx[+-]=lsr(Rs,#u5)", 
+        "Rx = Rx [+-] Rs >>> #u;"
+    ], 
+    [
+        "Rx[+-]=rol(Rs,#u5)", 
+        "Rx = Rx [+-] Rs <<R #u;"
+    ], 
+    [
+        "Rxx[+-]=asl(Rss,#u6)", 
+        "Rxx = Rxx [+-] Rss << #u;"
+    ], 
+    [
+        "Rxx[+-]=asr(Rss,#u6)", 
+        "Rxx = Rxx [+-] Rss >> #u;"
+    ], 
+    [
+        "Rxx[+-]=lsr(Rss,#u6)", 
+        "Rxx = Rxx [+-] Rss >>> #u;"
+    ], 
+    [
+        "Rxx[+-]=rol(Rss,#u6)", 
+        "Rxx = Rxx [+-] Rss <<R #u;"
+    ], 
+    [
+        "Rd=addasl(Rt,Rs,#u3)", 
+        "Rd = Rt + Rs << #u;"
+    ], 
+    [
+        "Rx=and(#u8,asl(Rx,#U5))", 
+        "Rx=apply_extension(#u)&(Rx<<#U);"
+    ], 
+    [
+        "Rx=and(#u8,lsr(Rx,#U5))", 
+        "Rx=apply_extension(#u)&(((unsigned int)Rx)>>#U);"
+    ], 
+    [
+        "Rx=or(#u8,asl(Rx,#U5))", 
+        "Rx=apply_extension(#u)|(Rx<<#U);"
+    ], 
+    [
+        "Rx=or(#u8,lsr(Rx,#U5))", 
+        "Rx=apply_extension(#u)|(((unsigned int)Rx)>>#U);"
+    ], 
+    [
+        "Rx[&|]=asl(Rs,#u5)", 
+        "Rx = Rx [|&] Rs << #u;"
+    ], 
+    [
+        "Rx[&|]=asr(Rs,#u5)", 
+        "Rx = Rx [|&] Rs >> #u;"
+    ], 
+    [
+        "Rx[&|]=lsr(Rs,#u5)", 
+        "Rx = Rx [|&] Rs >>> #u;"
+    ], 
+    [
+        "Rx[&|]=rol(Rs,#u5)", 
+        "Rx = Rx [|&] Rs <<R #u;"
+    ], 
+    [
+        "Rx^=asl(Rs,#u5)", 
+        "Rx = Rx ^ Rs << #u;"
+    ], 
+    [
+        "Rx^=lsr(Rs,#u5)", 
+        "Rx = Rx ^ Rs >>> #u;"
+    ], 
+    [
+        "Rx^=rol(Rs,#u5)", 
+        "Rx = Rx ^ Rs <<R #u;"
+    ], 
+    [
+        "Rxx[&|]=asl(Rss,#u6)", 
+        "Rxx = Rxx [|&] Rss << #u;"
+    ], 
+    [
+        "Rxx[&|]=asr(Rss,#u6)", 
+        "Rxx = Rxx [|&] Rss >> #u;"
+    ], 
+    [
+        "Rxx[&|]=lsr(Rss,#u6)", 
+        "Rxx = Rxx [|&] Rss >>> #u;"
+    ], 
+    [
+        "Rxx[&|]=rol(Rss,#u6)", 
+        "Rxx = Rxx [|&] Rss <<R #u;"
+    ], 
+    [
+        "Rxx^=asl(Rss,#u6)", 
+        "Rxx = Rxx ^ Rss << #u;"
+    ], 
+    [
+        "Rxx^=lsr(Rss,#u6)", 
+        "Rxx = Rxx ^ Rss >>> #u;"
+    ], 
+    [
+        "Rxx^=rol(Rss,#u6)", 
+        "Rxx = Rxx ^ Rss <<R #u;"
+    ], 
+    [
+        "Rd=asr(Rs,#u5):rnd", 
+        "Rd = ((Rs >> #u)+1) >> 1;"
+    ], 
+    [
+        "Rd=asrrnd(Rs,#u5)", 
+        "if (\"#u5==0\") {\r\nAssembler mapped to: \"Rd=Rs\";\r\n} else {\r\nAssembler mapped to: \"Rd=asr(Rs,#u5-1):rnd\";\r\n}"
+    ], 
+    [
+        "Rdd=asr(Rss,#u6):rnd", 
+        "tmp = Rss >> #u;\r\nrnd = tmp & 1;\r\nRdd = tmp >> 1 + rnd;"
+    ], 
+    [
+        "Rdd=asrrnd(Rss,#u6)", 
+        "if (\"#u6==0\") {\r\nAssembler mapped to: \"Rdd=Rss\";\r\n} else {\r\nAssembler mapped to: \"Rdd=asr(Rss,#u6-\r\n1):rnd\";\r\n}"
+    ], 
+    [
+        "Rd=asl(Rs,#u5):sat", 
+        "Rd = sat_32(sxt32->64(Rs) << #u);"
+    ], 
+    [
+        "Rd=asl(Rs,Rt)", 
+        "shamt=sxt7->32(Rt);\r\nRd = (shamt>0)?(sxt32->64(Rs)<<shamt):(sxt32-\r\n>64(Rs)>>shamt);"
+    ], 
+    [
+        "Rd=asr(Rs,Rt)", 
+        "shamt=sxt7->32(Rt);\r\nRd = (shamt>0)?(sxt32->64(Rs)>>shamt):(sxt32-\r\n>64(Rs)<<shamt);"
+    ], 
+    [
+        "Rd=lsl(#s6,Rt)", 
+        "shamt = sxt7->32(Rt);\r\nRd = (shamt>0)?(zxt32->64(#s)<<shamt):(zxt32-\r\n>64(#s)>>>shamt);"
+    ], 
+    [
+        "Rd=lsl(Rs,Rt)", 
+        "shamt=sxt7->32(Rt);\r\nRd = (shamt>0)?(zxt32->64(Rs)<<shamt):(zxt32-\r\n>64(Rs)>>>shamt);"
+    ], 
+    [
+        "Rd=lsr(Rs,Rt)", 
+        "shamt=sxt7->32(Rt);\nRd = (shamt>0)?(zxt32->64(Rs)>>>shamt):(zxt32-\n>64(Rs)<<shamt);"
+    ], 
+    [
+        "Rdd=asl(Rss,Rt)", 
+        "shamt=sxt7->32(Rt);\nRdd = (shamt>0)?(Rss<<shamt):(Rss>>shamt);"
+    ], 
+    [
+        "Rdd=asr(Rss,Rt)", 
+        "shamt=sxt7->32(Rt);\nRdd = (shamt>0)?(Rss>>shamt):(Rss<<shamt);"
+    ], 
+    [
+        "Rdd=lsl(Rss,Rt)", 
+        "shamt=sxt7->32(Rt);\nRdd = (shamt>0)?(Rss<<shamt):(Rss>>>shamt);"
+    ], 
+    [
+        "Rdd=lsr(Rss,Rt)", 
+        "shamt=sxt7->32(Rt);\nRdd = (shamt>0)?(Rss>>>shamt):(Rss<<shamt);"
+    ], 
+    [
+        "Rx[+-]=asl(Rs,Rt)", 
+        "shamt=sxt7->32(Rt);\nRx = Rx [+-] (shamt>0)?(sxt32->64(Rs)<<shamt):(sxt32-\n>64(Rs)>>shamt);"
+    ], 
+    [
+        "Rx[+-]=asr(Rs,Rt)", 
+        "shamt=sxt7->32(Rt);\nRx = Rx [+-] (shamt>0)?(sxt32->64(Rs)>>shamt):(sxt32-\n>64(Rs)<<shamt);"
+    ], 
+    [
+        "Rx[+-]=lsl(Rs,Rt)", 
+        "shamt=sxt7->32(Rt);\nRx = Rx [+-] (shamt>0)?(zxt32->64(Rs)<<shamt):(zxt32-\n>64(Rs)>>>shamt);"
+    ], 
+    [
+        "Rx[+-]=lsr(Rs,Rt)", 
+        "shamt=sxt7->32(Rt);\nRx = Rx [+-] (shamt>0)?(zxt32->64(Rs)>>>shamt):(zxt32-\n>64(Rs)<<shamt);"
+    ], 
+    [
+        "Rxx[+-]=asl(Rss,Rt)", 
+        "shamt=sxt7->32(Rt);\nRxx = Rxx [+-] (shamt>0)?(Rss<<shamt):(Rss>>shamt);"
+    ], 
+    [
+        "Rxx[+-]=asr(Rss,Rt)", 
+        "shamt=sxt7->32(Rt);\nRxx = Rxx [+-] (shamt>0)?(Rss>>shamt):(Rss<<shamt);"
+    ], 
+    [
+        "Rxx[+-]=lsl(Rss,Rt)", 
+        "shamt=sxt7->32(Rt);\nRxx = Rxx [+-] (shamt>0)?(Rss<<shamt):(Rss>>>shamt);"
+    ], 
+    [
+        "Rxx[+-]=lsr(Rss,Rt)", 
+        "shamt=sxt7->32(Rt);\nRxx = Rxx [+-] (shamt>0)?(Rss>>>shamt):(Rss<<shamt);"
+    ], 
+    [
+        "Rx[&|]=asl(Rs,Rt)", 
+        "shamt=sxt7->32(Rt);\nRx = Rx [|&] (shamt>0)?(sxt32->64(Rs)<<shamt):(sxt32-\n>64(Rs)>>shamt);"
+    ], 
+    [
+        "Rx[&|]=asr(Rs,Rt)", 
+        "shamt=sxt7->32(Rt);\nRx = Rx [|&] (shamt>0)?(sxt32->64(Rs)>>shamt):(sxt32-\n>64(Rs)<<shamt);"
+    ], 
+    [
+        "Rx[&|]=lsl(Rs,Rt)", 
+        "shamt=sxt7->32(Rt);\nRx = Rx [|&] (shamt>0)?(zxt32->64(Rs)<<shamt):(zxt32-\n>64(Rs)>>>shamt);"
+    ], 
+    [
+        "Rx[&|]=lsr(Rs,Rt)", 
+        "shamt=sxt7->32(Rt);\nRx = Rx [|&] (shamt>0)?(zxt32->64(Rs)>>>shamt):(zxt32-\n>64(Rs)<<shamt);"
+    ], 
+    [
+        "Rxx[&|]=asl(Rss,Rt)", 
+        "shamt=sxt7->32(Rt);\r\nRxx = Rxx [|&] (shamt>0)?(Rss<<shamt):(Rss>>shamt);"
+    ], 
+    [
+        "Rxx[&|]=asr(Rss,Rt)", 
+        "shamt=sxt7->32(Rt);\r\nRxx = Rxx [|&] (shamt>0)?(Rss>>shamt):(Rss<<shamt);"
+    ], 
+    [
+        "Rxx[&|]=lsl(Rss,Rt)", 
+        "shamt=sxt7->32(Rt);\r\nRxx = Rxx [|&] (shamt>0)?(Rss<<shamt):(Rss>>>shamt);"
+    ], 
+    [
+        "Rxx[&|]=lsr(Rss,Rt)", 
+        "shamt=sxt7->32(Rt);\r\nRxx = Rxx [|&] (shamt>0)?(Rss>>>shamt):(Rss<<shamt);"
+    ], 
+    [
+        "Rxx^=asl(Rss,Rt)", 
+        "shamt=sxt7->32(Rt);\r\nRxx = Rxx ^ (shamt>0)?(Rss<<shamt):(Rss>>shamt);"
+    ], 
+    [
+        "Rxx^=asr(Rss,Rt)", 
+        "shamt=sxt7->32(Rt);\r\nRxx = Rxx ^ (shamt>0)?(Rss>>shamt):(Rss<<shamt);"
+    ], 
+    [
+        "Rxx^=lsl(Rss,Rt)", 
+        "shamt=sxt7->32(Rt);\r\nRxx = Rxx ^ (shamt>0)?(Rss<<shamt):(Rss>>>shamt);"
+    ], 
+    [
+        "Rxx^=lsr(Rss,Rt)", 
+        "shamt=sxt7->32(Rt);\r\nRxx = Rxx ^ (shamt>0)?(Rss>>>shamt):(Rss<<shamt);"
+    ], 
+    [
+        "Rd=asl(Rs,Rt):sat", 
+        "shamt=sxt7->32(Rt);\nRd = bidir_shiftl(Rs,shamt);"
+    ], 
+    [
+        "Rd=asr(Rs,Rt):sat", 
+        "shamt=sxt7->32(Rt);\nRd = bidir_shiftr(Rs,shamt);\n"
+    ], 
+    [
+        "Rdd=vaslh(Rss,#u4)", 
+        "for (i=0;i<4;i++) {\r\nRdd.h[i]=(Rss.h[i]<<#u)\r\n}"
+    ], 
+    [
+        "Rdd=vasrh(Rss,#u4)", 
+        "for (i=0;i<4;i++) {\r\nRdd.h[i]=(Rss.h[i]>>#u)\r\n}"
+    ], 
+    [
+        "Rdd=vlsrh(Rss,#u4)", 
+        "for (i=0;i<4;i++) {\r\nRdd.h[i]=(Rss.uh[i]>>#u\r\n}"
+    ], 
+    [
+        "Rdd=vasrh(Rss,#u4):raw", 
+        "for (i=0;i<4;i++) {\nRdd.h[i]=( ((Rss.h[i] >> #u)+1)>>1 );\n}"
+    ], 
+    [
+        "Rdd=vasrh(Rss,#u4):rnd", 
+        "if (\"#u4==0\") {\nAssembler mapped to: \"Rdd=Rss\";\n} else {\nAssembler mapped to: \"Rdd=vasrh(Rss,#u4-\n1):raw\";\n}"
+    ], 
+    [
+        "Rd=vasrhub(Rss,#u4):raw", 
+        "for (i=0;i<4;i++) {\nRd.b[i]=usat_8(((Rss.h[i] >> #u )+1)>>1);\n}"
+    ], 
+    [
+        "Rd=vasrhub(Rss,#u4):rnd:sat", 
+        "if (\"#u4==0\") {\nAssembler mapped to: \"Rd=vsathub(Rss)\";\n} else {\nAssembler mapped to: \"Rd=vasrhub(Rss,#u4-\n1):raw\";\n}"
+    ], 
+    [
+        "Rd=vasrhub(Rss,#u4):sat", 
+        "for (i=0;i<4;i++) {\nRd.b[i]=usat_8(Rss.h[i] >> #u);\n}"
+    ], 
+    [
+        "Rdd=vaslh(Rss,Rt)", 
+        "for (i=0;i<4;i++) {\nRdd.h[i]=(sxt7->32(Rt)>0)?(sxt16-\n>64(Rss.h[i])<<sxt7->32(Rt)):(sxt16-\n>64(Rss.h[i])>>sxt7->32(Rt));\n}"
+    ], 
+    [
+        "Rdd=vasrh(Rss,Rt)", 
+        "for (i=0;i<4;i++) {\nRdd.h[i]=(sxt7->32(Rt)>0)?(sxt16-\n>64(Rss.h[i])>>sxt7->32(Rt)):(sxt16-\n>64(Rss.h[i])<<sxt7->32(Rt));\n}"
+    ], 
+    [
+        "Rdd=vlslh(Rss,Rt)", 
+        "for (i=0;i<4;i++) {\nRdd.h[i]=(sxt7->32(Rt)>0)?(zxt16-\n>64(Rss.uh[i])<<sxt7->32(Rt)):(zxt16-\n>64(Rss.uh[i])>>>sxt7->32(Rt));\n}"
+    ], 
+    [
+        "Rdd=vlsrh(Rss,Rt)", 
+        "for (i=0;i<4;i++) {\nRdd.h[i]=(sxt7->32(Rt)>0)?(zxt16-\n>64(Rss.uh[i])>>>sxt7->32(Rt)):(zxt16-\n>64(Rss.uh[i])<<sxt7->32(Rt));\n}"
+    ], 
+    [
+        "Rdd=vaslw(Rss,#u5)", 
+        "for (i=0;i<2;i++) {\nRdd.w[i]=(Rss.w[i]<<#u);\n}"
+    ], 
+    [
+        "Rdd=vasrw(Rss,#u5)", 
+        "for (i=0;i<2;i++) {\nRdd.w[i]=(Rss.w[i]>>#u);\n}"
+    ], 
+    [
+        "Rdd=vlsrw(Rss,#u5)", 
+        "for (i=0;i<2;i++) {\nRdd.w[i]=(Rss.uw[i]>>#u);\n}"
+    ], 
+    [
+        "Rdd=vaslw(Rss,Rt)", 
+        "for (i=0;i<2;i++) {\nRdd.w[i]=(sxt7->32(Rt)>0)?(sxt32-\n>64(Rss.w[i])<<sxt7->32(Rt)):(sxt32-\n>64(Rss.w[i])>>sxt7->32(Rt));\n}"
+    ], 
+    [
+        "Rdd=vasrw(Rss,Rt)", 
+        "for (i=0;i<2;i++) {\nRdd.w[i]=(sxt7->32(Rt)>0)?(sxt32-\n>64(Rss.w[i])>>sxt7->32(Rt)):(sxt32-\n>64(Rss.w[i])<<sxt7->32(Rt));\n}"
+    ], 
+    [
+        "Rdd=vlslw(Rss,Rt)", 
+        "for (i=0;i<2;i++) {\nRdd.w[i]=(sxt7->32(Rt)>0)?(zxt32-\n>64(Rss.uw[i])<<sxt7->32(Rt)):(zxt32-\n>64(Rss.uw[i])>>>sxt7->32(Rt));\n}"
+    ], 
+    [
+        "Rdd=vlsrw(Rss,Rt)", 
+        "for (i=0;i<2;i++) {\nRdd.w[i]=(sxt7->32(Rt)>0)?(zxt32-\n>64(Rss.uw[i])>>>sxt7->32(Rt)):(zxt32-\n>64(Rss.uw[i])<<sxt7->32(Rt));\n}"
+    ], 
+    [
+        "Rd=vasrw(Rss,#u5)", 
+        "or (i=0;i<2;i++) {\r\nRd.h[i]=(Rss.w[i]>>#u).h[0];"
+    ], 
+    [
+        "Rd=vasrw(Rss,Rt)", 
+        "or (i=0;i<2;i++) {\r\nRd.h[i]=(sxt7->32(Rt)>0)?(sxt32-\r\n64(Rss.w[i])>>sxt7->32(Rt)):(sxt32-\r\n64(Rss.w[i])<<sxt7->32(Rt)).h[0];"
+    ]
+]
