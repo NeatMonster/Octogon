@@ -19,6 +19,7 @@ REGISTER_SIZES = {
     "SS": 64,
     "P": 8,
     "M": 32,
+    "r": 32,
 }
 
 REGISTER_NAMES = {
@@ -31,7 +32,8 @@ REGISTER_NAMES = {
     "S": ["S{}".format(i) for i in range(32)],
     "SS": ["S{}_{}".format(i + 1, i) if i % 2 == 0 else "_" for i in range(0, 32)],
     "P": ["P{}".format(i) for i in range(4)],
-    "M": ["M{}".format(i) for i in range(2)],
+    "M": ["$(M{})".format(i) for i in range(2)],
+    "r": ["R{}".format(i) for i in list(range(0, 8)) + list(range(16, 24))],
 }
 
 REGISTER_ALIASES = {
@@ -497,7 +499,9 @@ class Node:
 
     def resize(self, scope, length):
         self.check(isinstance(self.type, Integer))
-        if Integer.compare_length(self.type.length, length):
+        if self.type.length == 0:
+            self.type.length = length
+        if self.type.length == length:
             return self
 
         if self.type.length < length:
@@ -588,30 +592,46 @@ class Assignment(Node, c_ast.Assignment):
 
 class BinaryOp(Node, c_ast.BinaryOp):
     ARITHMETIC = ["+", "-", "*", "/", "<<", ">>", "&", "|", "^"]
-    COMPARISON = ["==", "!=", "<", ">", "<=", ">="]
+    COMPARISON = ["==", "!=", "<", ">", "<=", ">=", "s<", "s>", "s<=", "s>="]
 
     def eval(self, scope):
         self.check(self.op in BinaryOp.ARITHMETIC + BinaryOp.COMPARISON)
         self.left = self.left.eval(scope)
         self.check(self.left.returns_value())
+        left_type = self.left.type
         self.right = self.right.eval(scope)
         self.check(self.right.returns_value())
+        right_type = self.right.type
 
         if self.op in [">>", "<<"]:
-            self.check(self.right.is_const())
-            self.type = self.left.type
+            self.type = left_type
             return self
 
-        if self.left.type.length < self.right.type.length:
-            self.left = self.left.resize(scope, self.right.type.length)
+        if left_type.length < right_type.length:
+            self.left = self.left.resize(scope, right_type.length)
 
-        if self.right.type.length < self.left.type.length:
-            self.right = self.right.resize(scope, self.left.type.length)
+        if right_type.length < left_type.length:
+            self.right = self.right.resize(scope, left_type.length)
 
         if self.op in BinaryOp.COMPARISON:
+            if self.op in ["<", ">", "<=", ">="]:
+                if left_type.signed == False or right_type.signed == False:
+                    self.check(Integer.compare_signed(left_type.signed, right_type.signed))
+
+                elif left_type.signed == True or right_type.signed == True:
+                    self.check(Integer.compare_signed(left_type.signed, right_type.signed))
+                    self.op = "s{}".format(self.op)
+
+                elif left_type.signed is None and right_type.signed is None:
+                    #print("Assuming comparison is signed for {}".format(self.print(scope)), file=sys.stderr)
+                    self.op = "s{}".format(self.op)
+
+                else:
+                    self.check(False)
+
             self.type = Integer(1, False)
         else:
-            self.type = self.left.type
+            self.type = left_type
         return self
 
     def print(self, scope):
@@ -817,6 +837,23 @@ class FuncCall(Node, c_ast.FuncCall):
             self.type = Integer(32, False)
             return self
 
+        elif self.name.get_name() == "constExtend":
+            self.args = self.args.eval(scope)
+            self.check(len(self.args.exprs) == 0)
+            self.type = Integer(0, None)
+            return self
+
+        elif self.name.get_name() == "circAdd":
+            self.args = self.args.eval(scope)
+            self.check(len(self.args.exprs) == 3)
+            # FIXME: Workaround for immediates
+            arg = self.args.exprs[1]
+            arg_name = "arg_{}".format(Node.labelify(arg.print(scope)))
+            scope.decl_variable(arg_name, arg.type, arg)
+            self.args.exprs[1] = ID(arg_name).eval(scope)
+            self.type = self.args.exprs[0].type
+            return self
+
         else:
             self.check(False)
 
@@ -836,7 +873,7 @@ class Goto(Node, c_ast.Goto):
 class ID(Node, c_ast.ID):
     IGNORED_FUNCTIONS = ["PREDUSE_TIMING", "NOP"]
     BUILTIN_FUNCTIONS = ["apply_extension", "sat", "usat", "sxt", "zxt",
-                         "newSuffix", "nextPacket"]
+                         "newSuffix", "nextPacket", "constExtend", "circAdd"]
     SUBPIECE_KEYWORDS = ["b", "ub", "h", "uh", "w", "uw", "new"]
 
     def eval(self, scope):
@@ -851,14 +888,32 @@ class ID(Node, c_ast.ID):
         self.name = scope.get_mapping(self.name)
         self.type = scope.get_variable(self.name)
         if self.type is None:
-            if self.name == "tmp":
+            if self.name in ["tmp", "EA"]:
                 self.type = Integer(32, False)
                 scope.decl_variable(self.name, self.type)
+                return self
+
+            if self.name in ["MuV", "tmpV"]:
+                return ID(self.name[:-1]).eval(scope)
+
+            if self.name == "I":
+                name = scope.get_mapping("Mu")
+                self.type = Integer(32, False)
+                line = "local I:4 = ((({} >> 28) & 0xf) << 7) | (({} >> 17) & 0x7f);"
+                scope.lines.append(line.format(name, name))
+                scope.add_variable("I", self.type)
                 return self
 
             if self.name == "NPC":
                 node = FuncCall(ID("nextPacket"), ExprList([]))
                 return node.eval(scope)
+
+            if self.name == "Constant_extended":
+                node = FuncCall(ID("constExtend"), ExprList([]))
+                return node.eval(scope)
+
+            if self.name == "circ_add":
+                return ID("circAdd").eval(scope)
 
             # Check if it is a register name
             for reg_type, tokens in REGISTER_NAMES.items():
@@ -907,7 +962,13 @@ class If(Node, c_ast.If):
         self.cond = self.cond.eval(scope)
         self.check(self.cond.returns_value())
 
-        if self.cond.type.length != 1:
+        if self.cond.type.length == 0:
+            arg_name = "arg_{}".format(Node.labelify(self.cond.print(scope)))
+            arg_type = Integer(32, False)
+            scope.decl_variable(arg_name, arg_type, self.cond)
+            self.cond = ID(arg_name).eval(scope)
+
+        if self.cond.type.length > 1:
             node = BinaryOp("!=", self.cond, Constant("int", "0"))
             self.cond = node.eval(scope)
 
@@ -1018,7 +1079,8 @@ class TernaryOp(Node, c_ast.TernaryOp):
 
         elif self.iftrue.returns_value() \
                 and self.iffalse.returns_value():
-            self.check(self.iftrue.type == self.iffalse.type)
+            self.check(Integer.compare_length(self.iftrue.type.length, self.iffalse.type.length))
+            self.check(Integer.compare_signed(self.iftrue.type.signed, self.iffalse.type.signed))
             cond = self.cond.print(scope)
             res_name = "res_{}".format(Node.labelify(cond))
             res_type = self.iftrue.type
@@ -1057,6 +1119,12 @@ class UnaryOp(Node, c_ast.UnaryOp):
             self.check(self.expr.is_assignable())
             self.type = Pointer(self.expr.type)
 
+        elif self.op == "*":
+            self.check(self.expr.is_ident())
+            self.check(self.expr.get_name() == "EA")
+            self.type = Integer(0, None)
+            return self
+
         elif self.op in ["+", "-"]:
             self.check(self.expr.returns_value())
             self.type = self.expr.type
@@ -1081,10 +1149,17 @@ class UnaryOp(Node, c_ast.UnaryOp):
         return self
 
     def print(self, scope):
+        expr = self.expr.print(scope)
         if self.op.startswith(":"):
-            return "{}{}".format(self.expr.print(scope), self.op)
-        elif self.op in ["&", "+", "-", "~", "!"]:
-            return "({}{})".format(self.op, self.expr.print(scope))
+            return "{}{}".format(expr, self.op)
+        elif self.op == "&":
+            return "{}{}".format(self.op, expr)
+        elif self.op == "*":
+            self.check(self.type.length > 0)
+            self.check(self.type.length % 8 == 0)
+            return "*:{} {}".format(self.type.length // 8, expr)
+        elif self.op in ["+", "-", "~", "!"]:
+            return "({}{})".format(self.op, expr)
 
 class Union(Node, c_ast.Union):
     pass
@@ -1200,8 +1275,10 @@ class Constructor:
     def generate_executor(self):
         for register in self.encoding.registers[::-1]:
             reg_beg, reg_end = register.ranges[0]
+            reg_length = reg_end - reg_beg + 1
             token = "{}_{}_{}".format(register.token, reg_end, reg_beg)
             reg_type = register.token[0] * (len(register.token) - 1)
+            reg_type = "r" if reg_type == "R" and reg_length == 4 else reg_type
             assert reg_type in REGISTER_SIZES, reg_type
             reg_length = REGISTER_SIZES[reg_type]
             if reg_type not in self.variables:
@@ -1312,7 +1389,7 @@ def main(args):
         print(";")
 
     print("")
-    pcodeops = ["newSuffix", "nextPacket"]
+    pcodeops = ["newSuffix", "nextPacket", "constExtend", "circAdd"]
     for pcodeop in pcodeops:
         print("define pcodeop {};".format(pcodeop))
 

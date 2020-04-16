@@ -58,6 +58,42 @@ define token encoding (32)
      Rss_20_16=(16,20)
      Cdd_4_0=(0,4)
      Css_20_16=(16,20)
+     Cs_20_16=(16,20)
+     bits_12_11=(11,12)
+     r22_24_16=(16,24) signed
+     r22_13_1=(1,13) signed
+     bits_0_0=(0,0)
+     r15_23_22=(22,23) signed
+     r15_20_16=(16,20) signed
+     r15_13_13=(13,13) signed
+     r15_7_1=(1,7) signed
+     bits_11_11=(11,11)
+     Rs_19_16=(16,19)
+     r9_21_20=(20,21) signed
+     r9_7_1=(1,7) signed
+     bits_9_8=(8,9)
+     U5_12_8=(8,12)
+     Rt_11_8=(8,11)
+     bits_13_12=(12,13)
+     r13_21_21=(21,21) signed
+     r13_13_13=(13,13) signed
+     r13_11_1=(1,11) signed
+     bits_12_12=(12,12)
+     Rd_19_16=(16,19)
+     U6_13_8=(8,13)
+     Rd_11_8=(8,11)
+     u2_13_13=(13,13)
+     u2_7_7=(7,7)
+     u16_26_25=(25,26)
+     u16_20_16=(16,20)
+     u16_13_5=(5,13)
+     bits_31_27=(27,31)
+     bits_24_21=(21,24)
+     s11_26_25=(25,26) signed
+     s11_13_5=(5,13) signed
+     Mu_13_13=(13,13)
+     s4_8_5=(5,8) signed
+     bits_9_9=(9,9)
 ;
 
 attach variables [ Rs_20_16 Rd_4_0 Rt_12_8 Rx_20_16 ]
@@ -78,7 +114,7 @@ attach variables [ Pu_22_21 Pu_24_23 Pu_6_5 Pu_9_8 Pd_1_0 Pt_9_8 Ps_17_16 Pu_7_6
     [P0 P1 P2 P3]
 ;
 
-attach variables [ Cd_4_0 ]
+attach variables [ Cd_4_0 Cs_20_16 ]
     [C0  C1  C2  C3  C4  C5  C6  C7 
      C8  C9  C10 C11 C12 C13 C14 C15
      C16 C17 C18 C19 C20 C21 C22 C23
@@ -92,8 +128,19 @@ attach variables [ Cdd_4_0 Css_20_16 ]
      C25_24 _      C27_26 _      C29_28 _      C31_30 _     ]
 ;
 
+attach variables [ Rs_19_16 Rt_11_8 Rd_19_16 Rd_11_8 ]
+    [R0  R1  R2  R3  R4  R5  R6  R7 
+     R16 R17 R18 R19 R20 R21 R22 R23]
+;
+
+attach variables [ Mu_13_13 ]
+    [$(M0) $(M1)]
+;
+
 define pcodeop newSuffix;
 define pcodeop nextPacket;
+define pcodeop constExtend;
+define pcodeop circAdd;
 
 # 
 # Rd=add(Rs,#s16)
@@ -287,7 +334,7 @@ define pcodeop nextPacket;
 :Q6_Rl_U_6 Rx_20_16, u16
         is bits_31_24=0b01110001 & u16_23_22 & bits_21_21=0b1 & Rx_20_16 & u16_13_0
             [u16 = (u16_23_22 << 0) | (u16_13_0 << 2);] {
-    local Rx_20_16_h:4 = (&Rx_20_16);
+    local Rx_20_16_h:4 = &Rx_20_16;
     *[register]:2 (Rx_20_16_h + 2 * 0) = u16:2;
 }
 
@@ -300,7 +347,7 @@ define pcodeop nextPacket;
 :Q6_Rh_U_6 Rx_20_16, u16
         is bits_31_24=0b01110010 & u16_23_22 & bits_21_21=0b1 & Rx_20_16 & u16_13_0
             [u16 = (u16_23_22 << 0) | (u16_13_0 << 2);] {
-    local Rx_20_16_h:4 = (&Rx_20_16);
+    local Rx_20_16_h:4 = &Rx_20_16;
     *[register]:2 (Rx_20_16_h + 2 * 1) = u16:2;
 }
 
@@ -340,9 +387,9 @@ define pcodeop nextPacket;
         is bits_31_21=0b11110110000 & Rs_20_16 & Rt_12_8 & Rd_4_0 {
     local i:4 = 0;
     <for_i>
-    local Rd_4_0_h:4 = (&Rd_4_0);
-    local Rs_20_16_h:4 = (&Rs_20_16);
-    local Rt_12_8_h:4 = (&Rt_12_8);
+    local Rd_4_0_h:4 = &Rd_4_0;
+    local Rs_20_16_h:4 = &Rs_20_16;
+    local Rt_12_8_h:4 = &Rt_12_8;
     *[register]:2 (Rd_4_0_h + 2 * i) = (*[register]:2 (Rs_20_16_h + 2 * i) + *[register]:2 (Rt_12_8_h + 2 * i));
     i = i + 1;
     if (i < 2) goto <for_i>;
@@ -360,9 +407,9 @@ define pcodeop nextPacket;
         is bits_31_21=0b11110110001 & Rs_20_16 & Rt_12_8 & Rd_4_0 {
     local i:4 = 0;
     <for_i>
-    local Rd_4_0_h:4 = (&Rd_4_0);
-    local Rs_20_16_h:4 = (&Rs_20_16);
-    local Rt_12_8_h:4 = (&Rt_12_8);
+    local Rd_4_0_h:4 = &Rd_4_0;
+    local Rs_20_16_h:4 = &Rs_20_16;
+    local Rt_12_8_h:4 = &Rt_12_8;
     *[register]:2 (Rd_4_0_h + 2 * i) = (*[register]:2 (Rs_20_16_h + 2 * i) + *[register]:2 (Rt_12_8_h + 2 * i));
     i = i + 1;
     if (i < 2) goto <for_i>;
@@ -380,9 +427,9 @@ define pcodeop nextPacket;
         is bits_31_21=0b11110110011 & Rs_20_16 & Rt_12_8 & Rd_4_0 {
     local i:4 = 0;
     <for_i>
-    local Rd_4_0_h:4 = (&Rd_4_0);
-    local Rs_20_16_uh:4 = (&Rs_20_16);
-    local Rt_12_8_uh:4 = (&Rt_12_8);
+    local Rd_4_0_h:4 = &Rd_4_0;
+    local Rs_20_16_uh:4 = &Rs_20_16;
+    local Rt_12_8_uh:4 = &Rt_12_8;
     *[register]:2 (Rd_4_0_h + 2 * i) = (*[register]:2 (Rs_20_16_uh + 2 * i) + *[register]:2 (Rt_12_8_uh + 2 * i));
     i = i + 1;
     if (i < 2) goto <for_i>;
@@ -400,9 +447,9 @@ define pcodeop nextPacket;
         is bits_31_24=0b11110111 & bits_22_21=0b00 & Rs_20_16 & Rt_12_8 & Rd_4_0 {
     local i:4 = 0;
     <for_i>
-    local Rd_4_0_h:4 = (&Rd_4_0);
-    local Rs_20_16_h:4 = (&Rs_20_16);
-    local Rt_12_8_h:4 = (&Rt_12_8);
+    local Rd_4_0_h:4 = &Rd_4_0;
+    local Rs_20_16_h:4 = &Rs_20_16;
+    local Rt_12_8_h:4 = &Rt_12_8;
     *[register]:2 (Rd_4_0_h + 2 * i) = ((*[register]:2 (Rs_20_16_h + 2 * i) + *[register]:2 (Rt_12_8_h + 2 * i)) >> 1);
     i = i + 1;
     if (i < 2) goto <for_i>;
@@ -420,9 +467,9 @@ define pcodeop nextPacket;
         is bits_31_24=0b11110111 & bits_22_21=0b01 & Rs_20_16 & Rt_12_8 & Rd_4_0 {
     local i:4 = 0;
     <for_i>
-    local Rd_4_0_h:4 = (&Rd_4_0);
-    local Rs_20_16_h:4 = (&Rs_20_16);
-    local Rt_12_8_h:4 = (&Rt_12_8);
+    local Rd_4_0_h:4 = &Rd_4_0;
+    local Rs_20_16_h:4 = &Rs_20_16;
+    local Rt_12_8_h:4 = &Rt_12_8;
     *[register]:2 (Rd_4_0_h + 2 * i) = (((*[register]:2 (Rs_20_16_h + 2 * i) + *[register]:2 (Rt_12_8_h + 2 * i)) + 1) >> 1);
     i = i + 1;
     if (i < 2) goto <for_i>;
@@ -440,9 +487,9 @@ define pcodeop nextPacket;
         is bits_31_24=0b11110111 & bits_22_21=0b11 & Rs_20_16 & Rt_12_8 & Rd_4_0 {
     local i:4 = 0;
     <for_i>
-    local Rd_4_0_h:4 = (&Rd_4_0);
-    local Rt_12_8_h:4 = (&Rt_12_8);
-    local Rs_20_16_h:4 = (&Rs_20_16);
+    local Rd_4_0_h:4 = &Rd_4_0;
+    local Rt_12_8_h:4 = &Rt_12_8;
+    local Rs_20_16_h:4 = &Rs_20_16;
     *[register]:2 (Rd_4_0_h + 2 * i) = ((*[register]:2 (Rt_12_8_h + 2 * i) - *[register]:2 (Rs_20_16_h + 2 * i)) >> 1);
     i = i + 1;
     if (i < 2) goto <for_i>;
@@ -460,9 +507,9 @@ define pcodeop nextPacket;
         is bits_31_21=0b11110110100 & Rs_20_16 & Rt_12_8 & Rd_4_0 {
     local i:4 = 0;
     <for_i>
-    local Rd_4_0_h:4 = (&Rd_4_0);
-    local Rt_12_8_h:4 = (&Rt_12_8);
-    local Rs_20_16_h:4 = (&Rs_20_16);
+    local Rd_4_0_h:4 = &Rd_4_0;
+    local Rt_12_8_h:4 = &Rt_12_8;
+    local Rs_20_16_h:4 = &Rs_20_16;
     *[register]:2 (Rd_4_0_h + 2 * i) = (*[register]:2 (Rt_12_8_h + 2 * i) - *[register]:2 (Rs_20_16_h + 2 * i));
     i = i + 1;
     if (i < 2) goto <for_i>;
@@ -480,9 +527,9 @@ define pcodeop nextPacket;
         is bits_31_21=0b11110110101 & Rs_20_16 & Rt_12_8 & Rd_4_0 {
     local i:4 = 0;
     <for_i>
-    local Rd_4_0_h:4 = (&Rd_4_0);
-    local Rt_12_8_h:4 = (&Rt_12_8);
-    local Rs_20_16_h:4 = (&Rs_20_16);
+    local Rd_4_0_h:4 = &Rd_4_0;
+    local Rt_12_8_h:4 = &Rt_12_8;
+    local Rs_20_16_h:4 = &Rs_20_16;
     *[register]:2 (Rd_4_0_h + 2 * i) = (*[register]:2 (Rt_12_8_h + 2 * i) - *[register]:2 (Rs_20_16_h + 2 * i));
     i = i + 1;
     if (i < 2) goto <for_i>;
@@ -500,9 +547,9 @@ define pcodeop nextPacket;
         is bits_31_21=0b11110110111 & Rs_20_16 & Rt_12_8 & Rd_4_0 {
     local i:4 = 0;
     <for_i>
-    local Rd_4_0_h:4 = (&Rd_4_0);
-    local Rt_12_8_uh:4 = (&Rt_12_8);
-    local Rs_20_16_uh:4 = (&Rs_20_16);
+    local Rd_4_0_h:4 = &Rd_4_0;
+    local Rt_12_8_uh:4 = &Rt_12_8;
+    local Rs_20_16_uh:4 = &Rs_20_16;
     *[register]:2 (Rd_4_0_h + 2 * i) = (*[register]:2 (Rt_12_8_uh + 2 * i) - *[register]:2 (Rs_20_16_uh + 2 * i));
     i = i + 1;
     if (i < 2) goto <for_i>;
@@ -530,7 +577,7 @@ define pcodeop nextPacket;
 :Q6_RR_combine_R_S Rdd_4_0, Rs_20_16, s8
         is bits_31_24=0b01110011 & bits_22_21=0b00 & Rs_20_16 & bits_13_13=0b1 & s8_12_5 & Rdd_4_0
             [s8 = (s8_12_5 << 0);] {
-    local Rdd_4_0_w:4 = (&Rdd_4_0);
+    local Rdd_4_0_w:4 = &Rdd_4_0;
     *[register]:4 (Rdd_4_0_w + 4 * 0) = s8;
     *[register]:4 (Rdd_4_0_w + 4 * 1) = Rs_20_16;
 }
@@ -546,7 +593,7 @@ define pcodeop nextPacket;
 :Q6_RR_combine_S_R Rdd_4_0, s8, Rs_20_16
         is bits_31_24=0b01110011 & bits_22_21=0b01 & Rs_20_16 & bits_13_13=0b1 & s8_12_5 & Rdd_4_0
             [s8 = (s8_12_5 << 0);] {
-    local Rdd_4_0_w:4 = (&Rdd_4_0);
+    local Rdd_4_0_w:4 = &Rdd_4_0;
     *[register]:4 (Rdd_4_0_w + 4 * 0) = Rs_20_16;
     *[register]:4 (Rdd_4_0_w + 4 * 1) = s8;
 }
@@ -562,7 +609,7 @@ define pcodeop nextPacket;
 :Q6_RR_combine_S_S Rdd_4_0, s8, S8
         is bits_31_23=0b011111000 & S8_22_16 & S8_13_13 & s8_12_5 & Rdd_4_0
             [S8 = (S8_22_16 << 0) | (S8_13_13 << 7); s8 = (s8_12_5 << 0);] {
-    local Rdd_4_0_w:4 = (&Rdd_4_0);
+    local Rdd_4_0_w:4 = &Rdd_4_0;
     *[register]:4 (Rdd_4_0_w + 4 * 0) = S8;
     *[register]:4 (Rdd_4_0_w + 4 * 1) = s8;
 }
@@ -578,7 +625,7 @@ define pcodeop nextPacket;
 :Q6_RR_combine_S_U Rdd_4_0, s8, U6
         is bits_31_23=0b011111001 & U6_20_16 & U6_13_13 & s8_12_5 & Rdd_4_0
             [U6 = (U6_20_16 << 0) | (U6_13_13 << 5); s8 = (s8_12_5 << 0);] {
-    local Rdd_4_0_w:4 = (&Rdd_4_0);
+    local Rdd_4_0_w:4 = &Rdd_4_0;
     *[register]:4 (Rdd_4_0_w + 4 * 0) = U6;
     *[register]:4 (Rdd_4_0_w + 4 * 1) = s8;
 }
@@ -591,8 +638,8 @@ define pcodeop nextPacket;
 # 
 :Q6_R_combine_Rh_Rh Rd_4_0, Rt_12_8, Rs_20_16
         is bits_31_21=0b11110011100 & Rs_20_16 & Rt_12_8 & Rd_4_0 {
-    local Rt_12_8_uh:4 = (&Rt_12_8);
-    local Rs_20_16_uh:4 = (&Rs_20_16);
+    local Rt_12_8_uh:4 = &Rt_12_8;
+    local Rs_20_16_uh:4 = &Rs_20_16;
     Rd_4_0 = zext(((*[register]:2 (Rt_12_8_uh + 2 * 1) << 16) | *[register]:2 (Rs_20_16_uh + 2 * 1)));
 }
 
@@ -604,8 +651,8 @@ define pcodeop nextPacket;
 # 
 :Q6_R_combine_Rh_Rl Rd_4_0, Rt_12_8, Rs_20_16
         is bits_31_21=0b11110011101 & Rs_20_16 & Rt_12_8 & Rd_4_0 {
-    local Rt_12_8_uh:4 = (&Rt_12_8);
-    local Rs_20_16_uh:4 = (&Rs_20_16);
+    local Rt_12_8_uh:4 = &Rt_12_8;
+    local Rs_20_16_uh:4 = &Rs_20_16;
     Rd_4_0 = zext(((*[register]:2 (Rt_12_8_uh + 2 * 1) << 16) | *[register]:2 (Rs_20_16_uh + 2 * 0)));
 }
 
@@ -617,8 +664,8 @@ define pcodeop nextPacket;
 # 
 :Q6_R_combine_Rl_Rh Rd_4_0, Rt_12_8, Rs_20_16
         is bits_31_21=0b11110011110 & Rs_20_16 & Rt_12_8 & Rd_4_0 {
-    local Rt_12_8_uh:4 = (&Rt_12_8);
-    local Rs_20_16_uh:4 = (&Rs_20_16);
+    local Rt_12_8_uh:4 = &Rt_12_8;
+    local Rs_20_16_uh:4 = &Rs_20_16;
     Rd_4_0 = zext(((*[register]:2 (Rt_12_8_uh + 2 * 0) << 16) | *[register]:2 (Rs_20_16_uh + 2 * 1)));
 }
 
@@ -630,8 +677,8 @@ define pcodeop nextPacket;
 # 
 :Q6_R_combine_Rl_Rl Rd_4_0, Rt_12_8, Rs_20_16
         is bits_31_21=0b11110011111 & Rs_20_16 & Rt_12_8 & Rd_4_0 {
-    local Rt_12_8_uh:4 = (&Rt_12_8);
-    local Rs_20_16_uh:4 = (&Rs_20_16);
+    local Rt_12_8_uh:4 = &Rt_12_8;
+    local Rs_20_16_uh:4 = &Rs_20_16;
     Rd_4_0 = zext(((*[register]:2 (Rt_12_8_uh + 2 * 0) << 16) | *[register]:2 (Rs_20_16_uh + 2 * 0)));
 }
 
@@ -644,7 +691,7 @@ define pcodeop nextPacket;
 # 
 :Q6_RR_combine_R_R Rdd_4_0, Rs_20_16, Rt_12_8
         is bits_31_23=0b111101010 & Rs_20_16 & Rt_12_8 & Rdd_4_0 {
-    local Rdd_4_0_w:4 = (&Rdd_4_0);
+    local Rdd_4_0_w:4 = &Rdd_4_0;
     *[register]:4 (Rdd_4_0_w + 4 * 0) = Rt_12_8;
     *[register]:4 (Rdd_4_0_w + 4 * 1) = Rs_20_16;
 }
@@ -756,9 +803,9 @@ define pcodeop nextPacket;
 # 
 :Q6_RR_packhl_R_R Rdd_4_0, Rs_20_16, Rt_12_8
         is bits_31_23=0b111101011 & Rs_20_16 & Rt_12_8 & Rdd_4_0 {
-    local Rdd_4_0_h:4 = (&Rdd_4_0);
-    local Rt_12_8_h:4 = (&Rt_12_8);
-    local Rs_20_16_h:4 = (&Rs_20_16);
+    local Rdd_4_0_h:4 = &Rdd_4_0;
+    local Rt_12_8_h:4 = &Rt_12_8;
+    local Rs_20_16_h:4 = &Rs_20_16;
     *[register]:2 (Rdd_4_0_h + 2 * 0) = *[register]:2 (Rt_12_8_h + 2 * 0);
     *[register]:2 (Rdd_4_0_h + 2 * 1) = *[register]:2 (Rs_20_16_h + 2 * 0);
     *[register]:2 (Rdd_4_0_h + 2 * 2) = *[register]:2 (Rt_12_8_h + 2 * 1);
@@ -1101,7 +1148,7 @@ define pcodeop nextPacket;
     if (Pu_6_5[0, 1]) goto <if_Pu_6_5_0_1>;
     goto <endif_Pu_6_5_0_1>;
     <if_Pu_6_5_0_1>
-    local Rdd_4_0_w:4 = (&Rdd_4_0);
+    local Rdd_4_0_w:4 = &Rdd_4_0;
     *[register]:4 (Rdd_4_0_w + 4 * 0) = Rt_12_8;
     *[register]:4 (Rdd_4_0_w + 4 * 1) = Rs_20_16;
     <endif_Pu_6_5_0_1>
@@ -1123,7 +1170,7 @@ define pcodeop nextPacket;
     if ((!Pu_6_5[0, 1])) goto <if_Pu_6_5_0_1>;
     goto <endif_Pu_6_5_0_1>;
     <if_Pu_6_5_0_1>
-    local Rdd_4_0_w:4 = (&Rdd_4_0);
+    local Rdd_4_0_w:4 = &Rdd_4_0;
     *[register]:4 (Rdd_4_0_w + 4 * 0) = Rt_12_8;
     *[register]:4 (Rdd_4_0_w + 4 * 1) = Rs_20_16;
     <endif_Pu_6_5_0_1>
@@ -1146,7 +1193,7 @@ define pcodeop nextPacket;
     if (new_new[0, 1]) goto <if_new_new_0_1>;
     goto <endif_new_new_0_1>;
     <if_new_new_0_1>
-    local Rdd_4_0_w:4 = (&Rdd_4_0);
+    local Rdd_4_0_w:4 = &Rdd_4_0;
     *[register]:4 (Rdd_4_0_w + 4 * 0) = Rt_12_8;
     *[register]:4 (Rdd_4_0_w + 4 * 1) = Rs_20_16;
     <endif_new_new_0_1>
@@ -1169,7 +1216,7 @@ define pcodeop nextPacket;
     if ((!new_new[0, 1])) goto <if_new_new_0_1>;
     goto <endif_new_new_0_1>;
     <if_new_new_0_1>
-    local Rdd_4_0_w:4 = (&Rdd_4_0);
+    local Rdd_4_0_w:4 = &Rdd_4_0;
     *[register]:4 (Rdd_4_0_w + 4 * 0) = Rt_12_8;
     *[register]:4 (Rdd_4_0_w + 4 * 1) = Rs_20_16;
     <endif_new_new_0_1>
@@ -1935,14 +1982,14 @@ define pcodeop nextPacket;
 :Q6_P_cmp_gt_R_S_0 Pd_1_0, Rs_20_16, s10
         is bits_31_22=0b0111010101 & s10_21_21 & Rs_20_16 & s10_13_5 & bits_4_2=0b000 & Pd_1_0
             [s10 = (s10_21_21 << 0) | (s10_13_5 << 1);] {
-    local res_Rs_20_16_s10:4;
-    if ((Rs_20_16 > s10)) goto <if_Rs_20_16_s10>;
-    res_Rs_20_16_s10 = 0x00;
-    goto <endif_Rs_20_16_s10>;
-    <if_Rs_20_16_s10>
-    res_Rs_20_16_s10 = 0xff;
-    <endif_Rs_20_16_s10>
-    Pd_1_0 = res_Rs_20_16_s10:1;
+    local res_Rs_20_16_s_s10:4;
+    if ((Rs_20_16 s> s10)) goto <if_Rs_20_16_s_s10>;
+    res_Rs_20_16_s_s10 = 0x00;
+    goto <endif_Rs_20_16_s_s10>;
+    <if_Rs_20_16_s_s10>
+    res_Rs_20_16_s_s10 = 0xff;
+    <endif_Rs_20_16_s_s10>
+    Pd_1_0 = res_Rs_20_16_s_s10:1;
 }
 
 # 
@@ -1955,14 +2002,14 @@ define pcodeop nextPacket;
 :Q6_P_notcmp_gt_R_S_0 Pd_1_0, Rs_20_16, s10
         is bits_31_22=0b0111010101 & s10_21_21 & Rs_20_16 & s10_13_5 & bits_4_2=0b100 & Pd_1_0
             [s10 = (s10_21_21 << 0) | (s10_13_5 << 1);] {
-    local res_Rs_20_16_s10:4;
-    if ((Rs_20_16 <= s10)) goto <if_Rs_20_16_s10>;
-    res_Rs_20_16_s10 = 0x00;
-    goto <endif_Rs_20_16_s10>;
-    <if_Rs_20_16_s10>
-    res_Rs_20_16_s10 = 0xff;
-    <endif_Rs_20_16_s10>
-    Pd_1_0 = res_Rs_20_16_s10:1;
+    local res_Rs_20_16_s_s10:4;
+    if ((Rs_20_16 s<= s10)) goto <if_Rs_20_16_s_s10>;
+    res_Rs_20_16_s_s10 = 0x00;
+    goto <endif_Rs_20_16_s_s10>;
+    <if_Rs_20_16_s_s10>
+    res_Rs_20_16_s_s10 = 0xff;
+    <endif_Rs_20_16_s_s10>
+    Pd_1_0 = res_Rs_20_16_s_s10:1;
 }
 
 # 
@@ -1975,7 +2022,7 @@ define pcodeop nextPacket;
 :Q6_P_cmp_gtu_R_U Pd_1_0, Rs_20_16, u9
         is bits_31_21=0b01110101100 & Rs_20_16 & u9_13_5 & bits_4_2=0b000 & Pd_1_0
             [u9 = (u9_13_5 << 0);] {
-    local Rs_20_16_uw:4 = (&Rs_20_16);
+    local Rs_20_16_uw:4 = &Rs_20_16;
     local res_register_4_Rs_20_16_uw_4_0_u9:4;
     if ((*[register]:4 (Rs_20_16_uw + 4 * 0) > u9)) goto <if_register_4_Rs_20_16_uw_4_0_u9>;
     res_register_4_Rs_20_16_uw_4_0_u9 = 0x00;
@@ -1996,7 +2043,7 @@ define pcodeop nextPacket;
 :Q6_P_notcmp_gtu_R_U Pd_1_0, Rs_20_16, u9
         is bits_31_21=0b01110101100 & Rs_20_16 & u9_13_5 & bits_4_2=0b100 & Pd_1_0
             [u9 = (u9_13_5 << 0);] {
-    local Rs_20_16_uw:4 = (&Rs_20_16);
+    local Rs_20_16_uw:4 = &Rs_20_16;
     local res_register_4_Rs_20_16_uw_4_0_u9:4;
     if ((*[register]:4 (Rs_20_16_uw + 4 * 0) <= u9)) goto <if_register_4_Rs_20_16_uw_4_0_u9>;
     res_register_4_Rs_20_16_uw_4_0_u9 = 0x00;
@@ -2051,14 +2098,14 @@ define pcodeop nextPacket;
 # 
 :Q6_P_cmp_gt_R_R Pd_1_0, Rs_20_16, Rt_12_8
         is bits_31_24=0b11110010 & bits_22_21=0b10 & Rs_20_16 & Rt_12_8 & bits_4_2=0b000 & Pd_1_0 {
-    local res_Rs_20_16_Rt_12_8:4;
-    if ((Rs_20_16 > Rt_12_8)) goto <if_Rs_20_16_Rt_12_8>;
-    res_Rs_20_16_Rt_12_8 = 0x00;
-    goto <endif_Rs_20_16_Rt_12_8>;
-    <if_Rs_20_16_Rt_12_8>
-    res_Rs_20_16_Rt_12_8 = 0xff;
-    <endif_Rs_20_16_Rt_12_8>
-    Pd_1_0 = res_Rs_20_16_Rt_12_8:1;
+    local res_Rs_20_16_s_Rt_12_8:4;
+    if ((Rs_20_16 s> Rt_12_8)) goto <if_Rs_20_16_s_Rt_12_8>;
+    res_Rs_20_16_s_Rt_12_8 = 0x00;
+    goto <endif_Rs_20_16_s_Rt_12_8>;
+    <if_Rs_20_16_s_Rt_12_8>
+    res_Rs_20_16_s_Rt_12_8 = 0xff;
+    <endif_Rs_20_16_s_Rt_12_8>
+    Pd_1_0 = res_Rs_20_16_s_Rt_12_8:1;
 }
 
 # 
@@ -2069,14 +2116,14 @@ define pcodeop nextPacket;
 # 
 :Q6_P_notcmp_gt_R_R Pd_1_0, Rs_20_16, Rt_12_8
         is bits_31_24=0b11110010 & bits_22_21=0b10 & Rs_20_16 & Rt_12_8 & bits_4_2=0b100 & Pd_1_0 {
-    local res_Rs_20_16_Rt_12_8:4;
-    if ((Rs_20_16 <= Rt_12_8)) goto <if_Rs_20_16_Rt_12_8>;
-    res_Rs_20_16_Rt_12_8 = 0x00;
-    goto <endif_Rs_20_16_Rt_12_8>;
-    <if_Rs_20_16_Rt_12_8>
-    res_Rs_20_16_Rt_12_8 = 0xff;
-    <endif_Rs_20_16_Rt_12_8>
-    Pd_1_0 = res_Rs_20_16_Rt_12_8:1;
+    local res_Rs_20_16_s_Rt_12_8:4;
+    if ((Rs_20_16 s<= Rt_12_8)) goto <if_Rs_20_16_s_Rt_12_8>;
+    res_Rs_20_16_s_Rt_12_8 = 0x00;
+    goto <endif_Rs_20_16_s_Rt_12_8>;
+    <if_Rs_20_16_s_Rt_12_8>
+    res_Rs_20_16_s_Rt_12_8 = 0xff;
+    <endif_Rs_20_16_s_Rt_12_8>
+    Pd_1_0 = res_Rs_20_16_s_Rt_12_8:1;
 }
 
 # 
@@ -2087,8 +2134,8 @@ define pcodeop nextPacket;
 # 
 :Q6_P_cmp_gtu_R_R Pd_1_0, Rs_20_16, Rt_12_8
         is bits_31_24=0b11110010 & bits_22_21=0b11 & Rs_20_16 & Rt_12_8 & bits_4_2=0b000 & Pd_1_0 {
-    local Rs_20_16_uw:4 = (&Rs_20_16);
-    local Rt_12_8_uw:4 = (&Rt_12_8);
+    local Rs_20_16_uw:4 = &Rs_20_16;
+    local Rt_12_8_uw:4 = &Rt_12_8;
     local res_register_4_Rs_20_16_uw_4_0_register_4_Rt_12_8_uw_4_0:4;
     if ((*[register]:4 (Rs_20_16_uw + 4 * 0) > *[register]:4 (Rt_12_8_uw + 4 * 0))) goto <if_register_4_Rs_20_16_uw_4_0_register_4_Rt_12_8_uw_4_0>;
     res_register_4_Rs_20_16_uw_4_0_register_4_Rt_12_8_uw_4_0 = 0x00;
@@ -2107,8 +2154,8 @@ define pcodeop nextPacket;
 # 
 :Q6_P_notcmp_gtu_R_R Pd_1_0, Rs_20_16, Rt_12_8
         is bits_31_24=0b11110010 & bits_22_21=0b11 & Rs_20_16 & Rt_12_8 & bits_4_2=0b100 & Pd_1_0 {
-    local Rs_20_16_uw:4 = (&Rs_20_16);
-    local Rt_12_8_uw:4 = (&Rt_12_8);
+    local Rs_20_16_uw:4 = &Rs_20_16;
+    local Rt_12_8_uw:4 = &Rt_12_8;
     local res_register_4_Rs_20_16_uw_4_0_register_4_Rt_12_8_uw_4_0:4;
     if ((*[register]:4 (Rs_20_16_uw + 4 * 0) <= *[register]:4 (Rt_12_8_uw + 4 * 0))) goto <if_register_4_Rs_20_16_uw_4_0_register_4_Rt_12_8_uw_4_0>;
     res_register_4_Rs_20_16_uw_4_0_register_4_Rt_12_8_uw_4_0 = 0x00;
@@ -2183,7 +2230,7 @@ define pcodeop nextPacket;
 :Q6_P_fastcorner9_P_P Pd_1_0, Ps_17_16, Pt_9_8
         is bits_31_20=0b011010110000 & Ps_17_16 & bits_13_13=0b1 & Pt_9_8 & bits_7_7=0b1 & bits_4_4=0b1 & Pd_1_0 {
     local tmp:4;
-    local tmp_h:4 = (&tmp);
+    local tmp_h:4 = &tmp;
     local res_tmp_0:4;
     *[register]:2 (tmp_h + 2 * 0) = zext(((Ps_17_16 << 8) | Pt_9_8));
     *[register]:2 (tmp_h + 2 * 1) = zext(((Ps_17_16 << 8) | Pt_9_8));
@@ -2217,7 +2264,7 @@ define pcodeop nextPacket;
 :Q6_P_notfastcorner9_P_P Pd_1_0, Ps_17_16, Pt_9_8
         is bits_31_20=0b011010110001 & Ps_17_16 & bits_13_13=0b1 & Pt_9_8 & bits_7_7=0b1 & bits_4_4=0b1 & Pd_1_0 {
     local tmp:4;
-    local tmp_h:4 = (&tmp);
+    local tmp_h:4 = &tmp;
     local res_tmp_0:4;
     *[register]:2 (tmp_h + 2 * 0) = zext(((Ps_17_16 << 8) | Pt_9_8));
     *[register]:2 (tmp_h + 2 * 1) = zext(((Ps_17_16 << 8) | Pt_9_8));
@@ -2688,4 +2735,3080 @@ define pcodeop nextPacket;
 :Q6_RR_CC Rdd_4_0, Css_20_16
         is bits_31_21=0b01101000000 & Css_20_16 & Rdd_4_0 {
     Rdd_4_0 = Css_20_16;
+}
+
+# 
+# Rd=Cs
+# 01101010000sssssPP---------ddddd
+# 
+# Rd = Cs;
+# 
+:Q6_R_C Rd_4_0, Cs_20_16
+        is bits_31_21=0b01101010000 & Cs_20_16 & Rd_4_0 {
+    Rd_4_0 = Cs_20_16;
+}
+
+# 
+# callr Rs
+# 01010000101sssssPP--------------
+# 
+# LR = NPC;
+# PC = Rs;
+# 
+:Q6_callr_R Rs_20_16
+        is bits_31_21=0b01010000101 & Rs_20_16 {
+    $(LR) = nextPacket();
+    $(PC) = Rs_20_16;
+}
+
+# 
+# if (Pu) callr Rs
+# 01010001000sssssPP----uu--------
+# 
+# if (Pu[0]) {
+#     LR = NPC;
+#     PC = Rs;
+# }
+# 
+:Q6_if_P_callr_R Pu_9_8, Rs_20_16
+        is bits_31_21=0b01010001000 & Rs_20_16 & Pu_9_8 {
+    if (Pu_9_8[0, 1]) goto <if_Pu_9_8_0_1>;
+    goto <endif_Pu_9_8_0_1>;
+    <if_Pu_9_8_0_1>
+    $(LR) = nextPacket();
+    $(PC) = Rs_20_16;
+    <endif_Pu_9_8_0_1>
+}
+
+# 
+# if (!Pu) callr Rs
+# 01010001001sssssPP----uu--------
+# 
+# if (!Pu[0]) {
+#     LR = NPC;
+#     PC = Rs;
+# }
+# 
+:Q6_if_not_P_callr_R Pu_9_8, Rs_20_16
+        is bits_31_21=0b01010001001 & Rs_20_16 & Pu_9_8 {
+    if ((!Pu_9_8[0, 1])) goto <if_Pu_9_8_0_1>;
+    goto <endif_Pu_9_8_0_1>;
+    <if_Pu_9_8_0_1>
+    $(LR) = nextPacket();
+    $(PC) = Rs_20_16;
+    <endif_Pu_9_8_0_1>
+}
+
+# 
+# hintjr(Rs)
+# 01010010101sssssPP--------------
+# 
+# 
+# 
+:Q6_hintjr_R Rs_20_16
+        is bits_31_21=0b01010010101 & Rs_20_16 {
+}
+
+# 
+# jumpr Rs
+# 01010010100sssssPP--------------
+# 
+# PC = Rs;
+# 
+:Q6_jumpr_R Rs_20_16
+        is bits_31_21=0b01010010100 & Rs_20_16 {
+    $(PC) = Rs_20_16;
+}
+
+# 
+# if (Pu) jumpr:nt Rs
+# 01010011010sssssPP-00-uu--------
+# 
+# if (Pu[0]) {
+#     PC = Rs;
+# }
+# 
+:Q6_if_P_jumpr_nt_R Pu_9_8, Rs_20_16
+        is bits_31_21=0b01010011010 & Rs_20_16 & bits_12_11=0b00 & Pu_9_8 {
+    if (Pu_9_8[0, 1]) goto <if_Pu_9_8_0_1>;
+    goto <endif_Pu_9_8_0_1>;
+    <if_Pu_9_8_0_1>
+    $(PC) = Rs_20_16;
+    <endif_Pu_9_8_0_1>
+}
+
+# 
+# if (Pu.new) jumpr:nt Rs
+# 01010011010sssssPP-01-uu--------
+# 
+# if (Pu.new[0]) {
+#     PC = Rs;
+# }
+# 
+:Q6_if_P_new_jumpr_nt_R Pu_9_8, Rs_20_16
+        is bits_31_21=0b01010011010 & Rs_20_16 & bits_12_11=0b01 & Pu_9_8 {
+    local new_new:1 = newSuffix(Pu_9_8);
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    $(PC) = Rs_20_16;
+    <endif_new_new_0_1>
+}
+
+# 
+# if (Pu) jumpr:t Rs
+# 01010011010sssssPP-10-uu--------
+# 
+# if (Pu[0]) {
+#     PC = Rs;
+# }
+# 
+:Q6_if_P_jumpr_t_R Pu_9_8, Rs_20_16
+        is bits_31_21=0b01010011010 & Rs_20_16 & bits_12_11=0b10 & Pu_9_8 {
+    if (Pu_9_8[0, 1]) goto <if_Pu_9_8_0_1>;
+    goto <endif_Pu_9_8_0_1>;
+    <if_Pu_9_8_0_1>
+    $(PC) = Rs_20_16;
+    <endif_Pu_9_8_0_1>
+}
+
+# 
+# if (Pu.new) jumpr:t Rs
+# 01010011010sssssPP-11-uu--------
+# 
+# if (Pu.new[0]) {
+#     PC = Rs;
+# }
+# 
+:Q6_if_P_new_jumpr_t_R Pu_9_8, Rs_20_16
+        is bits_31_21=0b01010011010 & Rs_20_16 & bits_12_11=0b11 & Pu_9_8 {
+    local new_new:1 = newSuffix(Pu_9_8);
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    $(PC) = Rs_20_16;
+    <endif_new_new_0_1>
+}
+
+# 
+# if (!Pu) jumpr:nt Rs
+# 01010011011sssssPP-00-uu--------
+# 
+# if (!Pu[0]) {
+#     PC = Rs;
+# }
+# 
+:Q6_if_not_P_jumpr_nt_R Pu_9_8, Rs_20_16
+        is bits_31_21=0b01010011011 & Rs_20_16 & bits_12_11=0b00 & Pu_9_8 {
+    if ((!Pu_9_8[0, 1])) goto <if_Pu_9_8_0_1>;
+    goto <endif_Pu_9_8_0_1>;
+    <if_Pu_9_8_0_1>
+    $(PC) = Rs_20_16;
+    <endif_Pu_9_8_0_1>
+}
+
+# 
+# if (!Pu.new) jumpr:nt Rs
+# 01010011011sssssPP-01-uu--------
+# 
+# if (!Pu.new[0]) {
+#     PC = Rs;
+# }
+# 
+:Q6_if_not_P_new_jumpr_nt_R Pu_9_8, Rs_20_16
+        is bits_31_21=0b01010011011 & Rs_20_16 & bits_12_11=0b01 & Pu_9_8 {
+    local new_new:1 = newSuffix(Pu_9_8);
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    $(PC) = Rs_20_16;
+    <endif_new_new_0_1>
+}
+
+# 
+# if (!Pu) jumpr:t Rs
+# 01010011011sssssPP-10-uu--------
+# 
+# if (!Pu[0]) {
+#     PC = Rs;
+# }
+# 
+:Q6_if_not_P_jumpr_t_R Pu_9_8, Rs_20_16
+        is bits_31_21=0b01010011011 & Rs_20_16 & bits_12_11=0b10 & Pu_9_8 {
+    if ((!Pu_9_8[0, 1])) goto <if_Pu_9_8_0_1>;
+    goto <endif_Pu_9_8_0_1>;
+    <if_Pu_9_8_0_1>
+    $(PC) = Rs_20_16;
+    <endif_Pu_9_8_0_1>
+}
+
+# 
+# if (!Pu.new) jumpr:t Rs
+# 01010011011sssssPP-11-uu--------
+# 
+# if (!Pu.new[0]) {
+#     PC = Rs;
+# }
+# 
+:Q6_if_not_P_new_jumpr_t_R Pu_9_8, Rs_20_16
+        is bits_31_21=0b01010011011 & Rs_20_16 & bits_12_11=0b11 & Pu_9_8 {
+    local new_new:1 = newSuffix(Pu_9_8);
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    $(PC) = Rs_20_16;
+    <endif_new_new_0_1>
+}
+
+# 
+# call #r22:2
+# 0101101iiiiiiiiiPPiiiiiiiiiiiii0
+# 
+# apply_extension(imm_r);
+# imm_r = imm_r & ~0x3;
+# LR = NPC;
+# PC = PC + imm_r;
+# 
+:Q6_call_R_2_2 r22
+        is bits_31_25=0b0101101 & r22_24_16 & r22_13_1 & bits_0_0=0b0
+            [r22 = (r22_24_16 << 2) | (r22_13_1 << 11);] {
+    local cst_0x3:4 = 0x3;
+    r22 = (r22 & (~cst_0x3));
+    $(LR) = nextPacket();
+    $(PC) = ($(PC) + r22);
+}
+
+# 
+# if (Pu) call #r15:2
+# 01011101ii0iiiiiPPi-0-uuiiiiiii-
+# 
+# apply_extension(imm_r);
+# imm_r = imm_r & ~0x3;
+# if (Pu[0]) {
+#     LR = NPC;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_if_P_call_R_5_2 Pu_9_8, r15
+        is bits_31_24=0b01011101 & r15_23_22 & bits_21_21=0b0 & r15_20_16 & r15_13_13 & bits_11_11=0b0 & Pu_9_8 & r15_7_1
+            [r15 = (r15_23_22 << 2) | (r15_20_16 << 4) | (r15_13_13 << 9) | (r15_7_1 << 10);] {
+    local cst_0x3:4 = 0x3;
+    r15 = (r15 & (~cst_0x3));
+    if (Pu_9_8[0, 1]) goto <if_Pu_9_8_0_1>;
+    goto <endif_Pu_9_8_0_1>;
+    <if_Pu_9_8_0_1>
+    $(LR) = nextPacket();
+    $(PC) = ($(PC) + r15);
+    <endif_Pu_9_8_0_1>
+}
+
+# 
+# if (!Pu) call #r15:2
+# 01011101ii1iiiiiPPi-0-uuiiiiiii-
+# 
+# apply_extension(imm_r);
+# imm_r = imm_r & ~0x3;
+# if (!Pu[0]) {
+#     LR = NPC;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_if_not_P_call_R_5_2 Pu_9_8, r15
+        is bits_31_24=0b01011101 & r15_23_22 & bits_21_21=0b1 & r15_20_16 & r15_13_13 & bits_11_11=0b0 & Pu_9_8 & r15_7_1
+            [r15 = (r15_23_22 << 2) | (r15_20_16 << 4) | (r15_13_13 << 9) | (r15_7_1 << 10);] {
+    local cst_0x3:4 = 0x3;
+    r15 = (r15 & (~cst_0x3));
+    if ((!Pu_9_8[0, 1])) goto <if_Pu_9_8_0_1>;
+    goto <endif_Pu_9_8_0_1>;
+    <if_Pu_9_8_0_1>
+    $(LR) = nextPacket();
+    $(PC) = ($(PC) + r15);
+    <endif_Pu_9_8_0_1>
+}
+
+# 
+# p0=cmp.eq(Rs,#-1); if (p0.new) jump:nt #r9:2
+# 0001000110iissssPP0---00iiiiiii-
+# 
+# P0 = (Rs == -1) ? 0xff : 0x00;
+# if (P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_eq_R_m1_if_p0_new_jump_nt_R Rs_19_16, r9
+        is bits_31_22=0b0001000110 & r9_21_20 & Rs_19_16 & bits_13_13=0b0 & bits_9_8=0b00 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_1:4;
+    local new_new:1 = newSuffix(P0);
+    if ((Rs_19_16 == (-1))) goto <if_Rs_19_16_1>;
+    res_Rs_19_16_1 = 0x00;
+    goto <endif_Rs_19_16_1>;
+    <if_Rs_19_16_1>
+    res_Rs_19_16_1 = 0xff;
+    <endif_Rs_19_16_1>
+    P0 = res_Rs_19_16_1:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.gt(Rs,#-1); if (p0.new) jump:nt #r9:2
+# 0001000110iissssPP0---01iiiiiii-
+# 
+# P0 = (Rs > -1) ? 0xff : 0x00;
+# if (P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_gt_R_m1_if_p0_new_jump_nt_R Rs_19_16, r9
+        is bits_31_22=0b0001000110 & r9_21_20 & Rs_19_16 & bits_13_13=0b0 & bits_9_8=0b01 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_s_1:4;
+    local new_new:1 = newSuffix(P0);
+    if ((Rs_19_16 s> (-1))) goto <if_Rs_19_16_s_1>;
+    res_Rs_19_16_s_1 = 0x00;
+    goto <endif_Rs_19_16_s_1>;
+    <if_Rs_19_16_s_1>
+    res_Rs_19_16_s_1 = 0xff;
+    <endif_Rs_19_16_s_1>
+    P0 = res_Rs_19_16_s_1:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=tstbit(Rs,#0); if (p0.new) jump:nt #r9:2
+# 0001000110iissssPP0---11iiiiiii-
+# 
+# P0 = (Rs & 1) ? 0xff : 0x00;
+# if (P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_tstbit_R_0_if_p0_new_jump_nt_R Rs_19_16, r9
+        is bits_31_22=0b0001000110 & r9_21_20 & Rs_19_16 & bits_13_13=0b0 & bits_9_8=0b11 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_1:4;
+    local new_new:1 = newSuffix(P0);
+    if (((Rs_19_16 & 1) != 0)) goto <if_Rs_19_16_1_0>;
+    res_Rs_19_16_1 = 0x00;
+    goto <endif_Rs_19_16_1_0>;
+    <if_Rs_19_16_1_0>
+    res_Rs_19_16_1 = 0xff;
+    <endif_Rs_19_16_1_0>
+    P0 = res_Rs_19_16_1:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.eq(Rs,#-1); if (p0.new) jump:t #r9:2
+# 0001000110iissssPP1---00iiiiiii-
+# 
+# P0 = (Rs == -1) ? 0xff : 0x00;
+# if (P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_eq_R_m1_if_p0_new_jump_t_R Rs_19_16, r9
+        is bits_31_22=0b0001000110 & r9_21_20 & Rs_19_16 & bits_13_13=0b1 & bits_9_8=0b00 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_1:4;
+    local new_new:1 = newSuffix(P0);
+    if ((Rs_19_16 == (-1))) goto <if_Rs_19_16_1>;
+    res_Rs_19_16_1 = 0x00;
+    goto <endif_Rs_19_16_1>;
+    <if_Rs_19_16_1>
+    res_Rs_19_16_1 = 0xff;
+    <endif_Rs_19_16_1>
+    P0 = res_Rs_19_16_1:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.gt(Rs,#-1); if (p0.new) jump:t #r9:2
+# 0001000110iissssPP1---01iiiiiii-
+# 
+# P0 = (Rs > -1) ? 0xff : 0x00;
+# if (P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_gt_R_m1_if_p0_new_jump_t_R Rs_19_16, r9
+        is bits_31_22=0b0001000110 & r9_21_20 & Rs_19_16 & bits_13_13=0b1 & bits_9_8=0b01 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_s_1:4;
+    local new_new:1 = newSuffix(P0);
+    if ((Rs_19_16 s> (-1))) goto <if_Rs_19_16_s_1>;
+    res_Rs_19_16_s_1 = 0x00;
+    goto <endif_Rs_19_16_s_1>;
+    <if_Rs_19_16_s_1>
+    res_Rs_19_16_s_1 = 0xff;
+    <endif_Rs_19_16_s_1>
+    P0 = res_Rs_19_16_s_1:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=tstbit(Rs,#0); if (p0.new) jump:t #r9:2
+# 0001000110iissssPP1---11iiiiiii-
+# 
+# P0 = (Rs & 1) ? 0xff : 0x00;
+# if (P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_tstbit_R_0_if_p0_new_jump_t_R Rs_19_16, r9
+        is bits_31_22=0b0001000110 & r9_21_20 & Rs_19_16 & bits_13_13=0b1 & bits_9_8=0b11 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_1:4;
+    local new_new:1 = newSuffix(P0);
+    if (((Rs_19_16 & 1) != 0)) goto <if_Rs_19_16_1_0>;
+    res_Rs_19_16_1 = 0x00;
+    goto <endif_Rs_19_16_1_0>;
+    <if_Rs_19_16_1_0>
+    res_Rs_19_16_1 = 0xff;
+    <endif_Rs_19_16_1_0>
+    P0 = res_Rs_19_16_1:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.eq(Rs,#-1); if (!p0.new) jump:nt #r9:2
+# 0001000111iissssPP0---00iiiiiii-
+# 
+# P0 = (Rs == -1) ? 0xff : 0x00;
+# if (!P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_eq_R_m1_if_notp0_new_jump_nt_R Rs_19_16, r9
+        is bits_31_22=0b0001000111 & r9_21_20 & Rs_19_16 & bits_13_13=0b0 & bits_9_8=0b00 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_1:4;
+    local new_new:1 = newSuffix(P0);
+    if ((Rs_19_16 == (-1))) goto <if_Rs_19_16_1>;
+    res_Rs_19_16_1 = 0x00;
+    goto <endif_Rs_19_16_1>;
+    <if_Rs_19_16_1>
+    res_Rs_19_16_1 = 0xff;
+    <endif_Rs_19_16_1>
+    P0 = res_Rs_19_16_1:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.gt(Rs,#-1); if (!p0.new) jump:nt #r9:2
+# 0001000111iissssPP0---01iiiiiii-
+# 
+# P0 = (Rs > -1) ? 0xff : 0x00;
+# if (!P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_gt_R_m1_if_notp0_new_jump_nt_R Rs_19_16, r9
+        is bits_31_22=0b0001000111 & r9_21_20 & Rs_19_16 & bits_13_13=0b0 & bits_9_8=0b01 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_s_1:4;
+    local new_new:1 = newSuffix(P0);
+    if ((Rs_19_16 s> (-1))) goto <if_Rs_19_16_s_1>;
+    res_Rs_19_16_s_1 = 0x00;
+    goto <endif_Rs_19_16_s_1>;
+    <if_Rs_19_16_s_1>
+    res_Rs_19_16_s_1 = 0xff;
+    <endif_Rs_19_16_s_1>
+    P0 = res_Rs_19_16_s_1:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=tstbit(Rs,#0); if (!p0.new) jump:nt #r9:2
+# 0001000111iissssPP0---11iiiiiii-
+# 
+# P0 = (Rs & 1) ? 0xff : 0x00;
+# if (!P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_tstbit_R_0_if_notp0_new_jump_nt_R Rs_19_16, r9
+        is bits_31_22=0b0001000111 & r9_21_20 & Rs_19_16 & bits_13_13=0b0 & bits_9_8=0b11 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_1:4;
+    local new_new:1 = newSuffix(P0);
+    if (((Rs_19_16 & 1) != 0)) goto <if_Rs_19_16_1_0>;
+    res_Rs_19_16_1 = 0x00;
+    goto <endif_Rs_19_16_1_0>;
+    <if_Rs_19_16_1_0>
+    res_Rs_19_16_1 = 0xff;
+    <endif_Rs_19_16_1_0>
+    P0 = res_Rs_19_16_1:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.eq(Rs,#-1); if (!p0.new) jump:t #r9:2
+# 0001000111iissssPP1---00iiiiiii-
+# 
+# P0 = (Rs == -1) ? 0xff : 0x00;
+# if (!P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_eq_R_m1_if_notp0_new_jump_t_R Rs_19_16, r9
+        is bits_31_22=0b0001000111 & r9_21_20 & Rs_19_16 & bits_13_13=0b1 & bits_9_8=0b00 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_1:4;
+    local new_new:1 = newSuffix(P0);
+    if ((Rs_19_16 == (-1))) goto <if_Rs_19_16_1>;
+    res_Rs_19_16_1 = 0x00;
+    goto <endif_Rs_19_16_1>;
+    <if_Rs_19_16_1>
+    res_Rs_19_16_1 = 0xff;
+    <endif_Rs_19_16_1>
+    P0 = res_Rs_19_16_1:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.gt(Rs,#-1); if (!p0.new) jump:t #r9:2
+# 0001000111iissssPP1---01iiiiiii-
+# 
+# P0 = (Rs > -1) ? 0xff : 0x00;
+# if (!P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_gt_R_m1_if_notp0_new_jump_t_R Rs_19_16, r9
+        is bits_31_22=0b0001000111 & r9_21_20 & Rs_19_16 & bits_13_13=0b1 & bits_9_8=0b01 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_s_1:4;
+    local new_new:1 = newSuffix(P0);
+    if ((Rs_19_16 s> (-1))) goto <if_Rs_19_16_s_1>;
+    res_Rs_19_16_s_1 = 0x00;
+    goto <endif_Rs_19_16_s_1>;
+    <if_Rs_19_16_s_1>
+    res_Rs_19_16_s_1 = 0xff;
+    <endif_Rs_19_16_s_1>
+    P0 = res_Rs_19_16_s_1:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=tstbit(Rs,#0); if (!p0.new) jump:t #r9:2
+# 0001000111iissssPP1---11iiiiiii-
+# 
+# P0 = (Rs & 1) ? 0xff : 0x00;
+# if (!P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_tstbit_R_0_if_notp0_new_jump_t_R Rs_19_16, r9
+        is bits_31_22=0b0001000111 & r9_21_20 & Rs_19_16 & bits_13_13=0b1 & bits_9_8=0b11 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_1:4;
+    local new_new:1 = newSuffix(P0);
+    if (((Rs_19_16 & 1) != 0)) goto <if_Rs_19_16_1_0>;
+    res_Rs_19_16_1 = 0x00;
+    goto <endif_Rs_19_16_1_0>;
+    <if_Rs_19_16_1_0>
+    res_Rs_19_16_1 = 0xff;
+    <endif_Rs_19_16_1_0>
+    P0 = res_Rs_19_16_1:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.eq(Rs,#U5); if (p0.new) jump:nt #r9:2
+# 0001000000iissssPP0IIIIIiiiiiii-
+# 
+# P0 = (Rs == imm_U) ? 0xff : 0x00;
+# if (P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_eq_R_U_if_p0_new_jump_nt_R Rs_19_16, U5, r9
+        is bits_31_22=0b0001000000 & r9_21_20 & Rs_19_16 & bits_13_13=0b0 & U5_12_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4); U5 = (U5_12_8 << 0);] {
+    local res_Rs_19_16_U5:4;
+    local new_new:1 = newSuffix(P0);
+    if ((Rs_19_16 == U5)) goto <if_Rs_19_16_U5>;
+    res_Rs_19_16_U5 = 0x00;
+    goto <endif_Rs_19_16_U5>;
+    <if_Rs_19_16_U5>
+    res_Rs_19_16_U5 = 0xff;
+    <endif_Rs_19_16_U5>
+    P0 = res_Rs_19_16_U5:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.eq(Rs,#U5); if (p0.new) jump:t #r9:2
+# 0001000000iissssPP1IIIIIiiiiiii-
+# 
+# P0 = (Rs == imm_U) ? 0xff : 0x00;
+# if (P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_eq_R_U_if_p0_new_jump_t_R Rs_19_16, U5, r9
+        is bits_31_22=0b0001000000 & r9_21_20 & Rs_19_16 & bits_13_13=0b1 & U5_12_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4); U5 = (U5_12_8 << 0);] {
+    local res_Rs_19_16_U5:4;
+    local new_new:1 = newSuffix(P0);
+    if ((Rs_19_16 == U5)) goto <if_Rs_19_16_U5>;
+    res_Rs_19_16_U5 = 0x00;
+    goto <endif_Rs_19_16_U5>;
+    <if_Rs_19_16_U5>
+    res_Rs_19_16_U5 = 0xff;
+    <endif_Rs_19_16_U5>
+    P0 = res_Rs_19_16_U5:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.eq(Rs,#U5); if (!p0.new) jump:nt #r9:2
+# 0001000001iissssPP0IIIIIiiiiiii-
+# 
+# P0 = (Rs == imm_U) ? 0xff : 0x00;
+# if (!P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_eq_R_U_if_notp0_new_jump_nt_R Rs_19_16, U5, r9
+        is bits_31_22=0b0001000001 & r9_21_20 & Rs_19_16 & bits_13_13=0b0 & U5_12_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4); U5 = (U5_12_8 << 0);] {
+    local res_Rs_19_16_U5:4;
+    local new_new:1 = newSuffix(P0);
+    if ((Rs_19_16 == U5)) goto <if_Rs_19_16_U5>;
+    res_Rs_19_16_U5 = 0x00;
+    goto <endif_Rs_19_16_U5>;
+    <if_Rs_19_16_U5>
+    res_Rs_19_16_U5 = 0xff;
+    <endif_Rs_19_16_U5>
+    P0 = res_Rs_19_16_U5:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.eq(Rs,#U5); if (!p0.new) jump:t #r9:2
+# 0001000001iissssPP1IIIIIiiiiiii-
+# 
+# P0 = (Rs == imm_U) ? 0xff : 0x00;
+# if (!P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_eq_R_U_if_notp0_new_jump_t_R Rs_19_16, U5, r9
+        is bits_31_22=0b0001000001 & r9_21_20 & Rs_19_16 & bits_13_13=0b1 & U5_12_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4); U5 = (U5_12_8 << 0);] {
+    local res_Rs_19_16_U5:4;
+    local new_new:1 = newSuffix(P0);
+    if ((Rs_19_16 == U5)) goto <if_Rs_19_16_U5>;
+    res_Rs_19_16_U5 = 0x00;
+    goto <endif_Rs_19_16_U5>;
+    <if_Rs_19_16_U5>
+    res_Rs_19_16_U5 = 0xff;
+    <endif_Rs_19_16_U5>
+    P0 = res_Rs_19_16_U5:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.gt(Rs,#U5); if (p0.new) jump:nt #r9:2
+# 0001000010iissssPP0IIIIIiiiiiii-
+# 
+# P0 = (Rs > imm_U) ? 0xff : 0x00;
+# if (P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_gt_R_U_if_p0_new_jump_nt_R Rs_19_16, U5, r9
+        is bits_31_22=0b0001000010 & r9_21_20 & Rs_19_16 & bits_13_13=0b0 & U5_12_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4); U5 = (U5_12_8 << 0);] {
+    local res_Rs_19_16_U5:4;
+    local new_new:1 = newSuffix(P0);
+    if ((Rs_19_16 > U5)) goto <if_Rs_19_16_U5>;
+    res_Rs_19_16_U5 = 0x00;
+    goto <endif_Rs_19_16_U5>;
+    <if_Rs_19_16_U5>
+    res_Rs_19_16_U5 = 0xff;
+    <endif_Rs_19_16_U5>
+    P0 = res_Rs_19_16_U5:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.gt(Rs,#U5); if (p0.new) jump:t #r9:2
+# 0001000010iissssPP1IIIIIiiiiiii-
+# 
+# P0 = (Rs > imm_U) ? 0xff : 0x00;
+# if (P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_gt_R_U_if_p0_new_jump_t_R Rs_19_16, U5, r9
+        is bits_31_22=0b0001000010 & r9_21_20 & Rs_19_16 & bits_13_13=0b1 & U5_12_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4); U5 = (U5_12_8 << 0);] {
+    local res_Rs_19_16_U5:4;
+    local new_new:1 = newSuffix(P0);
+    if ((Rs_19_16 > U5)) goto <if_Rs_19_16_U5>;
+    res_Rs_19_16_U5 = 0x00;
+    goto <endif_Rs_19_16_U5>;
+    <if_Rs_19_16_U5>
+    res_Rs_19_16_U5 = 0xff;
+    <endif_Rs_19_16_U5>
+    P0 = res_Rs_19_16_U5:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.gt(Rs,#U5); if (!p0.new) jump:nt #r9:2
+# 0001000011iissssPP0IIIIIiiiiiii-
+# 
+# P0 = (Rs > imm_U) ? 0xff : 0x00;
+# if (!P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_gt_R_U_if_notp0_new_jump_nt_R Rs_19_16, U5, r9
+        is bits_31_22=0b0001000011 & r9_21_20 & Rs_19_16 & bits_13_13=0b0 & U5_12_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4); U5 = (U5_12_8 << 0);] {
+    local res_Rs_19_16_U5:4;
+    local new_new:1 = newSuffix(P0);
+    if ((Rs_19_16 > U5)) goto <if_Rs_19_16_U5>;
+    res_Rs_19_16_U5 = 0x00;
+    goto <endif_Rs_19_16_U5>;
+    <if_Rs_19_16_U5>
+    res_Rs_19_16_U5 = 0xff;
+    <endif_Rs_19_16_U5>
+    P0 = res_Rs_19_16_U5:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.gt(Rs,#U5); if (!p0.new) jump:t #r9:2
+# 0001000011iissssPP1IIIIIiiiiiii-
+# 
+# P0 = (Rs > imm_U) ? 0xff : 0x00;
+# if (!P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_gt_R_U_if_notp0_new_jump_t_R Rs_19_16, U5, r9
+        is bits_31_22=0b0001000011 & r9_21_20 & Rs_19_16 & bits_13_13=0b1 & U5_12_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4); U5 = (U5_12_8 << 0);] {
+    local res_Rs_19_16_U5:4;
+    local new_new:1 = newSuffix(P0);
+    if ((Rs_19_16 > U5)) goto <if_Rs_19_16_U5>;
+    res_Rs_19_16_U5 = 0x00;
+    goto <endif_Rs_19_16_U5>;
+    <if_Rs_19_16_U5>
+    res_Rs_19_16_U5 = 0xff;
+    <endif_Rs_19_16_U5>
+    P0 = res_Rs_19_16_U5:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.gtu(Rs,#U5); if (p0.new) jump:nt #r9:2
+# 0001000100iissssPP0IIIIIiiiiiii-
+# 
+# P0 = (Rs.uw[0] > imm_U) ? 0xff : 0x00;
+# if (P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_gtu_R_U_if_p0_new_jump_nt_R Rs_19_16, U5, r9
+        is bits_31_22=0b0001000100 & r9_21_20 & Rs_19_16 & bits_13_13=0b0 & U5_12_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4); U5 = (U5_12_8 << 0);] {
+    local Rs_19_16_uw:4 = &Rs_19_16;
+    local res_register_4_Rs_19_16_uw_4_0_U5:4;
+    local new_new:1 = newSuffix(P0);
+    if ((*[register]:4 (Rs_19_16_uw + 4 * 0) > U5)) goto <if_register_4_Rs_19_16_uw_4_0_U5>;
+    res_register_4_Rs_19_16_uw_4_0_U5 = 0x00;
+    goto <endif_register_4_Rs_19_16_uw_4_0_U5>;
+    <if_register_4_Rs_19_16_uw_4_0_U5>
+    res_register_4_Rs_19_16_uw_4_0_U5 = 0xff;
+    <endif_register_4_Rs_19_16_uw_4_0_U5>
+    P0 = res_register_4_Rs_19_16_uw_4_0_U5:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.gtu(Rs,#U5); if (p0.new) jump:t #r9:2
+# 0001000100iissssPP1IIIIIiiiiiii-
+# 
+# P0 = (Rs.uw[0] > imm_U) ? 0xff : 0x00;
+# if (P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_gtu_R_U_if_p0_new_jump_t_R Rs_19_16, U5, r9
+        is bits_31_22=0b0001000100 & r9_21_20 & Rs_19_16 & bits_13_13=0b1 & U5_12_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4); U5 = (U5_12_8 << 0);] {
+    local Rs_19_16_uw:4 = &Rs_19_16;
+    local res_register_4_Rs_19_16_uw_4_0_U5:4;
+    local new_new:1 = newSuffix(P0);
+    if ((*[register]:4 (Rs_19_16_uw + 4 * 0) > U5)) goto <if_register_4_Rs_19_16_uw_4_0_U5>;
+    res_register_4_Rs_19_16_uw_4_0_U5 = 0x00;
+    goto <endif_register_4_Rs_19_16_uw_4_0_U5>;
+    <if_register_4_Rs_19_16_uw_4_0_U5>
+    res_register_4_Rs_19_16_uw_4_0_U5 = 0xff;
+    <endif_register_4_Rs_19_16_uw_4_0_U5>
+    P0 = res_register_4_Rs_19_16_uw_4_0_U5:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.gtu(Rs,#U5); if (!p0.new) jump:nt #r9:2
+# 0001000101iissssPP0IIIIIiiiiiii-
+# 
+# P0 = (Rs.uw[0] > imm_U) ? 0xff : 0x00;
+# if (!P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_gtu_R_U_if_notp0_new_jump_nt_R Rs_19_16, U5, r9
+        is bits_31_22=0b0001000101 & r9_21_20 & Rs_19_16 & bits_13_13=0b0 & U5_12_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4); U5 = (U5_12_8 << 0);] {
+    local Rs_19_16_uw:4 = &Rs_19_16;
+    local res_register_4_Rs_19_16_uw_4_0_U5:4;
+    local new_new:1 = newSuffix(P0);
+    if ((*[register]:4 (Rs_19_16_uw + 4 * 0) > U5)) goto <if_register_4_Rs_19_16_uw_4_0_U5>;
+    res_register_4_Rs_19_16_uw_4_0_U5 = 0x00;
+    goto <endif_register_4_Rs_19_16_uw_4_0_U5>;
+    <if_register_4_Rs_19_16_uw_4_0_U5>
+    res_register_4_Rs_19_16_uw_4_0_U5 = 0xff;
+    <endif_register_4_Rs_19_16_uw_4_0_U5>
+    P0 = res_register_4_Rs_19_16_uw_4_0_U5:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.gtu(Rs,#U5); if (!p0.new) jump:t #r9:2
+# 0001000101iissssPP1IIIIIiiiiiii-
+# 
+# P0 = (Rs.uw[0] > imm_U) ? 0xff : 0x00;
+# if (!P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_gtu_R_U_if_notp0_new_jump_t_R Rs_19_16, U5, r9
+        is bits_31_22=0b0001000101 & r9_21_20 & Rs_19_16 & bits_13_13=0b1 & U5_12_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4); U5 = (U5_12_8 << 0);] {
+    local Rs_19_16_uw:4 = &Rs_19_16;
+    local res_register_4_Rs_19_16_uw_4_0_U5:4;
+    local new_new:1 = newSuffix(P0);
+    if ((*[register]:4 (Rs_19_16_uw + 4 * 0) > U5)) goto <if_register_4_Rs_19_16_uw_4_0_U5>;
+    res_register_4_Rs_19_16_uw_4_0_U5 = 0x00;
+    goto <endif_register_4_Rs_19_16_uw_4_0_U5>;
+    <if_register_4_Rs_19_16_uw_4_0_U5>
+    res_register_4_Rs_19_16_uw_4_0_U5 = 0xff;
+    <endif_register_4_Rs_19_16_uw_4_0_U5>
+    P0 = res_register_4_Rs_19_16_uw_4_0_U5:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.eq(Rs,#-1); if (p1.new) jump:nt #r9:2
+# 0001001110iissssPP0---00iiiiiii-
+# 
+# P1 = (Rs == -1) ? 0xff : 0x00;
+# if (P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_eq_R_m1_if_p1_new_jump_nt_R Rs_19_16, r9
+        is bits_31_22=0b0001001110 & r9_21_20 & Rs_19_16 & bits_13_13=0b0 & bits_9_8=0b00 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_1:4;
+    local new_new:1 = newSuffix(P1);
+    if ((Rs_19_16 == (-1))) goto <if_Rs_19_16_1>;
+    res_Rs_19_16_1 = 0x00;
+    goto <endif_Rs_19_16_1>;
+    <if_Rs_19_16_1>
+    res_Rs_19_16_1 = 0xff;
+    <endif_Rs_19_16_1>
+    P1 = res_Rs_19_16_1:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.gt(Rs,#-1); if (p1.new) jump:nt #r9:2
+# 0001001110iissssPP0---01iiiiiii-
+# 
+# P1 = (Rs > -1) ? 0xff : 0x00;
+# if (P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_gt_R_m1_if_p1_new_jump_nt_R Rs_19_16, r9
+        is bits_31_22=0b0001001110 & r9_21_20 & Rs_19_16 & bits_13_13=0b0 & bits_9_8=0b01 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_s_1:4;
+    local new_new:1 = newSuffix(P1);
+    if ((Rs_19_16 s> (-1))) goto <if_Rs_19_16_s_1>;
+    res_Rs_19_16_s_1 = 0x00;
+    goto <endif_Rs_19_16_s_1>;
+    <if_Rs_19_16_s_1>
+    res_Rs_19_16_s_1 = 0xff;
+    <endif_Rs_19_16_s_1>
+    P1 = res_Rs_19_16_s_1:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=tstbit(Rs,#0); if (p1.new) jump:nt #r9:2
+# 0001001110iissssPP0---11iiiiiii-
+# 
+# P1 = (Rs & 1) ? 0xff : 0x00;
+# if (P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_tstbit_R_0_if_p1_new_jump_nt_R Rs_19_16, r9
+        is bits_31_22=0b0001001110 & r9_21_20 & Rs_19_16 & bits_13_13=0b0 & bits_9_8=0b11 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_1:4;
+    local new_new:1 = newSuffix(P1);
+    if (((Rs_19_16 & 1) != 0)) goto <if_Rs_19_16_1_0>;
+    res_Rs_19_16_1 = 0x00;
+    goto <endif_Rs_19_16_1_0>;
+    <if_Rs_19_16_1_0>
+    res_Rs_19_16_1 = 0xff;
+    <endif_Rs_19_16_1_0>
+    P1 = res_Rs_19_16_1:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.eq(Rs,#-1); if (p1.new) jump:t #r9:2
+# 0001001110iissssPP1---00iiiiiii-
+# 
+# P1 = (Rs == -1) ? 0xff : 0x00;
+# if (P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_eq_R_m1_if_p1_new_jump_t_R Rs_19_16, r9
+        is bits_31_22=0b0001001110 & r9_21_20 & Rs_19_16 & bits_13_13=0b1 & bits_9_8=0b00 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_1:4;
+    local new_new:1 = newSuffix(P1);
+    if ((Rs_19_16 == (-1))) goto <if_Rs_19_16_1>;
+    res_Rs_19_16_1 = 0x00;
+    goto <endif_Rs_19_16_1>;
+    <if_Rs_19_16_1>
+    res_Rs_19_16_1 = 0xff;
+    <endif_Rs_19_16_1>
+    P1 = res_Rs_19_16_1:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.gt(Rs,#-1); if (p1.new) jump:t #r9:2
+# 0001001110iissssPP1---01iiiiiii-
+# 
+# P1 = (Rs > -1) ? 0xff : 0x00;
+# if (P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_gt_R_m1_if_p1_new_jump_t_R Rs_19_16, r9
+        is bits_31_22=0b0001001110 & r9_21_20 & Rs_19_16 & bits_13_13=0b1 & bits_9_8=0b01 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_s_1:4;
+    local new_new:1 = newSuffix(P1);
+    if ((Rs_19_16 s> (-1))) goto <if_Rs_19_16_s_1>;
+    res_Rs_19_16_s_1 = 0x00;
+    goto <endif_Rs_19_16_s_1>;
+    <if_Rs_19_16_s_1>
+    res_Rs_19_16_s_1 = 0xff;
+    <endif_Rs_19_16_s_1>
+    P1 = res_Rs_19_16_s_1:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=tstbit(Rs,#0); if (p1.new) jump:t #r9:2
+# 0001001110iissssPP1---11iiiiiii-
+# 
+# P1 = (Rs & 1) ? 0xff : 0x00;
+# if (P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_tstbit_R_0_if_p1_new_jump_t_R Rs_19_16, r9
+        is bits_31_22=0b0001001110 & r9_21_20 & Rs_19_16 & bits_13_13=0b1 & bits_9_8=0b11 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_1:4;
+    local new_new:1 = newSuffix(P1);
+    if (((Rs_19_16 & 1) != 0)) goto <if_Rs_19_16_1_0>;
+    res_Rs_19_16_1 = 0x00;
+    goto <endif_Rs_19_16_1_0>;
+    <if_Rs_19_16_1_0>
+    res_Rs_19_16_1 = 0xff;
+    <endif_Rs_19_16_1_0>
+    P1 = res_Rs_19_16_1:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.eq(Rs,#-1); if (!p1.new) jump:nt #r9:2
+# 0001001111iissssPP0---00iiiiiii-
+# 
+# P1 = (Rs == -1) ? 0xff : 0x00;
+# if (!P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_eq_R_m1_if_notp1_new_jump_nt_R Rs_19_16, r9
+        is bits_31_22=0b0001001111 & r9_21_20 & Rs_19_16 & bits_13_13=0b0 & bits_9_8=0b00 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_1:4;
+    local new_new:1 = newSuffix(P1);
+    if ((Rs_19_16 == (-1))) goto <if_Rs_19_16_1>;
+    res_Rs_19_16_1 = 0x00;
+    goto <endif_Rs_19_16_1>;
+    <if_Rs_19_16_1>
+    res_Rs_19_16_1 = 0xff;
+    <endif_Rs_19_16_1>
+    P1 = res_Rs_19_16_1:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.gt(Rs,#-1); if (!p1.new) jump:nt #r9:2
+# 0001001111iissssPP0---01iiiiiii-
+# 
+# P1 = (Rs > -1) ? 0xff : 0x00;
+# if (!P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_gt_R_m1_if_notp1_new_jump_nt_R Rs_19_16, r9
+        is bits_31_22=0b0001001111 & r9_21_20 & Rs_19_16 & bits_13_13=0b0 & bits_9_8=0b01 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_s_1:4;
+    local new_new:1 = newSuffix(P1);
+    if ((Rs_19_16 s> (-1))) goto <if_Rs_19_16_s_1>;
+    res_Rs_19_16_s_1 = 0x00;
+    goto <endif_Rs_19_16_s_1>;
+    <if_Rs_19_16_s_1>
+    res_Rs_19_16_s_1 = 0xff;
+    <endif_Rs_19_16_s_1>
+    P1 = res_Rs_19_16_s_1:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=tstbit(Rs,#0); if (!p1.new) jump:nt #r9:2
+# 0001001111iissssPP0---11iiiiiii-
+# 
+# P1 = (Rs & 1) ? 0xff : 0x00;
+# if (!P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_tstbit_R_0_if_notp1_new_jump_nt_R Rs_19_16, r9
+        is bits_31_22=0b0001001111 & r9_21_20 & Rs_19_16 & bits_13_13=0b0 & bits_9_8=0b11 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_1:4;
+    local new_new:1 = newSuffix(P1);
+    if (((Rs_19_16 & 1) != 0)) goto <if_Rs_19_16_1_0>;
+    res_Rs_19_16_1 = 0x00;
+    goto <endif_Rs_19_16_1_0>;
+    <if_Rs_19_16_1_0>
+    res_Rs_19_16_1 = 0xff;
+    <endif_Rs_19_16_1_0>
+    P1 = res_Rs_19_16_1:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.eq(Rs,#-1); if (!p1.new) jump:t #r9:2
+# 0001001111iissssPP1---00iiiiiii-
+# 
+# P1 = (Rs == -1) ? 0xff : 0x00;
+# if (!P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_eq_R_m1_if_notp1_new_jump_t_R Rs_19_16, r9
+        is bits_31_22=0b0001001111 & r9_21_20 & Rs_19_16 & bits_13_13=0b1 & bits_9_8=0b00 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_1:4;
+    local new_new:1 = newSuffix(P1);
+    if ((Rs_19_16 == (-1))) goto <if_Rs_19_16_1>;
+    res_Rs_19_16_1 = 0x00;
+    goto <endif_Rs_19_16_1>;
+    <if_Rs_19_16_1>
+    res_Rs_19_16_1 = 0xff;
+    <endif_Rs_19_16_1>
+    P1 = res_Rs_19_16_1:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.gt(Rs,#-1); if (!p1.new) jump:t #r9:2
+# 0001001111iissssPP1---01iiiiiii-
+# 
+# P1 = (Rs > -1) ? 0xff : 0x00;
+# if (!P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_gt_R_m1_if_notp1_new_jump_t_R Rs_19_16, r9
+        is bits_31_22=0b0001001111 & r9_21_20 & Rs_19_16 & bits_13_13=0b1 & bits_9_8=0b01 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_s_1:4;
+    local new_new:1 = newSuffix(P1);
+    if ((Rs_19_16 s> (-1))) goto <if_Rs_19_16_s_1>;
+    res_Rs_19_16_s_1 = 0x00;
+    goto <endif_Rs_19_16_s_1>;
+    <if_Rs_19_16_s_1>
+    res_Rs_19_16_s_1 = 0xff;
+    <endif_Rs_19_16_s_1>
+    P1 = res_Rs_19_16_s_1:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=tstbit(Rs,#0); if (!p1.new) jump:t #r9:2
+# 0001001111iissssPP1---11iiiiiii-
+# 
+# P1 = (Rs & 1) ? 0xff : 0x00;
+# if (!P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_tstbit_R_0_if_notp1_new_jump_t_R Rs_19_16, r9
+        is bits_31_22=0b0001001111 & r9_21_20 & Rs_19_16 & bits_13_13=0b1 & bits_9_8=0b11 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_1:4;
+    local new_new:1 = newSuffix(P1);
+    if (((Rs_19_16 & 1) != 0)) goto <if_Rs_19_16_1_0>;
+    res_Rs_19_16_1 = 0x00;
+    goto <endif_Rs_19_16_1_0>;
+    <if_Rs_19_16_1_0>
+    res_Rs_19_16_1 = 0xff;
+    <endif_Rs_19_16_1_0>
+    P1 = res_Rs_19_16_1:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.eq(Rs,#U5); if (p1.new) jump:nt #r9:2
+# 0001001000iissssPP0IIIIIiiiiiii-
+# 
+# P1 = (Rs == imm_U) ? 0xff : 0x00;
+# if (P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_eq_R_U_if_p1_new_jump_nt_R Rs_19_16, U5, r9
+        is bits_31_22=0b0001001000 & r9_21_20 & Rs_19_16 & bits_13_13=0b0 & U5_12_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4); U5 = (U5_12_8 << 0);] {
+    local res_Rs_19_16_U5:4;
+    local new_new:1 = newSuffix(P1);
+    if ((Rs_19_16 == U5)) goto <if_Rs_19_16_U5>;
+    res_Rs_19_16_U5 = 0x00;
+    goto <endif_Rs_19_16_U5>;
+    <if_Rs_19_16_U5>
+    res_Rs_19_16_U5 = 0xff;
+    <endif_Rs_19_16_U5>
+    P1 = res_Rs_19_16_U5:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.eq(Rs,#U5); if (p1.new) jump:t #r9:2
+# 0001001000iissssPP1IIIIIiiiiiii-
+# 
+# P1 = (Rs == imm_U) ? 0xff : 0x00;
+# if (P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_eq_R_U_if_p1_new_jump_t_R Rs_19_16, U5, r9
+        is bits_31_22=0b0001001000 & r9_21_20 & Rs_19_16 & bits_13_13=0b1 & U5_12_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4); U5 = (U5_12_8 << 0);] {
+    local res_Rs_19_16_U5:4;
+    local new_new:1 = newSuffix(P1);
+    if ((Rs_19_16 == U5)) goto <if_Rs_19_16_U5>;
+    res_Rs_19_16_U5 = 0x00;
+    goto <endif_Rs_19_16_U5>;
+    <if_Rs_19_16_U5>
+    res_Rs_19_16_U5 = 0xff;
+    <endif_Rs_19_16_U5>
+    P1 = res_Rs_19_16_U5:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.eq(Rs,#U5); if (!p1.new) jump:nt #r9:2
+# 0001001001iissssPP0IIIIIiiiiiii-
+# 
+# P1 = (Rs == imm_U) ? 0xff : 0x00;
+# if (!P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_eq_R_U_if_notp1_new_jump_nt_R Rs_19_16, U5, r9
+        is bits_31_22=0b0001001001 & r9_21_20 & Rs_19_16 & bits_13_13=0b0 & U5_12_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4); U5 = (U5_12_8 << 0);] {
+    local res_Rs_19_16_U5:4;
+    local new_new:1 = newSuffix(P1);
+    if ((Rs_19_16 == U5)) goto <if_Rs_19_16_U5>;
+    res_Rs_19_16_U5 = 0x00;
+    goto <endif_Rs_19_16_U5>;
+    <if_Rs_19_16_U5>
+    res_Rs_19_16_U5 = 0xff;
+    <endif_Rs_19_16_U5>
+    P1 = res_Rs_19_16_U5:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.eq(Rs,#U5); if (!p1.new) jump:t #r9:2
+# 0001001001iissssPP1IIIIIiiiiiii-
+# 
+# P1 = (Rs == imm_U) ? 0xff : 0x00;
+# if (!P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_eq_R_U_if_notp1_new_jump_t_R Rs_19_16, U5, r9
+        is bits_31_22=0b0001001001 & r9_21_20 & Rs_19_16 & bits_13_13=0b1 & U5_12_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4); U5 = (U5_12_8 << 0);] {
+    local res_Rs_19_16_U5:4;
+    local new_new:1 = newSuffix(P1);
+    if ((Rs_19_16 == U5)) goto <if_Rs_19_16_U5>;
+    res_Rs_19_16_U5 = 0x00;
+    goto <endif_Rs_19_16_U5>;
+    <if_Rs_19_16_U5>
+    res_Rs_19_16_U5 = 0xff;
+    <endif_Rs_19_16_U5>
+    P1 = res_Rs_19_16_U5:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.gt(Rs,#U5); if (p1.new) jump:nt #r9:2
+# 0001001010iissssPP0IIIIIiiiiiii-
+# 
+# P1 = (Rs > imm_U) ? 0xff : 0x00;
+# if (P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_gt_R_U_if_p1_new_jump_nt_R Rs_19_16, U5, r9
+        is bits_31_22=0b0001001010 & r9_21_20 & Rs_19_16 & bits_13_13=0b0 & U5_12_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4); U5 = (U5_12_8 << 0);] {
+    local res_Rs_19_16_U5:4;
+    local new_new:1 = newSuffix(P1);
+    if ((Rs_19_16 > U5)) goto <if_Rs_19_16_U5>;
+    res_Rs_19_16_U5 = 0x00;
+    goto <endif_Rs_19_16_U5>;
+    <if_Rs_19_16_U5>
+    res_Rs_19_16_U5 = 0xff;
+    <endif_Rs_19_16_U5>
+    P1 = res_Rs_19_16_U5:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.gt(Rs,#U5); if (p1.new) jump:t #r9:2
+# 0001001010iissssPP1IIIIIiiiiiii-
+# 
+# P1 = (Rs > imm_U) ? 0xff : 0x00;
+# if (P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_gt_R_U_if_p1_new_jump_t_R Rs_19_16, U5, r9
+        is bits_31_22=0b0001001010 & r9_21_20 & Rs_19_16 & bits_13_13=0b1 & U5_12_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4); U5 = (U5_12_8 << 0);] {
+    local res_Rs_19_16_U5:4;
+    local new_new:1 = newSuffix(P1);
+    if ((Rs_19_16 > U5)) goto <if_Rs_19_16_U5>;
+    res_Rs_19_16_U5 = 0x00;
+    goto <endif_Rs_19_16_U5>;
+    <if_Rs_19_16_U5>
+    res_Rs_19_16_U5 = 0xff;
+    <endif_Rs_19_16_U5>
+    P1 = res_Rs_19_16_U5:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.gt(Rs,#U5); if (!p1.new) jump:nt #r9:2
+# 0001001011iissssPP0IIIIIiiiiiii-
+# 
+# P1 = (Rs > imm_U) ? 0xff : 0x00;
+# if (!P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_gt_R_U_if_notp1_new_jump_nt_R Rs_19_16, U5, r9
+        is bits_31_22=0b0001001011 & r9_21_20 & Rs_19_16 & bits_13_13=0b0 & U5_12_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4); U5 = (U5_12_8 << 0);] {
+    local res_Rs_19_16_U5:4;
+    local new_new:1 = newSuffix(P1);
+    if ((Rs_19_16 > U5)) goto <if_Rs_19_16_U5>;
+    res_Rs_19_16_U5 = 0x00;
+    goto <endif_Rs_19_16_U5>;
+    <if_Rs_19_16_U5>
+    res_Rs_19_16_U5 = 0xff;
+    <endif_Rs_19_16_U5>
+    P1 = res_Rs_19_16_U5:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.gt(Rs,#U5); if (!p1.new) jump:t #r9:2
+# 0001001011iissssPP1IIIIIiiiiiii-
+# 
+# P1 = (Rs > imm_U) ? 0xff : 0x00;
+# if (!P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_gt_R_U_if_notp1_new_jump_t_R Rs_19_16, U5, r9
+        is bits_31_22=0b0001001011 & r9_21_20 & Rs_19_16 & bits_13_13=0b1 & U5_12_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4); U5 = (U5_12_8 << 0);] {
+    local res_Rs_19_16_U5:4;
+    local new_new:1 = newSuffix(P1);
+    if ((Rs_19_16 > U5)) goto <if_Rs_19_16_U5>;
+    res_Rs_19_16_U5 = 0x00;
+    goto <endif_Rs_19_16_U5>;
+    <if_Rs_19_16_U5>
+    res_Rs_19_16_U5 = 0xff;
+    <endif_Rs_19_16_U5>
+    P1 = res_Rs_19_16_U5:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.gtu(Rs,#U5); if (p1.new) jump:nt #r9:2
+# 0001001100iissssPP0IIIIIiiiiiii-
+# 
+# P1 = (Rs.uw[0] > imm_U) ? 0xff : 0x00;
+# if (P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_gtu_R_U_if_p1_new_jump_nt_R Rs_19_16, U5, r9
+        is bits_31_22=0b0001001100 & r9_21_20 & Rs_19_16 & bits_13_13=0b0 & U5_12_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4); U5 = (U5_12_8 << 0);] {
+    local Rs_19_16_uw:4 = &Rs_19_16;
+    local res_register_4_Rs_19_16_uw_4_0_U5:4;
+    local new_new:1 = newSuffix(P1);
+    if ((*[register]:4 (Rs_19_16_uw + 4 * 0) > U5)) goto <if_register_4_Rs_19_16_uw_4_0_U5>;
+    res_register_4_Rs_19_16_uw_4_0_U5 = 0x00;
+    goto <endif_register_4_Rs_19_16_uw_4_0_U5>;
+    <if_register_4_Rs_19_16_uw_4_0_U5>
+    res_register_4_Rs_19_16_uw_4_0_U5 = 0xff;
+    <endif_register_4_Rs_19_16_uw_4_0_U5>
+    P1 = res_register_4_Rs_19_16_uw_4_0_U5:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.gtu(Rs,#U5); if (p1.new) jump:t #r9:2
+# 0001001100iissssPP1IIIIIiiiiiii-
+# 
+# P1 = (Rs.uw[0] > imm_U) ? 0xff : 0x00;
+# if (P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_gtu_R_U_if_p1_new_jump_t_R Rs_19_16, U5, r9
+        is bits_31_22=0b0001001100 & r9_21_20 & Rs_19_16 & bits_13_13=0b1 & U5_12_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4); U5 = (U5_12_8 << 0);] {
+    local Rs_19_16_uw:4 = &Rs_19_16;
+    local res_register_4_Rs_19_16_uw_4_0_U5:4;
+    local new_new:1 = newSuffix(P1);
+    if ((*[register]:4 (Rs_19_16_uw + 4 * 0) > U5)) goto <if_register_4_Rs_19_16_uw_4_0_U5>;
+    res_register_4_Rs_19_16_uw_4_0_U5 = 0x00;
+    goto <endif_register_4_Rs_19_16_uw_4_0_U5>;
+    <if_register_4_Rs_19_16_uw_4_0_U5>
+    res_register_4_Rs_19_16_uw_4_0_U5 = 0xff;
+    <endif_register_4_Rs_19_16_uw_4_0_U5>
+    P1 = res_register_4_Rs_19_16_uw_4_0_U5:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.gtu(Rs,#U5); if (!p1.new) jump:nt #r9:2
+# 0001001101iissssPP0IIIIIiiiiiii-
+# 
+# P1 = (Rs.uw[0] > imm_U) ? 0xff : 0x00;
+# if (!P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_gtu_R_U_if_notp1_new_jump_nt_R Rs_19_16, U5, r9
+        is bits_31_22=0b0001001101 & r9_21_20 & Rs_19_16 & bits_13_13=0b0 & U5_12_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4); U5 = (U5_12_8 << 0);] {
+    local Rs_19_16_uw:4 = &Rs_19_16;
+    local res_register_4_Rs_19_16_uw_4_0_U5:4;
+    local new_new:1 = newSuffix(P1);
+    if ((*[register]:4 (Rs_19_16_uw + 4 * 0) > U5)) goto <if_register_4_Rs_19_16_uw_4_0_U5>;
+    res_register_4_Rs_19_16_uw_4_0_U5 = 0x00;
+    goto <endif_register_4_Rs_19_16_uw_4_0_U5>;
+    <if_register_4_Rs_19_16_uw_4_0_U5>
+    res_register_4_Rs_19_16_uw_4_0_U5 = 0xff;
+    <endif_register_4_Rs_19_16_uw_4_0_U5>
+    P1 = res_register_4_Rs_19_16_uw_4_0_U5:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.gtu(Rs,#U5); if (!p1.new) jump:t #r9:2
+# 0001001101iissssPP1IIIIIiiiiiii-
+# 
+# P1 = (Rs.uw[0] > imm_U) ? 0xff : 0x00;
+# if (!P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_gtu_R_U_if_notp1_new_jump_t_R Rs_19_16, U5, r9
+        is bits_31_22=0b0001001101 & r9_21_20 & Rs_19_16 & bits_13_13=0b1 & U5_12_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4); U5 = (U5_12_8 << 0);] {
+    local Rs_19_16_uw:4 = &Rs_19_16;
+    local res_register_4_Rs_19_16_uw_4_0_U5:4;
+    local new_new:1 = newSuffix(P1);
+    if ((*[register]:4 (Rs_19_16_uw + 4 * 0) > U5)) goto <if_register_4_Rs_19_16_uw_4_0_U5>;
+    res_register_4_Rs_19_16_uw_4_0_U5 = 0x00;
+    goto <endif_register_4_Rs_19_16_uw_4_0_U5>;
+    <if_register_4_Rs_19_16_uw_4_0_U5>
+    res_register_4_Rs_19_16_uw_4_0_U5 = 0xff;
+    <endif_register_4_Rs_19_16_uw_4_0_U5>
+    P1 = res_register_4_Rs_19_16_uw_4_0_U5:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.eq(Rs,Rt); if (p0.new) jump:nt #r9:2
+# 0001010000iissssPP00ttttiiiiiii-
+# 
+# P0 = (Rs == Rt) ? 0xff : 0x00;
+# if (P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_eq_R_R_if_p0_new_jump_nt_R Rs_19_16, Rt_11_8, r9
+        is bits_31_22=0b0001010000 & r9_21_20 & Rs_19_16 & bits_13_12=0b00 & Rt_11_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_Rt_11_8:4;
+    local new_new:1 = newSuffix(P0);
+    if ((Rs_19_16 == Rt_11_8)) goto <if_Rs_19_16_Rt_11_8>;
+    res_Rs_19_16_Rt_11_8 = 0x00;
+    goto <endif_Rs_19_16_Rt_11_8>;
+    <if_Rs_19_16_Rt_11_8>
+    res_Rs_19_16_Rt_11_8 = 0xff;
+    <endif_Rs_19_16_Rt_11_8>
+    P0 = res_Rs_19_16_Rt_11_8:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.eq(Rs,Rt); if (p1.new) jump:nt #r9:2
+# 0001010000iissssPP01ttttiiiiiii-
+# 
+# P1 = (Rs == Rt) ? 0xff : 0x00;
+# if (P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_eq_R_R_if_p1_new_jump_nt_R Rs_19_16, Rt_11_8, r9
+        is bits_31_22=0b0001010000 & r9_21_20 & Rs_19_16 & bits_13_12=0b01 & Rt_11_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_Rt_11_8:4;
+    local new_new:1 = newSuffix(P1);
+    if ((Rs_19_16 == Rt_11_8)) goto <if_Rs_19_16_Rt_11_8>;
+    res_Rs_19_16_Rt_11_8 = 0x00;
+    goto <endif_Rs_19_16_Rt_11_8>;
+    <if_Rs_19_16_Rt_11_8>
+    res_Rs_19_16_Rt_11_8 = 0xff;
+    <endif_Rs_19_16_Rt_11_8>
+    P1 = res_Rs_19_16_Rt_11_8:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.eq(Rs,Rt); if (p0.new) jump:t #r9:2
+# 0001010000iissssPP10ttttiiiiiii-
+# 
+# P0 = (Rs == Rt) ? 0xff : 0x00;
+# if (P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_eq_R_R_if_p0_new_jump_t_R Rs_19_16, Rt_11_8, r9
+        is bits_31_22=0b0001010000 & r9_21_20 & Rs_19_16 & bits_13_12=0b10 & Rt_11_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_Rt_11_8:4;
+    local new_new:1 = newSuffix(P0);
+    if ((Rs_19_16 == Rt_11_8)) goto <if_Rs_19_16_Rt_11_8>;
+    res_Rs_19_16_Rt_11_8 = 0x00;
+    goto <endif_Rs_19_16_Rt_11_8>;
+    <if_Rs_19_16_Rt_11_8>
+    res_Rs_19_16_Rt_11_8 = 0xff;
+    <endif_Rs_19_16_Rt_11_8>
+    P0 = res_Rs_19_16_Rt_11_8:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.eq(Rs,Rt); if (p1.new) jump:t #r9:2
+# 0001010000iissssPP11ttttiiiiiii-
+# 
+# P1 = (Rs == Rt) ? 0xff : 0x00;
+# if (P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_eq_R_R_if_p1_new_jump_t_R Rs_19_16, Rt_11_8, r9
+        is bits_31_22=0b0001010000 & r9_21_20 & Rs_19_16 & bits_13_12=0b11 & Rt_11_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_Rt_11_8:4;
+    local new_new:1 = newSuffix(P1);
+    if ((Rs_19_16 == Rt_11_8)) goto <if_Rs_19_16_Rt_11_8>;
+    res_Rs_19_16_Rt_11_8 = 0x00;
+    goto <endif_Rs_19_16_Rt_11_8>;
+    <if_Rs_19_16_Rt_11_8>
+    res_Rs_19_16_Rt_11_8 = 0xff;
+    <endif_Rs_19_16_Rt_11_8>
+    P1 = res_Rs_19_16_Rt_11_8:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.eq(Rs,Rt); if (!p0.new) jump:nt #r9:2
+# 0001010001iissssPP00ttttiiiiiii-
+# 
+# P0 = (Rs == Rt) ? 0xff : 0x00;
+# if (!P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_eq_R_R_if_notp0_new_jump_nt_R Rs_19_16, Rt_11_8, r9
+        is bits_31_22=0b0001010001 & r9_21_20 & Rs_19_16 & bits_13_12=0b00 & Rt_11_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_Rt_11_8:4;
+    local new_new:1 = newSuffix(P0);
+    if ((Rs_19_16 == Rt_11_8)) goto <if_Rs_19_16_Rt_11_8>;
+    res_Rs_19_16_Rt_11_8 = 0x00;
+    goto <endif_Rs_19_16_Rt_11_8>;
+    <if_Rs_19_16_Rt_11_8>
+    res_Rs_19_16_Rt_11_8 = 0xff;
+    <endif_Rs_19_16_Rt_11_8>
+    P0 = res_Rs_19_16_Rt_11_8:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.eq(Rs,Rt); if (!p1.new) jump:nt #r9:2
+# 0001010001iissssPP01ttttiiiiiii-
+# 
+# P1 = (Rs == Rt) ? 0xff : 0x00;
+# if (!P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_eq_R_R_if_notp1_new_jump_nt_R Rs_19_16, Rt_11_8, r9
+        is bits_31_22=0b0001010001 & r9_21_20 & Rs_19_16 & bits_13_12=0b01 & Rt_11_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_Rt_11_8:4;
+    local new_new:1 = newSuffix(P1);
+    if ((Rs_19_16 == Rt_11_8)) goto <if_Rs_19_16_Rt_11_8>;
+    res_Rs_19_16_Rt_11_8 = 0x00;
+    goto <endif_Rs_19_16_Rt_11_8>;
+    <if_Rs_19_16_Rt_11_8>
+    res_Rs_19_16_Rt_11_8 = 0xff;
+    <endif_Rs_19_16_Rt_11_8>
+    P1 = res_Rs_19_16_Rt_11_8:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.eq(Rs,Rt); if (!p0.new) jump:t #r9:2
+# 0001010001iissssPP10ttttiiiiiii-
+# 
+# P0 = (Rs == Rt) ? 0xff : 0x00;
+# if (!P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_eq_R_R_if_notp0_new_jump_t_R Rs_19_16, Rt_11_8, r9
+        is bits_31_22=0b0001010001 & r9_21_20 & Rs_19_16 & bits_13_12=0b10 & Rt_11_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_Rt_11_8:4;
+    local new_new:1 = newSuffix(P0);
+    if ((Rs_19_16 == Rt_11_8)) goto <if_Rs_19_16_Rt_11_8>;
+    res_Rs_19_16_Rt_11_8 = 0x00;
+    goto <endif_Rs_19_16_Rt_11_8>;
+    <if_Rs_19_16_Rt_11_8>
+    res_Rs_19_16_Rt_11_8 = 0xff;
+    <endif_Rs_19_16_Rt_11_8>
+    P0 = res_Rs_19_16_Rt_11_8:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.eq(Rs,Rt); if (!p1.new) jump:t #r9:2
+# 0001010001iissssPP11ttttiiiiiii-
+# 
+# P1 = (Rs == Rt) ? 0xff : 0x00;
+# if (!P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_eq_R_R_if_notp1_new_jump_t_R Rs_19_16, Rt_11_8, r9
+        is bits_31_22=0b0001010001 & r9_21_20 & Rs_19_16 & bits_13_12=0b11 & Rt_11_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_Rt_11_8:4;
+    local new_new:1 = newSuffix(P1);
+    if ((Rs_19_16 == Rt_11_8)) goto <if_Rs_19_16_Rt_11_8>;
+    res_Rs_19_16_Rt_11_8 = 0x00;
+    goto <endif_Rs_19_16_Rt_11_8>;
+    <if_Rs_19_16_Rt_11_8>
+    res_Rs_19_16_Rt_11_8 = 0xff;
+    <endif_Rs_19_16_Rt_11_8>
+    P1 = res_Rs_19_16_Rt_11_8:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.gt(Rs,Rt); if (p0.new) jump:nt #r9:2
+# 0001010010iissssPP00ttttiiiiiii-
+# 
+# P0 = (Rs > Rt) ? 0xff : 0x00;
+# if (P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_gt_R_R_if_p0_new_jump_nt_R Rs_19_16, Rt_11_8, r9
+        is bits_31_22=0b0001010010 & r9_21_20 & Rs_19_16 & bits_13_12=0b00 & Rt_11_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_s_Rt_11_8:4;
+    local new_new:1 = newSuffix(P0);
+    if ((Rs_19_16 s> Rt_11_8)) goto <if_Rs_19_16_s_Rt_11_8>;
+    res_Rs_19_16_s_Rt_11_8 = 0x00;
+    goto <endif_Rs_19_16_s_Rt_11_8>;
+    <if_Rs_19_16_s_Rt_11_8>
+    res_Rs_19_16_s_Rt_11_8 = 0xff;
+    <endif_Rs_19_16_s_Rt_11_8>
+    P0 = res_Rs_19_16_s_Rt_11_8:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.gt(Rs,Rt); if (p1.new) jump:nt #r9:2
+# 0001010010iissssPP01ttttiiiiiii-
+# 
+# P1 = (Rs > Rt) ? 0xff : 0x00;
+# if (P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_gt_R_R_if_p1_new_jump_nt_R Rs_19_16, Rt_11_8, r9
+        is bits_31_22=0b0001010010 & r9_21_20 & Rs_19_16 & bits_13_12=0b01 & Rt_11_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_s_Rt_11_8:4;
+    local new_new:1 = newSuffix(P1);
+    if ((Rs_19_16 s> Rt_11_8)) goto <if_Rs_19_16_s_Rt_11_8>;
+    res_Rs_19_16_s_Rt_11_8 = 0x00;
+    goto <endif_Rs_19_16_s_Rt_11_8>;
+    <if_Rs_19_16_s_Rt_11_8>
+    res_Rs_19_16_s_Rt_11_8 = 0xff;
+    <endif_Rs_19_16_s_Rt_11_8>
+    P1 = res_Rs_19_16_s_Rt_11_8:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.gt(Rs,Rt); if (p0.new) jump:t #r9:2
+# 0001010010iissssPP10ttttiiiiiii-
+# 
+# P0 = (Rs > Rt) ? 0xff : 0x00;
+# if (P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_gt_R_R_if_p0_new_jump_t_R Rs_19_16, Rt_11_8, r9
+        is bits_31_22=0b0001010010 & r9_21_20 & Rs_19_16 & bits_13_12=0b10 & Rt_11_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_s_Rt_11_8:4;
+    local new_new:1 = newSuffix(P0);
+    if ((Rs_19_16 s> Rt_11_8)) goto <if_Rs_19_16_s_Rt_11_8>;
+    res_Rs_19_16_s_Rt_11_8 = 0x00;
+    goto <endif_Rs_19_16_s_Rt_11_8>;
+    <if_Rs_19_16_s_Rt_11_8>
+    res_Rs_19_16_s_Rt_11_8 = 0xff;
+    <endif_Rs_19_16_s_Rt_11_8>
+    P0 = res_Rs_19_16_s_Rt_11_8:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.gt(Rs,Rt); if (p1.new) jump:t #r9:2
+# 0001010010iissssPP11ttttiiiiiii-
+# 
+# P1 = (Rs > Rt) ? 0xff : 0x00;
+# if (P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_gt_R_R_if_p1_new_jump_t_R Rs_19_16, Rt_11_8, r9
+        is bits_31_22=0b0001010010 & r9_21_20 & Rs_19_16 & bits_13_12=0b11 & Rt_11_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_s_Rt_11_8:4;
+    local new_new:1 = newSuffix(P1);
+    if ((Rs_19_16 s> Rt_11_8)) goto <if_Rs_19_16_s_Rt_11_8>;
+    res_Rs_19_16_s_Rt_11_8 = 0x00;
+    goto <endif_Rs_19_16_s_Rt_11_8>;
+    <if_Rs_19_16_s_Rt_11_8>
+    res_Rs_19_16_s_Rt_11_8 = 0xff;
+    <endif_Rs_19_16_s_Rt_11_8>
+    P1 = res_Rs_19_16_s_Rt_11_8:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.gt(Rs,Rt); if (!p0.new) jump:nt #r9:2
+# 0001010011iissssPP00ttttiiiiiii-
+# 
+# P0 = (Rs > Rt) ? 0xff : 0x00;
+# if (!P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_gt_R_R_if_notp0_new_jump_nt_R Rs_19_16, Rt_11_8, r9
+        is bits_31_22=0b0001010011 & r9_21_20 & Rs_19_16 & bits_13_12=0b00 & Rt_11_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_s_Rt_11_8:4;
+    local new_new:1 = newSuffix(P0);
+    if ((Rs_19_16 s> Rt_11_8)) goto <if_Rs_19_16_s_Rt_11_8>;
+    res_Rs_19_16_s_Rt_11_8 = 0x00;
+    goto <endif_Rs_19_16_s_Rt_11_8>;
+    <if_Rs_19_16_s_Rt_11_8>
+    res_Rs_19_16_s_Rt_11_8 = 0xff;
+    <endif_Rs_19_16_s_Rt_11_8>
+    P0 = res_Rs_19_16_s_Rt_11_8:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.gt(Rs,Rt); if (!p1.new) jump:nt #r9:2
+# 0001010011iissssPP01ttttiiiiiii-
+# 
+# P1 = (Rs > Rt) ? 0xff : 0x00;
+# if (!P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_gt_R_R_if_notp1_new_jump_nt_R Rs_19_16, Rt_11_8, r9
+        is bits_31_22=0b0001010011 & r9_21_20 & Rs_19_16 & bits_13_12=0b01 & Rt_11_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_s_Rt_11_8:4;
+    local new_new:1 = newSuffix(P1);
+    if ((Rs_19_16 s> Rt_11_8)) goto <if_Rs_19_16_s_Rt_11_8>;
+    res_Rs_19_16_s_Rt_11_8 = 0x00;
+    goto <endif_Rs_19_16_s_Rt_11_8>;
+    <if_Rs_19_16_s_Rt_11_8>
+    res_Rs_19_16_s_Rt_11_8 = 0xff;
+    <endif_Rs_19_16_s_Rt_11_8>
+    P1 = res_Rs_19_16_s_Rt_11_8:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.gt(Rs,Rt); if (!p0.new) jump:t #r9:2
+# 0001010011iissssPP10ttttiiiiiii-
+# 
+# P0 = (Rs > Rt) ? 0xff : 0x00;
+# if (!P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_gt_R_R_if_notp0_new_jump_t_R Rs_19_16, Rt_11_8, r9
+        is bits_31_22=0b0001010011 & r9_21_20 & Rs_19_16 & bits_13_12=0b10 & Rt_11_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_s_Rt_11_8:4;
+    local new_new:1 = newSuffix(P0);
+    if ((Rs_19_16 s> Rt_11_8)) goto <if_Rs_19_16_s_Rt_11_8>;
+    res_Rs_19_16_s_Rt_11_8 = 0x00;
+    goto <endif_Rs_19_16_s_Rt_11_8>;
+    <if_Rs_19_16_s_Rt_11_8>
+    res_Rs_19_16_s_Rt_11_8 = 0xff;
+    <endif_Rs_19_16_s_Rt_11_8>
+    P0 = res_Rs_19_16_s_Rt_11_8:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.gt(Rs,Rt); if (!p1.new) jump:t #r9:2
+# 0001010011iissssPP11ttttiiiiiii-
+# 
+# P1 = (Rs > Rt) ? 0xff : 0x00;
+# if (!P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_gt_R_R_if_notp1_new_jump_t_R Rs_19_16, Rt_11_8, r9
+        is bits_31_22=0b0001010011 & r9_21_20 & Rs_19_16 & bits_13_12=0b11 & Rt_11_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local res_Rs_19_16_s_Rt_11_8:4;
+    local new_new:1 = newSuffix(P1);
+    if ((Rs_19_16 s> Rt_11_8)) goto <if_Rs_19_16_s_Rt_11_8>;
+    res_Rs_19_16_s_Rt_11_8 = 0x00;
+    goto <endif_Rs_19_16_s_Rt_11_8>;
+    <if_Rs_19_16_s_Rt_11_8>
+    res_Rs_19_16_s_Rt_11_8 = 0xff;
+    <endif_Rs_19_16_s_Rt_11_8>
+    P1 = res_Rs_19_16_s_Rt_11_8:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.gtu(Rs,Rt); if (p0.new) jump:nt #r9:2
+# 0001010100iissssPP00ttttiiiiiii-
+# 
+# P0 = (Rs.uw[0] > Rt) ? 0xff : 0x00;
+# if (P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_gtu_R_R_if_p0_new_jump_nt_R Rs_19_16, Rt_11_8, r9
+        is bits_31_22=0b0001010100 & r9_21_20 & Rs_19_16 & bits_13_12=0b00 & Rt_11_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local Rs_19_16_uw:4 = &Rs_19_16;
+    local res_register_4_Rs_19_16_uw_4_0_Rt_11_8:4;
+    local new_new:1 = newSuffix(P0);
+    if ((*[register]:4 (Rs_19_16_uw + 4 * 0) > Rt_11_8)) goto <if_register_4_Rs_19_16_uw_4_0_Rt_11_8>;
+    res_register_4_Rs_19_16_uw_4_0_Rt_11_8 = 0x00;
+    goto <endif_register_4_Rs_19_16_uw_4_0_Rt_11_8>;
+    <if_register_4_Rs_19_16_uw_4_0_Rt_11_8>
+    res_register_4_Rs_19_16_uw_4_0_Rt_11_8 = 0xff;
+    <endif_register_4_Rs_19_16_uw_4_0_Rt_11_8>
+    P0 = res_register_4_Rs_19_16_uw_4_0_Rt_11_8:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.gtu(Rs,Rt); if (p1.new) jump:nt #r9:2
+# 0001010100iissssPP01ttttiiiiiii-
+# 
+# P1 = (Rs.uw[0] > Rt) ? 0xff : 0x00;
+# if (P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_gtu_R_R_if_p1_new_jump_nt_R Rs_19_16, Rt_11_8, r9
+        is bits_31_22=0b0001010100 & r9_21_20 & Rs_19_16 & bits_13_12=0b01 & Rt_11_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local Rs_19_16_uw:4 = &Rs_19_16;
+    local res_register_4_Rs_19_16_uw_4_0_Rt_11_8:4;
+    local new_new:1 = newSuffix(P1);
+    if ((*[register]:4 (Rs_19_16_uw + 4 * 0) > Rt_11_8)) goto <if_register_4_Rs_19_16_uw_4_0_Rt_11_8>;
+    res_register_4_Rs_19_16_uw_4_0_Rt_11_8 = 0x00;
+    goto <endif_register_4_Rs_19_16_uw_4_0_Rt_11_8>;
+    <if_register_4_Rs_19_16_uw_4_0_Rt_11_8>
+    res_register_4_Rs_19_16_uw_4_0_Rt_11_8 = 0xff;
+    <endif_register_4_Rs_19_16_uw_4_0_Rt_11_8>
+    P1 = res_register_4_Rs_19_16_uw_4_0_Rt_11_8:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.gtu(Rs,Rt); if (p0.new) jump:t #r9:2
+# 0001010100iissssPP10ttttiiiiiii-
+# 
+# P0 = (Rs.uw[0] > Rt) ? 0xff : 0x00;
+# if (P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_gtu_R_R_if_p0_new_jump_t_R Rs_19_16, Rt_11_8, r9
+        is bits_31_22=0b0001010100 & r9_21_20 & Rs_19_16 & bits_13_12=0b10 & Rt_11_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local Rs_19_16_uw:4 = &Rs_19_16;
+    local res_register_4_Rs_19_16_uw_4_0_Rt_11_8:4;
+    local new_new:1 = newSuffix(P0);
+    if ((*[register]:4 (Rs_19_16_uw + 4 * 0) > Rt_11_8)) goto <if_register_4_Rs_19_16_uw_4_0_Rt_11_8>;
+    res_register_4_Rs_19_16_uw_4_0_Rt_11_8 = 0x00;
+    goto <endif_register_4_Rs_19_16_uw_4_0_Rt_11_8>;
+    <if_register_4_Rs_19_16_uw_4_0_Rt_11_8>
+    res_register_4_Rs_19_16_uw_4_0_Rt_11_8 = 0xff;
+    <endif_register_4_Rs_19_16_uw_4_0_Rt_11_8>
+    P0 = res_register_4_Rs_19_16_uw_4_0_Rt_11_8:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.gtu(Rs,Rt); if (p1.new) jump:t #r9:2
+# 0001010100iissssPP11ttttiiiiiii-
+# 
+# P1 = (Rs.uw[0] > Rt) ? 0xff : 0x00;
+# if (P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_gtu_R_R_if_p1_new_jump_t_R Rs_19_16, Rt_11_8, r9
+        is bits_31_22=0b0001010100 & r9_21_20 & Rs_19_16 & bits_13_12=0b11 & Rt_11_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local Rs_19_16_uw:4 = &Rs_19_16;
+    local res_register_4_Rs_19_16_uw_4_0_Rt_11_8:4;
+    local new_new:1 = newSuffix(P1);
+    if ((*[register]:4 (Rs_19_16_uw + 4 * 0) > Rt_11_8)) goto <if_register_4_Rs_19_16_uw_4_0_Rt_11_8>;
+    res_register_4_Rs_19_16_uw_4_0_Rt_11_8 = 0x00;
+    goto <endif_register_4_Rs_19_16_uw_4_0_Rt_11_8>;
+    <if_register_4_Rs_19_16_uw_4_0_Rt_11_8>
+    res_register_4_Rs_19_16_uw_4_0_Rt_11_8 = 0xff;
+    <endif_register_4_Rs_19_16_uw_4_0_Rt_11_8>
+    P1 = res_register_4_Rs_19_16_uw_4_0_Rt_11_8:1;
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.gtu(Rs,Rt); if (!p0.new) jump:nt #r9:2
+# 0001010101iissssPP00ttttiiiiiii-
+# 
+# P0 = (Rs.uw[0] > Rt) ? 0xff : 0x00;
+# if (!P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_gtu_R_R_if_notp0_new_jump_nt_R Rs_19_16, Rt_11_8, r9
+        is bits_31_22=0b0001010101 & r9_21_20 & Rs_19_16 & bits_13_12=0b00 & Rt_11_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local Rs_19_16_uw:4 = &Rs_19_16;
+    local res_register_4_Rs_19_16_uw_4_0_Rt_11_8:4;
+    local new_new:1 = newSuffix(P0);
+    if ((*[register]:4 (Rs_19_16_uw + 4 * 0) > Rt_11_8)) goto <if_register_4_Rs_19_16_uw_4_0_Rt_11_8>;
+    res_register_4_Rs_19_16_uw_4_0_Rt_11_8 = 0x00;
+    goto <endif_register_4_Rs_19_16_uw_4_0_Rt_11_8>;
+    <if_register_4_Rs_19_16_uw_4_0_Rt_11_8>
+    res_register_4_Rs_19_16_uw_4_0_Rt_11_8 = 0xff;
+    <endif_register_4_Rs_19_16_uw_4_0_Rt_11_8>
+    P0 = res_register_4_Rs_19_16_uw_4_0_Rt_11_8:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.gtu(Rs,Rt); if (!p1.new) jump:nt #r9:2
+# 0001010101iissssPP01ttttiiiiiii-
+# 
+# P1 = (Rs.uw[0] > Rt) ? 0xff : 0x00;
+# if (!P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_gtu_R_R_if_notp1_new_jump_nt_R Rs_19_16, Rt_11_8, r9
+        is bits_31_22=0b0001010101 & r9_21_20 & Rs_19_16 & bits_13_12=0b01 & Rt_11_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local Rs_19_16_uw:4 = &Rs_19_16;
+    local res_register_4_Rs_19_16_uw_4_0_Rt_11_8:4;
+    local new_new:1 = newSuffix(P1);
+    if ((*[register]:4 (Rs_19_16_uw + 4 * 0) > Rt_11_8)) goto <if_register_4_Rs_19_16_uw_4_0_Rt_11_8>;
+    res_register_4_Rs_19_16_uw_4_0_Rt_11_8 = 0x00;
+    goto <endif_register_4_Rs_19_16_uw_4_0_Rt_11_8>;
+    <if_register_4_Rs_19_16_uw_4_0_Rt_11_8>
+    res_register_4_Rs_19_16_uw_4_0_Rt_11_8 = 0xff;
+    <endif_register_4_Rs_19_16_uw_4_0_Rt_11_8>
+    P1 = res_register_4_Rs_19_16_uw_4_0_Rt_11_8:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p0=cmp.gtu(Rs,Rt); if (!p0.new) jump:t #r9:2
+# 0001010101iissssPP10ttttiiiiiii-
+# 
+# P0 = (Rs.uw[0] > Rt) ? 0xff : 0x00;
+# if (!P0.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p0_cmp_gtu_R_R_if_notp0_new_jump_t_R Rs_19_16, Rt_11_8, r9
+        is bits_31_22=0b0001010101 & r9_21_20 & Rs_19_16 & bits_13_12=0b10 & Rt_11_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local Rs_19_16_uw:4 = &Rs_19_16;
+    local res_register_4_Rs_19_16_uw_4_0_Rt_11_8:4;
+    local new_new:1 = newSuffix(P0);
+    if ((*[register]:4 (Rs_19_16_uw + 4 * 0) > Rt_11_8)) goto <if_register_4_Rs_19_16_uw_4_0_Rt_11_8>;
+    res_register_4_Rs_19_16_uw_4_0_Rt_11_8 = 0x00;
+    goto <endif_register_4_Rs_19_16_uw_4_0_Rt_11_8>;
+    <if_register_4_Rs_19_16_uw_4_0_Rt_11_8>
+    res_register_4_Rs_19_16_uw_4_0_Rt_11_8 = 0xff;
+    <endif_register_4_Rs_19_16_uw_4_0_Rt_11_8>
+    P0 = res_register_4_Rs_19_16_uw_4_0_Rt_11_8:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# p1=cmp.gtu(Rs,Rt); if (!p1.new) jump:t #r9:2
+# 0001010101iissssPP11ttttiiiiiii-
+# 
+# P1 = (Rs.uw[0] > Rt) ? 0xff : 0x00;
+# if (!P1.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_p1_cmp_gtu_R_R_if_notp1_new_jump_t_R Rs_19_16, Rt_11_8, r9
+        is bits_31_22=0b0001010101 & r9_21_20 & Rs_19_16 & bits_13_12=0b11 & Rt_11_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local Rs_19_16_uw:4 = &Rs_19_16;
+    local res_register_4_Rs_19_16_uw_4_0_Rt_11_8:4;
+    local new_new:1 = newSuffix(P1);
+    if ((*[register]:4 (Rs_19_16_uw + 4 * 0) > Rt_11_8)) goto <if_register_4_Rs_19_16_uw_4_0_Rt_11_8>;
+    res_register_4_Rs_19_16_uw_4_0_Rt_11_8 = 0x00;
+    goto <endif_register_4_Rs_19_16_uw_4_0_Rt_11_8>;
+    <if_register_4_Rs_19_16_uw_4_0_Rt_11_8>
+    res_register_4_Rs_19_16_uw_4_0_Rt_11_8 = 0xff;
+    <endif_register_4_Rs_19_16_uw_4_0_Rt_11_8>
+    P1 = res_register_4_Rs_19_16_uw_4_0_Rt_11_8:1;
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    $(PC) = ($(PC) + r9);
+    <endif_new_new_0_1>
+}
+
+# 
+# jump #r22:2
+# 0101100iiiiiiiiiPPiiiiiiiiiiiii-
+# 
+# apply_extension(imm_r);
+# imm_r = imm_r & ~0x3;
+# PC = PC + imm_r;
+# 
+:Q6_jump_R_2_2 r22
+        is bits_31_25=0b0101100 & r22_24_16 & r22_13_1
+            [r22 = (r22_24_16 << 2) | (r22_13_1 << 11);] {
+    local cst_0x3:4 = 0x3;
+    r22 = (r22 & (~cst_0x3));
+    $(PC) = ($(PC) + r22);
+}
+
+# 
+# if (Pu) jump:nt #r15:2
+# 01011100ii0iiiiiPPi00-uuiiiiiii-
+# 
+# if (Pu[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_if_P_jump_nt_R_5_2 Pu_9_8, r15
+        is bits_31_24=0b01011100 & r15_23_22 & bits_21_21=0b0 & r15_20_16 & r15_13_13 & bits_12_11=0b00 & Pu_9_8 & r15_7_1
+            [r15 = (r15_23_22 << 2) | (r15_20_16 << 4) | (r15_13_13 << 9) | (r15_7_1 << 10);] {
+    if (Pu_9_8[0, 1]) goto <if_Pu_9_8_0_1>;
+    goto <endif_Pu_9_8_0_1>;
+    <if_Pu_9_8_0_1>
+    local cst_0x3:4 = 0x3;
+    r15 = (r15 & (~cst_0x3));
+    $(PC) = ($(PC) + r15);
+    <endif_Pu_9_8_0_1>
+}
+
+# 
+# if (Pu) jump:t #r15:2
+# 01011100ii0iiiiiPPi10-uuiiiiiii-
+# 
+# if (Pu[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_if_P_jump_t_R_5_2 Pu_9_8, r15
+        is bits_31_24=0b01011100 & r15_23_22 & bits_21_21=0b0 & r15_20_16 & r15_13_13 & bits_12_11=0b10 & Pu_9_8 & r15_7_1
+            [r15 = (r15_23_22 << 2) | (r15_20_16 << 4) | (r15_13_13 << 9) | (r15_7_1 << 10);] {
+    if (Pu_9_8[0, 1]) goto <if_Pu_9_8_0_1>;
+    goto <endif_Pu_9_8_0_1>;
+    <if_Pu_9_8_0_1>
+    local cst_0x3:4 = 0x3;
+    r15 = (r15 & (~cst_0x3));
+    $(PC) = ($(PC) + r15);
+    <endif_Pu_9_8_0_1>
+}
+
+# 
+# if (!Pu) jump:nt #r15:2
+# 01011100ii1iiiiiPPi00-uuiiiiiii-
+# 
+# if (!Pu[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_if_not_P_jump_nt_R_5_2 Pu_9_8, r15
+        is bits_31_24=0b01011100 & r15_23_22 & bits_21_21=0b1 & r15_20_16 & r15_13_13 & bits_12_11=0b00 & Pu_9_8 & r15_7_1
+            [r15 = (r15_23_22 << 2) | (r15_20_16 << 4) | (r15_13_13 << 9) | (r15_7_1 << 10);] {
+    if ((!Pu_9_8[0, 1])) goto <if_Pu_9_8_0_1>;
+    goto <endif_Pu_9_8_0_1>;
+    <if_Pu_9_8_0_1>
+    local cst_0x3:4 = 0x3;
+    r15 = (r15 & (~cst_0x3));
+    $(PC) = ($(PC) + r15);
+    <endif_Pu_9_8_0_1>
+}
+
+# 
+# if (!Pu) jump:t #r15:2
+# 01011100ii1iiiiiPPi10-uuiiiiiii-
+# 
+# if (!Pu[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_if_not_P_jump_t_R_5_2 Pu_9_8, r15
+        is bits_31_24=0b01011100 & r15_23_22 & bits_21_21=0b1 & r15_20_16 & r15_13_13 & bits_12_11=0b10 & Pu_9_8 & r15_7_1
+            [r15 = (r15_23_22 << 2) | (r15_20_16 << 4) | (r15_13_13 << 9) | (r15_7_1 << 10);] {
+    if ((!Pu_9_8[0, 1])) goto <if_Pu_9_8_0_1>;
+    goto <endif_Pu_9_8_0_1>;
+    <if_Pu_9_8_0_1>
+    local cst_0x3:4 = 0x3;
+    r15 = (r15 & (~cst_0x3));
+    $(PC) = ($(PC) + r15);
+    <endif_Pu_9_8_0_1>
+}
+
+# 
+# if (Pu.new) jump:nt #r15:2
+# 01011100ii0iiiiiPPi01-uuiiiiiii-
+# 
+# if (Pu.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_if_P_new_jump_nt_R_5_2 Pu_9_8, r15
+        is bits_31_24=0b01011100 & r15_23_22 & bits_21_21=0b0 & r15_20_16 & r15_13_13 & bits_12_11=0b01 & Pu_9_8 & r15_7_1
+            [r15 = (r15_23_22 << 2) | (r15_20_16 << 4) | (r15_13_13 << 9) | (r15_7_1 << 10);] {
+    local new_new:1 = newSuffix(Pu_9_8);
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r15 = (r15 & (~cst_0x3));
+    $(PC) = ($(PC) + r15);
+    <endif_new_new_0_1>
+}
+
+# 
+# if (Pu.new) jump:t #r15:2
+# 01011100ii0iiiiiPPi11-uuiiiiiii-
+# 
+# if (Pu.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_if_P_new_jump_t_R_5_2 Pu_9_8, r15
+        is bits_31_24=0b01011100 & r15_23_22 & bits_21_21=0b0 & r15_20_16 & r15_13_13 & bits_12_11=0b11 & Pu_9_8 & r15_7_1
+            [r15 = (r15_23_22 << 2) | (r15_20_16 << 4) | (r15_13_13 << 9) | (r15_7_1 << 10);] {
+    local new_new:1 = newSuffix(Pu_9_8);
+    if (new_new[0, 1]) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r15 = (r15 & (~cst_0x3));
+    $(PC) = ($(PC) + r15);
+    <endif_new_new_0_1>
+}
+
+# 
+# if (!Pu.new) jump:nt #r15:2
+# 01011100ii1iiiiiPPi01-uuiiiiiii-
+# 
+# if (!Pu.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_if_not_P_new_jump_nt_R_5_2 Pu_9_8, r15
+        is bits_31_24=0b01011100 & r15_23_22 & bits_21_21=0b1 & r15_20_16 & r15_13_13 & bits_12_11=0b01 & Pu_9_8 & r15_7_1
+            [r15 = (r15_23_22 << 2) | (r15_20_16 << 4) | (r15_13_13 << 9) | (r15_7_1 << 10);] {
+    local new_new:1 = newSuffix(Pu_9_8);
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r15 = (r15 & (~cst_0x3));
+    $(PC) = ($(PC) + r15);
+    <endif_new_new_0_1>
+}
+
+# 
+# if (!Pu.new) jump:t #r15:2
+# 01011100ii1iiiiiPPi11-uuiiiiiii-
+# 
+# if (!Pu.new[0]) {
+#     apply_extension(imm_r);
+#     imm_r = imm_r & ~0x3;
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_if_not_P_new_jump_t_R_5_2 Pu_9_8, r15
+        is bits_31_24=0b01011100 & r15_23_22 & bits_21_21=0b1 & r15_20_16 & r15_13_13 & bits_12_11=0b11 & Pu_9_8 & r15_7_1
+            [r15 = (r15_23_22 << 2) | (r15_20_16 << 4) | (r15_13_13 << 9) | (r15_7_1 << 10);] {
+    local new_new:1 = newSuffix(Pu_9_8);
+    if ((!new_new[0, 1])) goto <if_new_new_0_1>;
+    goto <endif_new_new_0_1>;
+    <if_new_new_0_1>
+    local cst_0x3:4 = 0x3;
+    r15 = (r15 & (~cst_0x3));
+    $(PC) = ($(PC) + r15);
+    <endif_new_new_0_1>
+}
+
+# 
+# if (Rs!=#0) jump:nt #r13:2
+# 0110000100isssssPPi0iiiiiiiiiii-
+# 
+# if (Rs != 0) {
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_if_R_ne_0_jump_nt_R_3_2 Rs_20_16, r13
+        is bits_31_22=0b0110000100 & r13_21_21 & Rs_20_16 & r13_13_13 & bits_12_12=0b0 & r13_11_1
+            [r13 = (r13_21_21 << 2) | (r13_13_13 << 3) | (r13_11_1 << 4);] {
+    if ((Rs_20_16 != 0)) goto <if_Rs_20_16_0>;
+    goto <endif_Rs_20_16_0>;
+    <if_Rs_20_16_0>
+    $(PC) = ($(PC) + r13);
+    <endif_Rs_20_16_0>
+}
+
+# 
+# if (Rs!=#0) jump:t #r13:2
+# 0110000100isssssPPi1iiiiiiiiiii-
+# 
+# if (Rs != 0) {
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_if_R_ne_0_jump_t_R_3_2 Rs_20_16, r13
+        is bits_31_22=0b0110000100 & r13_21_21 & Rs_20_16 & r13_13_13 & bits_12_12=0b1 & r13_11_1
+            [r13 = (r13_21_21 << 2) | (r13_13_13 << 3) | (r13_11_1 << 4);] {
+    if ((Rs_20_16 != 0)) goto <if_Rs_20_16_0>;
+    goto <endif_Rs_20_16_0>;
+    <if_Rs_20_16_0>
+    $(PC) = ($(PC) + r13);
+    <endif_Rs_20_16_0>
+}
+
+# 
+# if (Rs>=#0) jump:nt #r13:2
+# 0110000101isssssPPi0iiiiiiiiiii-
+# 
+# if (Rs >= 0) {
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_if_R_sup_0_jump_nt_R_3_2 Rs_20_16, r13
+        is bits_31_22=0b0110000101 & r13_21_21 & Rs_20_16 & r13_13_13 & bits_12_12=0b0 & r13_11_1
+            [r13 = (r13_21_21 << 2) | (r13_13_13 << 3) | (r13_11_1 << 4);] {
+    if ((Rs_20_16 s>= 0)) goto <if_Rs_20_16_s_0>;
+    goto <endif_Rs_20_16_s_0>;
+    <if_Rs_20_16_s_0>
+    $(PC) = ($(PC) + r13);
+    <endif_Rs_20_16_s_0>
+}
+
+# 
+# if (Rs>=#0) jump:t #r13:2
+# 0110000101isssssPPi1iiiiiiiiiii-
+# 
+# if (Rs >= 0) {
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_if_R_sup_0_jump_t_R_3_2 Rs_20_16, r13
+        is bits_31_22=0b0110000101 & r13_21_21 & Rs_20_16 & r13_13_13 & bits_12_12=0b1 & r13_11_1
+            [r13 = (r13_21_21 << 2) | (r13_13_13 << 3) | (r13_11_1 << 4);] {
+    if ((Rs_20_16 s>= 0)) goto <if_Rs_20_16_s_0>;
+    goto <endif_Rs_20_16_s_0>;
+    <if_Rs_20_16_s_0>
+    $(PC) = ($(PC) + r13);
+    <endif_Rs_20_16_s_0>
+}
+
+# 
+# if (Rs==#0) jump:nt #r13:2
+# 0110000110isssssPPi0iiiiiiiiiii-
+# 
+# if (Rs == 0) {
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_if_R_eq_0_jump_nt_R_3_2 Rs_20_16, r13
+        is bits_31_22=0b0110000110 & r13_21_21 & Rs_20_16 & r13_13_13 & bits_12_12=0b0 & r13_11_1
+            [r13 = (r13_21_21 << 2) | (r13_13_13 << 3) | (r13_11_1 << 4);] {
+    if ((Rs_20_16 == 0)) goto <if_Rs_20_16_0>;
+    goto <endif_Rs_20_16_0>;
+    <if_Rs_20_16_0>
+    $(PC) = ($(PC) + r13);
+    <endif_Rs_20_16_0>
+}
+
+# 
+# if (Rs==#0) jump:t #r13:2
+# 0110000110isssssPPi1iiiiiiiiiii-
+# 
+# if (Rs == 0) {
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_if_R_eq_0_jump_t_R_3_2 Rs_20_16, r13
+        is bits_31_22=0b0110000110 & r13_21_21 & Rs_20_16 & r13_13_13 & bits_12_12=0b1 & r13_11_1
+            [r13 = (r13_21_21 << 2) | (r13_13_13 << 3) | (r13_11_1 << 4);] {
+    if ((Rs_20_16 == 0)) goto <if_Rs_20_16_0>;
+    goto <endif_Rs_20_16_0>;
+    <if_Rs_20_16_0>
+    $(PC) = ($(PC) + r13);
+    <endif_Rs_20_16_0>
+}
+
+# 
+# if (Rs<=#0) jump:nt #r13:2
+# 0110000111isssssPPi0iiiiiiiiiii-
+# 
+# if (Rs <= 0) {
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_if_R_inf_0_jump_nt_R_3_2 Rs_20_16, r13
+        is bits_31_22=0b0110000111 & r13_21_21 & Rs_20_16 & r13_13_13 & bits_12_12=0b0 & r13_11_1
+            [r13 = (r13_21_21 << 2) | (r13_13_13 << 3) | (r13_11_1 << 4);] {
+    if ((Rs_20_16 s<= 0)) goto <if_Rs_20_16_s_0>;
+    goto <endif_Rs_20_16_s_0>;
+    <if_Rs_20_16_s_0>
+    $(PC) = ($(PC) + r13);
+    <endif_Rs_20_16_s_0>
+}
+
+# 
+# if (Rs<=#0) jump:t #r13:2
+# 0110000111isssssPPi1iiiiiiiiiii-
+# 
+# if (Rs <= 0) {
+#     PC = PC + imm_r;
+# }
+# 
+:Q6_if_R_inf_0_jump_t_R_3_2 Rs_20_16, r13
+        is bits_31_22=0b0110000111 & r13_21_21 & Rs_20_16 & r13_13_13 & bits_12_12=0b1 & r13_11_1
+            [r13 = (r13_21_21 << 2) | (r13_13_13 << 3) | (r13_11_1 << 4);] {
+    if ((Rs_20_16 s<= 0)) goto <if_Rs_20_16_s_0>;
+    goto <endif_Rs_20_16_s_0>;
+    <if_Rs_20_16_s_0>
+    $(PC) = ($(PC) + r13);
+    <endif_Rs_20_16_s_0>
+}
+
+# 
+# Rd=#U6; jump #r9:2
+# 00010110--iiddddPPIIIIIIiiiiiii-
+# 
+# apply_extension(imm_r);
+# imm_r = imm_r & ~0x3;
+# Rd = imm_U;
+# PC = PC + imm_r;
+# 
+:Q6_R_U_jump_R Rd_19_16, U6, r9
+        is bits_31_24=0b00010110 & r9_21_20 & Rd_19_16 & U6_13_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4); U6 = (U6_13_8 << 0);] {
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    Rd_19_16 = U6;
+    $(PC) = ($(PC) + r9);
+}
+
+# 
+# Rd=Rs; jump #r9:2
+# 00010111--iissssPP--ddddiiiiiii-
+# 
+# apply_extension(imm_r);
+# imm_r = imm_r & ~0x3;
+# Rd = Rs;
+# PC = PC + imm_r;
+# 
+:Q6_R_R_jump_R Rd_11_8, Rs_19_16, r9
+        is bits_31_24=0b00010111 & r9_21_20 & Rs_19_16 & Rd_11_8 & r9_7_1
+            [r9 = (r9_21_20 << 2) | (r9_7_1 << 4);] {
+    local cst_0x3:4 = 0x3;
+    r9 = (r9 & (~cst_0x3));
+    Rd_11_8 = Rs_19_16;
+    $(PC) = ($(PC) + r9);
+}
+
+# 
+# Rdd=memd(Rs+Rt<<#u2)
+# 00111010110sssssPPittttti--ddddd
+# 
+# EA = Rs + (Rt << imm_u);
+# Rdd = *EA;
+# 
+:Q6_RR_memd_R_R_sft_U Rdd_4_0, Rs_20_16, Rt_12_8, u2
+        is bits_31_21=0b00111010110 & Rs_20_16 & u2_13_13 & Rt_12_8 & u2_7_7 & Rdd_4_0
+            [u2 = (u2_13_13 << 0) | (u2_7_7 << 1);] {
+    local EA:4;
+    EA = (Rs_20_16 + (Rt_12_8 << u2));
+    Rdd_4_0 = *:8 EA;
+}
+
+# 
+# Rdd=memd(gp+#u16:3)
+# 01001ii1110iiiiiPPiiiiiiiiiddddd
+# 
+# apply_extension(imm_u);
+# EA = (Constant_extended ? (0) : GP) + imm_u;
+# Rdd = *EA;
+# 
+:Q6_RR_memd_gp_U_6_3 Rdd_4_0, u16
+        is bits_31_27=0b01001 & u16_26_25 & bits_24_21=0b1110 & u16_20_16 & u16_13_5 & Rdd_4_0
+            [u16 = (u16_26_25 << 3) | (u16_20_16 << 5) | (u16_13_5 << 10);] {
+    local EA:4;
+    local res_constExtend:4;
+    local arg_constExtend:4 = constExtend();
+    if ((arg_constExtend != 0)) goto <if_arg_constExtend_0>;
+    res_constExtend = $(GP);
+    goto <endif_arg_constExtend_0>;
+    <if_arg_constExtend_0>
+    res_constExtend = 0;
+    <endif_arg_constExtend_0>
+    EA = (res_constExtend + u16);
+    Rdd_4_0 = *:8 EA;
+}
+
+# 
+# Rdd=memd(Rs+#s11:3)
+# 10010ii1110sssssPPiiiiiiiiiddddd
+# 
+# apply_extension(imm_s);
+# EA = Rs + imm_s;
+# Rdd = *EA;
+# 
+:Q6_RR_memd_R_S_1_3 Rdd_4_0, Rs_20_16, s11
+        is bits_31_27=0b10010 & s11_26_25 & bits_24_21=0b1110 & Rs_20_16 & s11_13_5 & Rdd_4_0
+            [s11 = (s11_26_25 << 3) | (s11_13_5 << 5);] {
+    local EA:4;
+    EA = (Rs_20_16 + s11);
+    Rdd_4_0 = *:8 EA;
+}
+
+# 
+# Rdd=memd(Rx++#s4:3:circ(Mu))
+# 10011001110xxxxxPPu0--0iiiiddddd
+# 
+# EA = Rx;
+# Rx = circ_add(Rx, imm_s, MuV);
+# Rdd = *EA;
+# 
+:Q6_RR_memd_R_inc_S_circ_M Rdd_4_0, Rx_20_16, s4, Mu_13_13
+        is bits_31_21=0b10011001110 & Rx_20_16 & Mu_13_13 & bits_12_12=0b0 & bits_9_9=0b0 & s4_8_5 & Rdd_4_0
+            [s4 = (s4_8_5 << 3);] {
+    local EA:4;
+    local arg_s4:4 = s4;
+    EA = Rx_20_16;
+    Rx_20_16 = circAdd(Rx_20_16, arg_s4, Mu_13_13);
+    Rdd_4_0 = *:8 EA;
+}
+
+# 
+# Rdd=memd(Rx++I:circ(Mu))
+# 10011001110xxxxxPPu0--1-0--ddddd
+# 
+# EA = Rx;
+# Rx = circ_add(Rx, I << 3, MuV);
+# Rdd = *EA;
+# 
+:Q6_RR_memd_R_incI_circ_M Rdd_4_0, Rx_20_16, Mu_13_13
+        is bits_31_21=0b10011001110 & Rx_20_16 & Mu_13_13 & bits_12_12=0b0 & bits_9_9=0b1 & bits_7_7=0b0 & Rdd_4_0 {
+    local EA:4;
+    local I:4 = (((Mu_13_13 >> 28) & 0xf) << 7) | ((Mu_13_13 >> 17) & 0x7f);
+    local arg_I_3:4 = (I << 3);
+    EA = Rx_20_16;
+    Rx_20_16 = circAdd(Rx_20_16, arg_I_3, Mu_13_13);
+    Rdd_4_0 = *:8 EA;
 }
