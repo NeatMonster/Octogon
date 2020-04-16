@@ -130,16 +130,18 @@ class Encoding:
 
     def parse_syntax(self, syntax):
         # Extract registers from syntax
-        registers = set()
+        registers = []
         for match in re.finditer(r"[A-Z][a-z][a-z]?", syntax):
             register = match.group(0)
-            registers.add(match.group(0))
+            if register not in registers:
+                registers.append(register)
 
         # Extract immediates from syntax
-        immediates = set()
+        immediates = []
         for match in re.finditer(r"#[a-zA-Z][0-9]+(:[0-9]+)?", syntax):
             immediate = match.group(0)
-            immediates.add(match.group(0))
+            if immediate not in immediates:
+                immediates.append(immediate)
 
         return registers, immediates
 
@@ -308,20 +310,25 @@ class Scope:
             return self.parent.del_variable(name)
         return False
 
-    def decl_variable(self, name, type, expr):
+    def decl_variable(self, name, type, expr=None):
         if not self.add_variable(name, type):
             return
 
         if isinstance(type, Integer):
-            assert type.length % 8 == 0
-            length = type.length
+            if type.length > 0:
+                length = type.length
+            else:
+                type.length = length = 32
         elif isinstance(type, Pointer):
             length = 32
         else:
             assert False
+        assert length % 8 == 0
 
-        self.lines.append("local {}:{} = {};".format(
-            name, length // 8, expr.print(self)))
+        init = ""
+        if expr is not None:
+            init = " = {}".format(expr.print(self))
+        self.lines.append("local {}:{}{};".format(name, length // 8, init))
 
     def print(self, node):
         line = node.print(self)
@@ -331,21 +338,21 @@ class Scope:
             line = line + ";"
         self.lines.append(line)
 
-    def show(self, ident=0):
+    def show(self, ident=0, buf=sys.stdout):
         lead = " " * (ident * 4)
-        print(lead + "Scope #{}:".format(ident))
-        print(lead +  "  Lines:")
+        print(lead + "Scope #{}:".format(ident), file=buf)
+        print(lead +  "  Lines:", file=buf)
         for line in self.lines:
-            print(lead + "   - {}".format(line))
-        print(lead + "  Mapping:")
+            print(lead + "   - {}".format(line), file=buf)
+        print(lead + "  Mapping:", file=buf)
         for old_name, new_name in self.mapping.items():
-            print(lead + "   - {} -> {}".format(old_name, new_name))
-        print(lead + "  Variables:")
+            print(lead + "   - {} -> {}".format(old_name, new_name), file=buf)
+        print(lead + "  Variables:", file=buf)
         for name, type in self.variables.items():
-            print(lead + "   - {} -> {!r}".format(name, type))
+            print(lead + "   - {} -> {!r}".format(name, type), file=buf)
 
         if self.parent:
-            self.parent.show(ident + 1)
+            self.parent.show(ident + 1, buf=buf)
 
 class NodeException(Exception):
     def __init__(self, node, frame, msg):
@@ -502,33 +509,38 @@ class Assignment(Node, c_ast.Assignment):
         return self
 
     def print(self, scope):
-        return "{} = {}".format(self.lvalue.print(scope),
-                                self.rvalue.print(scope))
+        scope.lines.append("{} = {};".format(
+            self.lvalue.print(scope), self.rvalue.print(scope)))
+        return ""
 
 class BinaryOp(Node, c_ast.BinaryOp):
+    ARITHMETIC = ["+", "-", "*", "/", "<<", ">>"]
+    BITWISE = ["&", "|", "^"]
+    COMPARISON = ["==", "!=", "<", ">", "<=", ">="]
+
     def eval(self, scope):
-        self.check(self.op in ["+", "-", "&", "|", "^", ">>", "<<"])
+        self.check(self.op in BinaryOp.ARITHMETIC + BinaryOp.BITWISE + BinaryOp.COMPARISON)
         self.left = self.left.eval(scope)
         self.check(self.left.returns_value())
         self.right = self.right.eval(scope)
         self.check(self.right.returns_value())
 
         if self.op in [">>", "<<"]:
-            # TODO: Check if this actually works
             self.check(self.right.is_const())
-            shift = self.right.get_value()
             self.type = self.left.type
             return self
 
+        if self.left.type.length < self.right.type.length:
+            self.left = self.left.resize(scope, self.right.type.length)
+
+        if self.right.type.length < self.left.type.length:
+            self.right = self.right.resize(scope, self.left.type.length)
+
+        if self.op in BinaryOp.COMPARISON:
+            self.type = Integer(1, False)
         else:
-            if self.left.type.length < self.right.type.length:
-                self.left = self.left.resize(scope, self.right.type.length)
-
-            if self.right.type.length < self.left.type.length:
-                self.right = self.right.resize(scope, self.left.type.length)
-
             self.type = self.left.type
-            return self
+        return self
 
     def print(self, scope):
         return "({} {} {})".format(self.left.print(scope),
@@ -546,25 +558,31 @@ class Cast(Node, c_ast.Cast):
 
 class Compound(Node, c_ast.Compound):
     def eval(self, scope):
-        block_items = []
         self.block_items = (self.block_items or [])
+        if len(self.block_items) == 0:
+            self.type = Void()
+            return self
+
+        block_items = []
         for child in self.block_items:
             child = child.eval(scope)
-            self.check(not child.returns_value())
             block_items.append(child)
         self.block_items = block_items
-        self.type = Void()
+        self.type = self.block_items[-1].type
         return self
 
     def print(self, scope):
-        for child in self.block_items:
-            line = child.print(scope)
-            if not line:
-                continue
-            if not line.endswith(";"):
-                line = line + ";"
-            scope.lines.append(line)
-        return ""
+        if len(self.block_items) == 0:
+            return ""
+
+        for child in self.block_items[:-1]:
+            scope.print(child)
+        return self.block_items[-1].print(scope)
+
+    def is_assignable(self):
+        if len(self.block_items) == 0:
+            return super().is_assignable()
+        return self.block_items[-1].is_assignable()
 
 class CompoundLiteral(Node, c_ast.CompoundLiteral):
     pass
@@ -844,7 +862,7 @@ class StructRef(Node, c_ast.StructRef):
         signed = field[0] != "u"
 
         self.check(self.name.is_assignable())
-        self.check(self.name.type.length > length)
+        self.check(self.name.type.length >= length)
 
         ref_name = "{}_{}".format(self.name.get_name(), field)
         ref_type = Pointer(Integer(length, signed))
@@ -862,13 +880,29 @@ class TernaryOp(Node, c_ast.TernaryOp):
     def eval(self, scope):
         self.cond = self.cond.eval(scope)
         self.iftrue = self.iftrue.eval(scope)
-        self.check(not self.iftrue.returns_value())
         self.iffalse = self.iffalse.eval(scope)
-        self.check(not self.iffalse.returns_value())
 
-        node = If(self.cond, self.iftrue, self.iffalse)
-        node.eval(scope)
-        return node
+        if not self.iftrue.returns_value() \
+                and not self.iffalse.returns_value():
+            node = If(self.cond, self.iftrue, self.iffalse)
+            node.eval(scope)
+            return node
+
+        elif self.iftrue.returns_value() \
+                and self.iffalse.returns_value():
+            self.check(self.iftrue.type == self.iffalse.type)
+            cond = self.cond.print(scope)
+            res_name = "res_{}".format(Node.labelify(cond))
+            res_type = self.iftrue.type
+            scope.decl_variable(res_name, res_type)
+            result = ID(res_name)
+
+            iftrue = Assignment("=", result, self.iftrue)
+            iffalse = Assignment("=", result, self.iffalse)
+            node = If(self.cond, iftrue, iffalse)
+            return Compound([node, result]).eval(scope)
+
+        self.check(False)
 
     def print(self, scope):
         self.check(False)
@@ -1038,6 +1072,7 @@ class Constructor:
 
         # Sort display according to syntax
         self.display.sort(key=lambda token: self.encoding.positions.index(token.split("_")[0]))
+        self.pattern.sort(key=lambda token: int(token.split("_")[1], 10), reverse=True)
 
     def generate_executor(self):
         for register in self.encoding.registers[::-1]:
@@ -1061,28 +1096,28 @@ class Constructor:
         try:
             self.behavior.nodes.eval(self.behavior.scope)
         except NodeException as e:
-            print((" " + self.mnemonic.syntax + " ").center(80, "#"))
-            print(self.behavior.behavior)
-            print("-" * 80)
-            self.behavior.nodes.show(showcoord=True)
-            print("-" * 80)
-            print("Node: {!r}".format(e.node))
+            print((" " + self.mnemonic.syntax + " ").center(80, "#"), file=sys.stderr)
+            print(self.behavior.behavior, file=sys.stderr)
+            print("-" * 80, file=sys.stderr)
+            self.behavior.nodes.show(showcoord=True, buf=sys.stderr)
+            print("-" * 80, file=sys.stderr)
+            print("Node: {!r}".format(e.node), file=sys.stderr)
             if "scope" in e.frame.f_locals:
-                e.frame.f_locals["scope"].show()
-            print("-" * 80)
-            print("Message: {}".format(e))
+                e.frame.f_locals["scope"].show(buf=sys.stderr)
+            print("-" * 80, file=sys.stderr)
+            print("Message: {}".format(e), file=sys.stderr)
             for i, info in enumerate(inspect.getouterframes(e.frame)):
                 if i == 3:
                     break
-                print("File \"{}\", line {}, in {}".format(info.filename, info.lineno, info.function))
-                print("\n".join(info.code_context).strip("\n"))
-            print("Locals:")
+                print("File \"{}\", line {}, in {}".format(info.filename, info.lineno, info.function), file=sys.stderr)
+                print("\n".join(info.code_context).strip("\n"), file=sys.stderr)
+            print("Locals:", file=sys.stderr)
             for key, val in e.frame.f_locals.items():
                 if key not in ["self", "scope"]:
-                    print(" - {}: {!r}".format(key, val))
+                    print(" - {}: {!r}".format(key, val), file=sys.stderr)
             exit()
 
-        self.behavior.nodes.print(self.behavior.scope)
+        self.behavior.scope.print(self.behavior.nodes)
         for line in self.behavior.scope.lines:
             if line:
                 self.semantic.append(line)
@@ -1147,8 +1182,10 @@ def main(args):
                 print("     {}=({},{}){}".format(token, tok_beg, tok_end, signed))
         for reg_type, tokens in constructor.variables.items():
             if reg_type not in variables:
-                variables[reg_type] = set()
-            variables[reg_type].update(tokens)
+                variables[reg_type] = []
+            for token in tokens:
+                if token not in variables[reg_type]:
+                    variables[reg_type].append(token)
     print(";")
 
     for reg_type, tokens in variables.items():
