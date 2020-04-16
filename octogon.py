@@ -8,6 +8,80 @@ import sys
 from pycparser import c_parser, c_ast
 cparser = c_parser.CParser()
 
+REGISTER_SIZES = {
+    "R": 32,
+    "RR": 64,
+    "C": 32,
+    "CC": 64,
+    "G": 32,
+    "GG": 64,
+    "S": 32,
+    "SS": 64,
+    "P": 8,
+    "M": 32,
+}
+
+REGISTER_NAMES = {
+    "R": ["R{}".format(i) for i in range(32)],
+    "RR": ["R{}_{}".format(i + 1, i) if i % 2 == 0 else "_" for i in range(0, 32)],
+    "C": ["C{}".format(i) for i in range(32)],
+    "CC": ["C{}_{}".format(i + 1, i) if i % 2 == 0 else "_" for i in range(0, 32)],
+    "G": ["G{}".format(i) for i in range(32)],
+    "GG": ["G{}_{}".format(i + 1, i) if i % 2 == 0 else "_" for i in range(0, 32)],
+    "S": ["S{}".format(i) for i in range(32)],
+    "SS": ["S{}_{}".format(i + 1, i) if i % 2 == 0 else "_" for i in range(0, 32)],
+    "P": ["P{}".format(i) for i in range(4)],
+    "M": ["M{}".format(i) for i in range(2)],
+}
+
+REGISTER_ALIASES = {
+    "R": ["SP", "FP", "LR"],
+    "RR": ["LR_FP"],
+    "C": ["SA0", "LC0", "SA1", "LC1", "P3_0", "M0", "M1",
+            "USR", "PC", "UGP", "GP", "CS0", "CS1",
+            "UPCYCLELO", "UPCYCLEHI", "FRAMELIMIT", "FRAMEKEY",
+            "PKTCOUNTLO", "PKTCOUNTHI", "UTIMERLO", "UTIMERHI"],
+    "CC": ["UPCYCLE", "PKTCOUNT", "UTIMER"],
+    "G": ["GISDBMBXIN", "GISDBMBXOUT", "GPCYCLELO", "GPCYCLEHI",
+            "GPMUCNT0", "GPMUCNT1", "GPMUCNT2", "GPMUCNT3"],
+    "S": ["SGP0", "SGP1", "STID", "ELR", "BADVA0", "BADVA1", "SSR",
+            "CCR", "HTID", "BADVA", "IMASK", "EVB", "MODECTL", "SYSCFG",
+            "IPEND", "VID", "IAD", "IEL", "IAHL", "CFGBASE", "DIAG",
+            "REV", "PCYCLELO", "PCYCLEHI", "ISDBST", "ISDBCFG0",
+            "ISDBCFG1", "BRKPTPC0", "BRKPTCFG0", "BRKPTPC1", "BRKPTCFG1",
+            "ISDBMBXIN", "ISDBMBXOUT", "ISDBEN", "ISDBGPR", "PMUCNT0",
+            "PMUCNT1", "PMUCNT2", "PMUCNT3", "PMUEVTCFG", "PMUCFG"],
+    "SS": ["SGP"],
+}
+
+REGISTER_FIELDS = {
+    "USR": [
+        ("PFA", 1),
+        ("FPINEE", 1),
+        ("FPUNFE", 1),
+        ("FPOVFE", 1),
+        ("FPDBZE", 1),
+        ("FPINVE", 1),
+        ("FPRND", 2),
+        ("HFI", 2),
+        ("HFD", 2),
+        ("PCMME", 1),
+        ("PCGME", 1),
+        ("PCUME", 1),
+        ("LPCFG", 2),
+        ("FPINPF", 1),
+        ("FPUNFF", 1),
+        ("FPOVFF", 1),
+        ("FPDBZF", 1),
+        ("FPINVF", 1),
+        ("OVF", 1),
+    ],
+    "SYSCFG": [
+        ("TLBLOCK", 1),
+        ("K0LOCK", 1),
+    ]
+}
+
 class Mnemonic:
     OPERATORS =  [
         ("+=", "acc"),
@@ -85,16 +159,6 @@ class Immediate:
         self.ranges = ranges
 
 class Encoding:
-    REGISTERS = {
-        "R": ([2, 3], [4, 5]),
-        "C": ([2, 3], [4, 5]),
-        "G": ([2, 3], [4, 5]),
-        "P": ([2], [2]),
-        "M": ([2], [1]),
-        "N": ([2], [3]),
-        "S": ([2, 3], [6]),
-    }
-
     def __init__(self, syntax, encoding):
         self.encoding = encoding[::-1]
         # Sanity check
@@ -158,7 +222,7 @@ class Encoding:
             reg_char = register[1]
 
             # Sanity check
-            assert reg_type in Encoding.REGISTERS
+            assert reg_type in "RCGPMNS"
             assert reg_char in self.characters
 
             reg_index = [i for i, char in enumerate(self.encoding) if char == reg_char]
@@ -168,9 +232,6 @@ class Encoding:
             assert len(reg_ranges) == 1
             reg_beg, reg_end = reg_ranges[0]
             reg_size = reg_end - reg_beg + 1
-
-            assert len(register) in Encoding.REGISTERS[reg_type][0]
-            assert reg_size in Encoding.REGISTERS[reg_type][1]
 
             register = Register(register, reg_ranges)
             self.registers.append(register)
@@ -206,7 +267,7 @@ class Encoding:
             # Sanity check
             assert imm_size == imm_length
 
-            token = immediate.replace("#", "").replace(":", "_")
+            token = immediate.replace("#", "").split(":")[0]
             immediate = Immediate(token, imm_length, imm_shift, imm_ranges)
             self.immediates.append(immediate)
 
@@ -336,7 +397,11 @@ class Scope:
             return
         if not line.endswith(";"):
             line = line + ";"
-        self.lines.append(line)
+
+        if isinstance(node.type, Void):
+            self.lines.append(line)
+        #else:
+        #    print("Ignoring statement \"{}\"".format(line), file=sys.stderr)
 
     def show(self, ident=0, buf=sys.stdout):
         lead = " " * (ident * 4)
@@ -499,14 +564,22 @@ class ArrayRef(Node, c_ast.ArrayRef):
 
 class Assignment(Node, c_ast.Assignment):
     def eval(self, scope):
-        self.check(self.op == "=")
-        self.lvalue = self.lvalue.eval(scope)
-        self.check(self.lvalue.is_assignable())
-        self.rvalue = self.rvalue.eval(scope)
-        self.check(self.rvalue.returns_value())
-        self.rvalue = self.rvalue.resize(scope, self.lvalue.type.length)
-        self.type = Void()
-        return self
+        if self.op == "=":
+            self.lvalue = self.lvalue.eval(scope)
+            self.check(self.lvalue.is_assignable())
+            self.rvalue = self.rvalue.eval(scope)
+            self.check(self.rvalue.returns_value())
+            self.rvalue = self.rvalue.resize(scope, self.lvalue.type.length)
+            self.type = Void()
+            return self
+
+        elif self.op in ["+=", "-=", "*=", "/=", "&=", "|=", "^="]:
+            rvalue = BinaryOp(self.op[0], self.lvalue, self.rvalue)
+            node = Assignment("=", self.lvalue, rvalue)
+            return node.eval(scope)
+
+        else:
+            self.check(False)
 
     def print(self, scope):
         scope.lines.append("{} = {};".format(
@@ -514,12 +587,11 @@ class Assignment(Node, c_ast.Assignment):
         return ""
 
 class BinaryOp(Node, c_ast.BinaryOp):
-    ARITHMETIC = ["+", "-", "*", "/", "<<", ">>"]
-    BITWISE = ["&", "|", "^"]
+    ARITHMETIC = ["+", "-", "*", "/", "<<", ">>", "&", "|", "^"]
     COMPARISON = ["==", "!=", "<", ">", "<=", ">="]
 
     def eval(self, scope):
-        self.check(self.op in BinaryOp.ARITHMETIC + BinaryOp.BITWISE + BinaryOp.COMPARISON)
+        self.check(self.op in BinaryOp.ARITHMETIC + BinaryOp.COMPARISON)
         self.left = self.left.eval(scope)
         self.check(self.left.returns_value())
         self.right = self.right.eval(scope)
@@ -702,7 +774,10 @@ class FuncCall(Node, c_ast.FuncCall):
     def eval(self, scope):
         self.name = self.name.eval(scope)
         if self.name.get_name() == "apply_extension":
-            return Compound([]).eval(scope)
+            self.args = self.args.eval(scope)
+            self.check(len(self.args.exprs) == 1)
+            self.check(self.args.exprs[0].is_assignable())
+            return self.args.exprs[0]
 
         elif self.name.get_name() in ["sat", "usat"]:
             # TODO: Handle value saturation
@@ -736,6 +811,12 @@ class FuncCall(Node, c_ast.FuncCall):
             self.type = self.args.exprs[0].type
             return self
 
+        elif self.name.get_name() == "nextPacket":
+            self.args = self.args.eval(scope)
+            self.check(len(self.args.exprs) == 0)
+            self.type = Integer(32, False)
+            return self
+
         else:
             self.check(False)
 
@@ -754,21 +835,62 @@ class Goto(Node, c_ast.Goto):
 
 class ID(Node, c_ast.ID):
     IGNORED_FUNCTIONS = ["PREDUSE_TIMING", "NOP"]
-    BUILTIN_FUNCTIONS = ["apply_extension", "sat", "usat", "sxt", "zxt", "newSuffix"]
-    COMMON_KEYWORDS = ["b", "ub", "h", "uh", "w", "uw", "new"]
+    BUILTIN_FUNCTIONS = ["apply_extension", "sat", "usat", "sxt", "zxt",
+                         "newSuffix", "nextPacket"]
+    SUBPIECE_KEYWORDS = ["b", "ub", "h", "uh", "w", "uw", "new"]
 
     def eval(self, scope):
         if self.name in ID.IGNORED_FUNCTIONS:
             return Compound([]).eval(scope)
 
         if self.name in ID.BUILTIN_FUNCTIONS \
-                or self.name in ID.COMMON_KEYWORDS:
+                or self.name in ID.SUBPIECE_KEYWORDS:
             self.type = Void()
             return self
 
         self.name = scope.get_mapping(self.name)
         self.type = scope.get_variable(self.name)
-        self.check(self.type is not None, "Unknown identifier")
+        if self.type is None:
+            if self.name == "tmp":
+                self.type = Integer(32, False)
+                scope.decl_variable(self.name, self.type)
+                return self
+
+            if self.name == "NPC":
+                node = FuncCall(ID("nextPacket"), ExprList([]))
+                return node.eval(scope)
+
+            # Check if it is a register name
+            for reg_type, tokens in REGISTER_NAMES.items():
+                if self.name in tokens:
+                    length = REGISTER_SIZES[reg_type]
+                    self.type = Integer(length, False)
+                    scope.add_variable(self.name, self.type)
+                    return self
+
+            # Check if it is a register alias
+            for reg_type, tokens in REGISTER_ALIASES.items():
+                if self.name in tokens:
+                    length = REGISTER_SIZES[reg_type]
+                    old_name = self.name
+                    self.name = "$({})".format(self.name)
+                    self.type = Integer(length, False)
+                    scope.add_mapping(old_name, self.name)
+                    scope.add_variable(self.name, self.type)
+                    return self
+
+            # Check if it is a register field
+            for reg_name, fields in REGISTER_FIELDS.items():
+                for field, length in fields:
+                    if field == self.name:
+                        old_name = self.name
+                        self.name = "$({})".format(self.name)
+                        self.type = Integer(length, False)
+                        scope.add_mapping(old_name, self.name)
+                        scope.add_variable(self.name, self.type)
+                        return self
+
+            self.check(False, "Unknown identifier")
         return self
 
     def print(self, scope):
@@ -782,19 +904,21 @@ class IdentifierType(Node, c_ast.IdentifierType):
 
 class If(Node, c_ast.If):
     def eval(self, scope):
-        # cond, iftrue, iffalse
         self.cond = self.cond.eval(scope)
         self.check(self.cond.returns_value())
-        self.check(self.cond.type.length == 1)
-        self.check(self.cond.type.signed == False)
+
+        if self.cond.type.length != 1:
+            node = BinaryOp("!=", self.cond, Constant("int", "0"))
+            self.cond = node.eval(scope)
 
         self.iftrue_scope = Scope(scope)
         self.iftrue = self.iftrue.eval(self.iftrue_scope)
         self.check(not self.iftrue.returns_value())
 
-        self.iffalse_scope = Scope(scope)
-        self.iffalse = self.iffalse.eval(self.iffalse_scope)
-        self.check(not self.iffalse.returns_value())
+        if self.iffalse is not None:
+            self.iffalse_scope = Scope(scope)
+            self.iffalse = self.iffalse.eval(self.iffalse_scope)
+            self.check(not self.iffalse.returns_value())
 
         self.type = Void()
         return self
@@ -802,14 +926,15 @@ class If(Node, c_ast.If):
     def print(self, scope):
         cond = self.cond.print(scope)
         label = "if_{}".format(Node.labelify(cond))
-        self.iftrue_scope.print(self.iftrue)
-        self.iffalse_scope.print(self.iffalse)
 
         scope.lines.append("if ({}) goto <{}>;".format(cond, label))
-        for line in self.iffalse_scope.lines:
-            scope.lines.append(line)
+        if self.iffalse is not None:
+            self.iffalse_scope.print(self.iffalse)
+            for line in self.iffalse_scope.lines:
+                scope.lines.append(line)
         scope.lines.append("goto <{}>;".format("end" + label))
         scope.lines.append("<{}>".format(label))
+        self.iftrue_scope.print(self.iftrue)
         for line in self.iftrue_scope.lines:
             scope.lines.append(line)
         scope.lines.append("<{}>".format("end" + label))
@@ -838,9 +963,12 @@ class Struct(Node, c_ast.Struct):
 
 class StructRef(Node, c_ast.StructRef):
     def eval(self, scope):
-        self.name = self.name.eval(scope)
         self.check(self.orig_type == ".")
+        self.name = self.name.eval(scope)
         self.field = self.field.eval(scope)
+
+        if self.name.is_ident() and self.name.get_name() == "$(USR)":
+            return self.field
 
         field = self.field.get_name()
         if field == "new":
@@ -929,8 +1057,17 @@ class UnaryOp(Node, c_ast.UnaryOp):
             self.check(self.expr.is_assignable())
             self.type = Pointer(self.expr.type)
 
+        elif self.op in ["+", "-"]:
+            self.check(self.expr.returns_value())
+            self.type = self.expr.type
+
         elif self.op == "~":
             self.check(self.expr.returns_value())
+            if self.expr.is_const():
+                cst_name = "cst_{}".format(self.expr.print(scope))
+                cst_type = Integer(32, False)
+                scope.decl_variable(cst_name, cst_type, self.expr)
+                self.expr = ID(cst_name).eval(scope)
             self.type = self.expr.type
 
         elif self.op == "!":
@@ -946,7 +1083,7 @@ class UnaryOp(Node, c_ast.UnaryOp):
     def print(self, scope):
         if self.op.startswith(":"):
             return "{}{}".format(self.expr.print(scope), self.op)
-        elif self.op in ["&", "~", "!"]:
+        elif self.op in ["&", "+", "-", "~", "!"]:
             return "({}{})".format(self.op, self.expr.print(scope))
 
 class Union(Node, c_ast.Union):
@@ -986,20 +1123,6 @@ class Behavior:
         self.scope = Scope()
 
 class Constructor:
-    REGISTERS = {
-        "P": 8,
-        "N": 8,
-        "R": 32,
-        "C": 32,
-        "G": 32,
-        "S": 32,
-        "M": 32,
-        "RR": 64,
-        "CC": 64,
-        "GG": 64,
-        "SS": 64,
-    }
-
     def __init__(self, syntax, encoding, behavior):
         self.mnemonic = Mnemonic(syntax)
         self.encoding = Encoding(syntax, encoding)
@@ -1079,11 +1202,11 @@ class Constructor:
             reg_beg, reg_end = register.ranges[0]
             token = "{}_{}_{}".format(register.token, reg_end, reg_beg)
             reg_type = register.token[0] * (len(register.token) - 1)
-            assert reg_type in Constructor.REGISTERS, reg_type
+            assert reg_type in REGISTER_SIZES, reg_type
+            reg_length = REGISTER_SIZES[reg_type]
             if reg_type not in self.variables:
                 self.variables[reg_type] = []
             self.variables[reg_type].append(token)
-            reg_length = Constructor.REGISTERS[reg_type]
             self.behavior.scope.add_mapping(register.token, token)
             self.behavior.scope.add_variable(token, Integer(reg_length, None))
 
@@ -1140,18 +1263,6 @@ class Constructor:
         lines.append("}")
         return "\n".join(lines)
 
-ALL_REGISTERS = {
-    "R": ["R{}".format(i) for i in range(32)],
-    "RR": ["R{}_{}".format(i + 1, i) if i % 2 == 0 else "_" for i in range(0, 32)],
-    "C": ["C{}".format(i) for i in range(32)],
-    "CC": ["C{}_{}".format(i + 1, i) if i % 2 == 0 else "_" for i in range(0, 32)],
-    "G": ["G{}".format(i) for i in range(32)],
-    "GG": ["G{}_{}".format(i + 1, i) if i % 2 == 0 else "_" for i in range(0, 32)],
-    "S": ["S{}".format(i) for i in range(32)],
-    "SS": ["S{}_{}".format(i + 1, i) if i % 2 == 0 else "_" for i in range(0, 32)],
-    "P": ["P{}".format(i) for i in range(4)],
-}
-
 def main(args):
     constructors = []
     dataset = json.load(args.input)
@@ -1189,8 +1300,8 @@ def main(args):
     print(";")
 
     for reg_type, tokens in variables.items():
-        assert reg_type in ALL_REGISTERS
-        values = ALL_REGISTERS[reg_type]
+        assert reg_type in REGISTER_NAMES
+        values = REGISTER_NAMES[reg_type]
         print("")
         print("attach variables [ {} ]".format(" ".join(tokens)))
         width = max([len(value) for value in values])
@@ -1201,7 +1312,7 @@ def main(args):
         print(";")
 
     print("")
-    pcodeops = ["newSuffix"]
+    pcodeops = ["newSuffix", "nextPacket"]
     for pcodeop in pcodeops:
         print("define pcodeop {};".format(pcodeop))
 

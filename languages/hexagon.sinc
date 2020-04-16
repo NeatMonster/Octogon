@@ -42,6 +42,22 @@ define token encoding (32)
      Pd_1_0=(0,1)
      bits_4_2=(2,4)
      u9_13_5=(5,13)
+     Pt_9_8=(8,9)
+     Ps_17_16=(16,17)
+     bits_31_20=(20,31)
+     bits_4_4=(4,4)
+     r7_12_8=(8,12) signed
+     r7_4_3=(3,4) signed
+     U10_20_16=(16,20)
+     U10_7_5=(5,7)
+     U10_1_0=(0,1)
+     u6_12_7=(7,12)
+     bits_31_16=(16,31)
+     Pu_7_6=(6,7)
+     Cd_4_0=(0,4)
+     Rss_20_16=(16,20)
+     Cdd_4_0=(0,4)
+     Css_20_16=(16,20)
 ;
 
 attach variables [ Rs_20_16 Rd_4_0 Rt_12_8 Rx_20_16 ]
@@ -51,18 +67,33 @@ attach variables [ Rs_20_16 Rd_4_0 Rt_12_8 Rx_20_16 ]
      R24 R25 R26 R27 R28 R29 R30 R31]
 ;
 
-attach variables [ Rdd_4_0 ]
+attach variables [ Rdd_4_0 Rss_20_16 ]
     [R1_0   _      R3_2   _      R5_4   _      R7_6   _     
      R9_8   _      R11_10 _      R13_12 _      R15_14 _     
      R17_16 _      R19_18 _      R21_20 _      R23_22 _     
      R25_24 _      R27_26 _      R29_28 _      R31_30 _     ]
 ;
 
-attach variables [ Pu_22_21 Pu_24_23 Pu_6_5 Pu_9_8 Pd_1_0 ]
+attach variables [ Pu_22_21 Pu_24_23 Pu_6_5 Pu_9_8 Pd_1_0 Pt_9_8 Ps_17_16 Pu_7_6 ]
     [P0 P1 P2 P3]
 ;
 
+attach variables [ Cd_4_0 ]
+    [C0  C1  C2  C3  C4  C5  C6  C7 
+     C8  C9  C10 C11 C12 C13 C14 C15
+     C16 C17 C18 C19 C20 C21 C22 C23
+     C24 C25 C26 C27 C28 C29 C30 C31]
+;
+
+attach variables [ Cdd_4_0 Css_20_16 ]
+    [C1_0   _      C3_2   _      C5_4   _      C7_6   _     
+     C9_8   _      C11_10 _      C13_12 _      C15_14 _     
+     C17_16 _      C19_18 _      C21_20 _      C23_22 _     
+     C25_24 _      C27_26 _      C29_28 _      C31_30 _     ]
+;
+
 define pcodeop newSuffix;
+define pcodeop nextPacket;
 
 # 
 # Rd=add(Rs,#s16)
@@ -2010,4 +2041,651 @@ define pcodeop newSuffix;
     res_Rs_20_16_Rt_12_8 = 0xff;
     <endif_Rs_20_16_Rt_12_8>
     Pd_1_0 = res_Rs_20_16_Rt_12_8:1;
+}
+
+# 
+# Pd=cmp.gt(Rs,Rt)
+# 11110010-10sssssPP-ttttt---000dd
+# 
+# Pd = Rs > Rt ? 0xff : 0x00;
+# 
+:Q6_P_cmp_gt_R_R Pd_1_0, Rs_20_16, Rt_12_8
+        is bits_31_24=0b11110010 & bits_22_21=0b10 & Rs_20_16 & Rt_12_8 & bits_4_2=0b000 & Pd_1_0 {
+    local res_Rs_20_16_Rt_12_8:4;
+    if ((Rs_20_16 > Rt_12_8)) goto <if_Rs_20_16_Rt_12_8>;
+    res_Rs_20_16_Rt_12_8 = 0x00;
+    goto <endif_Rs_20_16_Rt_12_8>;
+    <if_Rs_20_16_Rt_12_8>
+    res_Rs_20_16_Rt_12_8 = 0xff;
+    <endif_Rs_20_16_Rt_12_8>
+    Pd_1_0 = res_Rs_20_16_Rt_12_8:1;
+}
+
+# 
+# Pd=!cmp.gt(Rs,Rt)
+# 11110010-10sssssPP-ttttt---100dd
+# 
+# Pd = Rs <= Rt ? 0xff : 0x00;
+# 
+:Q6_P_notcmp_gt_R_R Pd_1_0, Rs_20_16, Rt_12_8
+        is bits_31_24=0b11110010 & bits_22_21=0b10 & Rs_20_16 & Rt_12_8 & bits_4_2=0b100 & Pd_1_0 {
+    local res_Rs_20_16_Rt_12_8:4;
+    if ((Rs_20_16 <= Rt_12_8)) goto <if_Rs_20_16_Rt_12_8>;
+    res_Rs_20_16_Rt_12_8 = 0x00;
+    goto <endif_Rs_20_16_Rt_12_8>;
+    <if_Rs_20_16_Rt_12_8>
+    res_Rs_20_16_Rt_12_8 = 0xff;
+    <endif_Rs_20_16_Rt_12_8>
+    Pd_1_0 = res_Rs_20_16_Rt_12_8:1;
+}
+
+# 
+# Pd=cmp.gtu(Rs,Rt)
+# 11110010-11sssssPP-ttttt---000dd
+# 
+# Pd = Rs.uw[0] > Rt.uw[0] ? 0xff : 0x00;
+# 
+:Q6_P_cmp_gtu_R_R Pd_1_0, Rs_20_16, Rt_12_8
+        is bits_31_24=0b11110010 & bits_22_21=0b11 & Rs_20_16 & Rt_12_8 & bits_4_2=0b000 & Pd_1_0 {
+    local Rs_20_16_uw:4 = (&Rs_20_16);
+    local Rt_12_8_uw:4 = (&Rt_12_8);
+    local res_register_4_Rs_20_16_uw_4_0_register_4_Rt_12_8_uw_4_0:4;
+    if ((*[register]:4 (Rs_20_16_uw + 4 * 0) > *[register]:4 (Rt_12_8_uw + 4 * 0))) goto <if_register_4_Rs_20_16_uw_4_0_register_4_Rt_12_8_uw_4_0>;
+    res_register_4_Rs_20_16_uw_4_0_register_4_Rt_12_8_uw_4_0 = 0x00;
+    goto <endif_register_4_Rs_20_16_uw_4_0_register_4_Rt_12_8_uw_4_0>;
+    <if_register_4_Rs_20_16_uw_4_0_register_4_Rt_12_8_uw_4_0>
+    res_register_4_Rs_20_16_uw_4_0_register_4_Rt_12_8_uw_4_0 = 0xff;
+    <endif_register_4_Rs_20_16_uw_4_0_register_4_Rt_12_8_uw_4_0>
+    Pd_1_0 = res_register_4_Rs_20_16_uw_4_0_register_4_Rt_12_8_uw_4_0:1;
+}
+
+# 
+# Pd=!cmp.gtu(Rs,Rt)
+# 11110010-11sssssPP-ttttt---100dd
+# 
+# Pd = Rs.uw[0] <= Rt.uw[0] ? 0xff : 0x00;
+# 
+:Q6_P_notcmp_gtu_R_R Pd_1_0, Rs_20_16, Rt_12_8
+        is bits_31_24=0b11110010 & bits_22_21=0b11 & Rs_20_16 & Rt_12_8 & bits_4_2=0b100 & Pd_1_0 {
+    local Rs_20_16_uw:4 = (&Rs_20_16);
+    local Rt_12_8_uw:4 = (&Rt_12_8);
+    local res_register_4_Rs_20_16_uw_4_0_register_4_Rt_12_8_uw_4_0:4;
+    if ((*[register]:4 (Rs_20_16_uw + 4 * 0) <= *[register]:4 (Rt_12_8_uw + 4 * 0))) goto <if_register_4_Rs_20_16_uw_4_0_register_4_Rt_12_8_uw_4_0>;
+    res_register_4_Rs_20_16_uw_4_0_register_4_Rt_12_8_uw_4_0 = 0x00;
+    goto <endif_register_4_Rs_20_16_uw_4_0_register_4_Rt_12_8_uw_4_0>;
+    <if_register_4_Rs_20_16_uw_4_0_register_4_Rt_12_8_uw_4_0>
+    res_register_4_Rs_20_16_uw_4_0_register_4_Rt_12_8_uw_4_0 = 0xff;
+    <endif_register_4_Rs_20_16_uw_4_0_register_4_Rt_12_8_uw_4_0>
+    Pd_1_0 = res_register_4_Rs_20_16_uw_4_0_register_4_Rt_12_8_uw_4_0:1;
+}
+
+# 
+# Rd=cmp.eq(Rs,#s8)
+# 01110011-10sssssPP1iiiiiiiiddddd
+# 
+# apply_extension(imm_s);
+# Rd = (Rs == imm_s);
+# 
+:Q6_R_cmp_eq_R_S Rd_4_0, Rs_20_16, s8
+        is bits_31_24=0b01110011 & bits_22_21=0b10 & Rs_20_16 & bits_13_13=0b1 & s8_12_5 & Rd_4_0
+            [s8 = (s8_12_5 << 0);] {
+    Rd_4_0 = zext((Rs_20_16 == s8));
+}
+
+# 
+# Rd=!cmp.eq(Rs,#s8)
+# 01110011-11sssssPP1iiiiiiiiddddd
+# 
+# apply_extension(imm_s);
+# Rd = (Rs != imm_s);
+# 
+:Q6_R_notcmp_eq_R_S Rd_4_0, Rs_20_16, s8
+        is bits_31_24=0b01110011 & bits_22_21=0b11 & Rs_20_16 & bits_13_13=0b1 & s8_12_5 & Rd_4_0
+            [s8 = (s8_12_5 << 0);] {
+    Rd_4_0 = zext((Rs_20_16 != s8));
+}
+
+# 
+# Rd=cmp.eq(Rs,Rt)
+# 11110011010sssssPP-ttttt---ddddd
+# 
+# Rd = (Rs == Rt);
+# 
+:Q6_R_cmp_eq_R_R Rd_4_0, Rs_20_16, Rt_12_8
+        is bits_31_21=0b11110011010 & Rs_20_16 & Rt_12_8 & Rd_4_0 {
+    Rd_4_0 = zext((Rs_20_16 == Rt_12_8));
+}
+
+# 
+# Rd=!cmp.eq(Rs,Rt)
+# 11110011011sssssPP-ttttt---ddddd
+# 
+# Rd = (Rs != Rt);
+# 
+:Q6_R_notcmp_eq_R_R Rd_4_0, Rs_20_16, Rt_12_8
+        is bits_31_21=0b11110011011 & Rs_20_16 & Rt_12_8 & Rd_4_0 {
+    Rd_4_0 = zext((Rs_20_16 != Rt_12_8));
+}
+
+# 
+# Pd=fastcorner9(Ps,Pt)
+# 011010110000--ssPP1---tt1--1--dd
+# 
+# PREDUSE_TIMING;
+# tmp.h[0] = (Ps << 8) | Pt;
+# tmp.h[1] = (Ps << 8) | Pt;
+# for (i = 1; i < 9; i++) {
+#     tmp &= tmp >> 1;
+# }
+# 
+# Pd = tmp != 0 ? 0xff : 0x00;
+# 
+:Q6_P_fastcorner9_P_P Pd_1_0, Ps_17_16, Pt_9_8
+        is bits_31_20=0b011010110000 & Ps_17_16 & bits_13_13=0b1 & Pt_9_8 & bits_7_7=0b1 & bits_4_4=0b1 & Pd_1_0 {
+    local tmp:4;
+    local tmp_h:4 = (&tmp);
+    local res_tmp_0:4;
+    *[register]:2 (tmp_h + 2 * 0) = zext(((Ps_17_16 << 8) | Pt_9_8));
+    *[register]:2 (tmp_h + 2 * 1) = zext(((Ps_17_16 << 8) | Pt_9_8));
+    local i:4 = 1;
+    <for_i>
+    tmp = (tmp & (tmp >> 1));
+    i = i + 1;
+    if (i < 9) goto <for_i>;
+    if ((tmp != 0)) goto <if_tmp_0>;
+    res_tmp_0 = 0x00;
+    goto <endif_tmp_0>;
+    <if_tmp_0>
+    res_tmp_0 = 0xff;
+    <endif_tmp_0>
+    Pd_1_0 = res_tmp_0:1;
+}
+
+# 
+# Pd=!fastcorner9(Ps,Pt)
+# 011010110001--ssPP1---tt1--1--dd
+# 
+# PREDUSE_TIMING;
+# tmp.h[0] = (Ps << 8) | Pt;
+# tmp.h[1] = (Ps << 8) | Pt;
+# for (i = 1; i < 9; i++) {
+#     tmp &= tmp >> 1;
+# }
+# 
+# Pd = tmp == 0 ? 0xff : 0x00;
+# 
+:Q6_P_notfastcorner9_P_P Pd_1_0, Ps_17_16, Pt_9_8
+        is bits_31_20=0b011010110001 & Ps_17_16 & bits_13_13=0b1 & Pt_9_8 & bits_7_7=0b1 & bits_4_4=0b1 & Pd_1_0 {
+    local tmp:4;
+    local tmp_h:4 = (&tmp);
+    local res_tmp_0:4;
+    *[register]:2 (tmp_h + 2 * 0) = zext(((Ps_17_16 << 8) | Pt_9_8));
+    *[register]:2 (tmp_h + 2 * 1) = zext(((Ps_17_16 << 8) | Pt_9_8));
+    local i:4 = 1;
+    <for_i>
+    tmp = (tmp & (tmp >> 1));
+    i = i + 1;
+    if (i < 9) goto <for_i>;
+    if ((tmp == 0)) goto <if_tmp_0>;
+    res_tmp_0 = 0x00;
+    goto <endif_tmp_0>;
+    <if_tmp_0>
+    res_tmp_0 = 0xff;
+    <endif_tmp_0>
+    Pd_1_0 = res_tmp_0:1;
+}
+
+# 
+# Pd=any8(Ps)
+# 011010111000--ssPP0-----------dd
+# 
+# PREDUSE_TIMING;
+# Ps ? (Pd = 0xff) : (Pd = 0x00);
+# 
+:Q6_P_any8_P Pd_1_0, Ps_17_16
+        is bits_31_20=0b011010111000 & Ps_17_16 & bits_13_13=0b0 & Pd_1_0 {
+    if ((Ps_17_16 != 0)) goto <if_Ps_17_16_0>;
+    Pd_1_0 = 0x00;
+    goto <endif_Ps_17_16_0>;
+    <if_Ps_17_16_0>
+    Pd_1_0 = 0xff;
+    <endif_Ps_17_16_0>
+}
+
+# 
+# Pd=all8(Ps)
+# 011010111010--ssPP0-----------dd
+# 
+# PREDUSE_TIMING;
+# (Ps == 0xff) ? (Pd = 0xff) : (Pd = 0x00);
+# 
+:Q6_P_all8_P Pd_1_0, Ps_17_16
+        is bits_31_20=0b011010111010 & Ps_17_16 & bits_13_13=0b0 & Pd_1_0 {
+    if ((Ps_17_16 == 0xff)) goto <if_Ps_17_16_0xff>;
+    Pd_1_0 = 0x00;
+    goto <endif_Ps_17_16_0xff>;
+    <if_Ps_17_16_0xff>
+    Pd_1_0 = 0xff;
+    <endif_Ps_17_16_0xff>
+}
+
+# 
+# loop0(#r7:2,Rs)
+# 01100000000sssssPP-iiiii---ii---
+# 
+# apply_extension(imm_r);
+# imm_r = imm_r & ~0x3;
+# SA0 = PC + imm_r;
+# LC0 = Rs;
+# USR.LPCFG = 0;
+# 
+:Q6_loop0_R_R r7, Rs_20_16
+        is bits_31_21=0b01100000000 & Rs_20_16 & r7_12_8 & r7_4_3
+            [r7 = (r7_12_8 << 2) | (r7_4_3 << 7);] {
+    local cst_0x3:4 = 0x3;
+    r7 = (r7 & (~cst_0x3));
+    $(SA0) = ($(PC) + r7);
+    $(LC0) = Rs_20_16;
+    $(LPCFG) = 0;
+}
+
+# 
+# loop1(#r7:2,Rs)
+# 01100000001sssssPP-iiiii---ii---
+# 
+# apply_extension(imm_r);
+# imm_r = imm_r & ~0x3;
+# SA1 = PC + imm_r;
+# LC1 = Rs;
+# 
+:Q6_loop1_R_R r7, Rs_20_16
+        is bits_31_21=0b01100000001 & Rs_20_16 & r7_12_8 & r7_4_3
+            [r7 = (r7_12_8 << 2) | (r7_4_3 << 7);] {
+    local cst_0x3:4 = 0x3;
+    r7 = (r7 & (~cst_0x3));
+    $(SA1) = ($(PC) + r7);
+    $(LC1) = Rs_20_16;
+}
+
+# 
+# loop0(#r7:2,#U10)
+# 01101001000IIIIIPP-iiiiiIIIii-II
+# 
+# apply_extension(imm_r);
+# imm_r = imm_r & ~0x3;
+# SA0 = PC + imm_r;
+# LC0 = imm_U;
+# USR.LPCFG = 0;
+# 
+:Q6_loop0_R_U_0 r7, U10
+        is bits_31_21=0b01101001000 & U10_20_16 & r7_12_8 & U10_7_5 & r7_4_3 & U10_1_0
+            [U10 = (U10_20_16 << 0) | (U10_7_5 << 5) | (U10_1_0 << 8); r7 = (r7_12_8 << 2) | (r7_4_3 << 7);] {
+    local cst_0x3:4 = 0x3;
+    r7 = (r7 & (~cst_0x3));
+    $(SA0) = ($(PC) + r7);
+    $(LC0) = U10;
+    $(LPCFG) = 0;
+}
+
+# 
+# loop1(#r7:2,#U10)
+# 01101001001IIIIIPP-iiiiiIIIii-II
+# 
+# apply_extension(imm_r);
+# imm_r = imm_r & ~0x3;
+# SA1 = PC + imm_r;
+# LC1 = imm_U;
+# 
+:Q6_loop1_R_U_0 r7, U10
+        is bits_31_21=0b01101001001 & U10_20_16 & r7_12_8 & U10_7_5 & r7_4_3 & U10_1_0
+            [U10 = (U10_20_16 << 0) | (U10_7_5 << 5) | (U10_1_0 << 8); r7 = (r7_12_8 << 2) | (r7_4_3 << 7);] {
+    local cst_0x3:4 = 0x3;
+    r7 = (r7 & (~cst_0x3));
+    $(SA1) = ($(PC) + r7);
+    $(LC1) = U10;
+}
+
+# 
+# Rd=add(pc,#u6)
+# 0110101001001001PP-iiiiii--ddddd
+# 
+# Rd = PC + apply_extension(imm_u);
+# 
+:Q6_R_add_pc_U Rd_4_0, u6
+        is bits_31_16=0b0110101001001001 & u6_12_7 & Rd_4_0
+            [u6 = (u6_12_7 << 0);] {
+    Rd_4_0 = ($(PC) + u6);
+}
+
+# 
+# p3=sp1loop0(#r7:2,Rs)
+# 01100000101sssssPP-iiiii---ii---
+# 
+# apply_extension(imm_r);
+# imm_r = imm_r & ~0x3;
+# SA0 = PC + imm_r;
+# LC0 = Rs;
+# USR.LPCFG = 1;
+# P3 = 0;
+# 
+:Q6_p3_sp1loop0_R_R r7, Rs_20_16
+        is bits_31_21=0b01100000101 & Rs_20_16 & r7_12_8 & r7_4_3
+            [r7 = (r7_12_8 << 2) | (r7_4_3 << 7);] {
+    local cst_0x3:4 = 0x3;
+    r7 = (r7 & (~cst_0x3));
+    $(SA0) = ($(PC) + r7);
+    $(LC0) = Rs_20_16;
+    $(LPCFG) = 1;
+    P3 = 0;
+}
+
+# 
+# p3=sp2loop0(#r7:2,Rs)
+# 01100000110sssssPP-iiiii---ii---
+# 
+# apply_extension(imm_r);
+# imm_r = imm_r & ~0x3;
+# SA0 = PC + imm_r;
+# LC0 = Rs;
+# USR.LPCFG = 2;
+# P3 = 0;
+# 
+:Q6_p3_sp2loop0_R_R r7, Rs_20_16
+        is bits_31_21=0b01100000110 & Rs_20_16 & r7_12_8 & r7_4_3
+            [r7 = (r7_12_8 << 2) | (r7_4_3 << 7);] {
+    local cst_0x3:4 = 0x3;
+    r7 = (r7 & (~cst_0x3));
+    $(SA0) = ($(PC) + r7);
+    $(LC0) = Rs_20_16;
+    $(LPCFG) = 2;
+    P3 = 0;
+}
+
+# 
+# p3=sp3loop0(#r7:2,Rs)
+# 01100000111sssssPP-iiiii---ii---
+# 
+# apply_extension(imm_r);
+# imm_r = imm_r & ~0x3;
+# SA0 = PC + imm_r;
+# LC0 = Rs;
+# USR.LPCFG = 3;
+# P3 = 0;
+# 
+:Q6_p3_sp3loop0_R_R r7, Rs_20_16
+        is bits_31_21=0b01100000111 & Rs_20_16 & r7_12_8 & r7_4_3
+            [r7 = (r7_12_8 << 2) | (r7_4_3 << 7);] {
+    local cst_0x3:4 = 0x3;
+    r7 = (r7 & (~cst_0x3));
+    $(SA0) = ($(PC) + r7);
+    $(LC0) = Rs_20_16;
+    $(LPCFG) = 3;
+    P3 = 0;
+}
+
+# 
+# p3=sp1loop0(#r7:2,#U10)
+# 01101001101IIIIIPP-iiiiiIIIii-II
+# 
+# apply_extension(imm_r);
+# imm_r = imm_r & ~0x3;
+# SA0 = PC + imm_r;
+# LC0 = imm_U;
+# USR.LPCFG = 1;
+# P3 = 0;
+# 
+:Q6_p3_sp1loop0_R_U_0 r7, U10
+        is bits_31_21=0b01101001101 & U10_20_16 & r7_12_8 & U10_7_5 & r7_4_3 & U10_1_0
+            [U10 = (U10_20_16 << 0) | (U10_7_5 << 5) | (U10_1_0 << 8); r7 = (r7_12_8 << 2) | (r7_4_3 << 7);] {
+    local cst_0x3:4 = 0x3;
+    r7 = (r7 & (~cst_0x3));
+    $(SA0) = ($(PC) + r7);
+    $(LC0) = U10;
+    $(LPCFG) = 1;
+    P3 = 0;
+}
+
+# 
+# p3=sp2loop0(#r7:2,#U10)
+# 01101001110IIIIIPP-iiiiiIIIii-II
+# 
+# apply_extension(imm_r);
+# imm_r = imm_r & ~0x3;
+# SA0 = PC + imm_r;
+# LC0 = imm_U;
+# USR.LPCFG = 2;
+# P3 = 0;
+# 
+:Q6_p3_sp2loop0_R_U_0 r7, U10
+        is bits_31_21=0b01101001110 & U10_20_16 & r7_12_8 & U10_7_5 & r7_4_3 & U10_1_0
+            [U10 = (U10_20_16 << 0) | (U10_7_5 << 5) | (U10_1_0 << 8); r7 = (r7_12_8 << 2) | (r7_4_3 << 7);] {
+    local cst_0x3:4 = 0x3;
+    r7 = (r7 & (~cst_0x3));
+    $(SA0) = ($(PC) + r7);
+    $(LC0) = U10;
+    $(LPCFG) = 2;
+    P3 = 0;
+}
+
+# 
+# p3=sp3loop0(#r7:2,#U10)
+# 01101001111IIIIIPP-iiiiiIIIii-II
+# 
+# apply_extension(imm_r);
+# imm_r = imm_r & ~0x3;
+# SA0 = PC + imm_r;
+# LC0 = imm_U;
+# USR.LPCFG = 3;
+# P3 = 0;
+# 
+:Q6_p3_sp3loop0_R_U_0 r7, U10
+        is bits_31_21=0b01101001111 & U10_20_16 & r7_12_8 & U10_7_5 & r7_4_3 & U10_1_0
+            [U10 = (U10_20_16 << 0) | (U10_7_5 << 5) | (U10_1_0 << 8); r7 = (r7_12_8 << 2) | (r7_4_3 << 7);] {
+    local cst_0x3:4 = 0x3;
+    r7 = (r7 & (~cst_0x3));
+    $(SA0) = ($(PC) + r7);
+    $(LC0) = U10;
+    $(LPCFG) = 3;
+    P3 = 0;
+}
+
+# 
+# Pd=and(Pt,Ps)
+# 011010110000--ssPP0---tt------dd
+# 
+# PREDUSE_TIMING;
+# Pd = Pt & Ps;
+# 
+:Q6_P_and_P_P Pd_1_0, Pt_9_8, Ps_17_16
+        is bits_31_20=0b011010110000 & Ps_17_16 & bits_13_13=0b0 & Pt_9_8 & Pd_1_0 {
+    Pd_1_0 = (Pt_9_8 & Ps_17_16);
+}
+
+# 
+# Pd=and(Ps,and(Pt,Pu))
+# 011010110001--ssPP0---ttuu----dd
+# 
+# PREDUSE_TIMING;
+# Pd = Ps & Pt & Pu;
+# 
+:Q6_P_and_P_and_P_P Pd_1_0, Ps_17_16, Pt_9_8, Pu_7_6
+        is bits_31_20=0b011010110001 & Ps_17_16 & bits_13_13=0b0 & Pt_9_8 & Pu_7_6 & Pd_1_0 {
+    Pd_1_0 = ((Ps_17_16 & Pt_9_8) & Pu_7_6);
+}
+
+# 
+# Pd=or(Pt,Ps)
+# 011010110010--ssPP0---tt------dd
+# 
+# PREDUSE_TIMING;
+# Pd = Pt | Ps;
+# 
+:Q6_P_or_P_P Pd_1_0, Pt_9_8, Ps_17_16
+        is bits_31_20=0b011010110010 & Ps_17_16 & bits_13_13=0b0 & Pt_9_8 & Pd_1_0 {
+    Pd_1_0 = (Pt_9_8 | Ps_17_16);
+}
+
+# 
+# Pd=and(Ps,or(Pt,Pu))
+# 011010110011--ssPP0---ttuu----dd
+# 
+# PREDUSE_TIMING;
+# Pd = Ps & (Pt | Pu);
+# 
+:Q6_P_and_P_or_P_P Pd_1_0, Ps_17_16, Pt_9_8, Pu_7_6
+        is bits_31_20=0b011010110011 & Ps_17_16 & bits_13_13=0b0 & Pt_9_8 & Pu_7_6 & Pd_1_0 {
+    Pd_1_0 = (Ps_17_16 & (Pt_9_8 | Pu_7_6));
+}
+
+# 
+# Pd=xor(Ps,Pt)
+# 011010110100--ssPP0---tt------dd
+# 
+# PREDUSE_TIMING;
+# Pd = Ps ^ Pt;
+# 
+:Q6_P_xor_P_P Pd_1_0, Ps_17_16, Pt_9_8
+        is bits_31_20=0b011010110100 & Ps_17_16 & bits_13_13=0b0 & Pt_9_8 & Pd_1_0 {
+    Pd_1_0 = (Ps_17_16 ^ Pt_9_8);
+}
+
+# 
+# Pd=or(Ps,and(Pt,Pu))
+# 011010110101--ssPP0---ttuu----dd
+# 
+# PREDUSE_TIMING;
+# Pd = Ps | (Pt & Pu);
+# 
+:Q6_P_or_P_and_P_P Pd_1_0, Ps_17_16, Pt_9_8, Pu_7_6
+        is bits_31_20=0b011010110101 & Ps_17_16 & bits_13_13=0b0 & Pt_9_8 & Pu_7_6 & Pd_1_0 {
+    Pd_1_0 = (Ps_17_16 | (Pt_9_8 & Pu_7_6));
+}
+
+# 
+# Pd=and(Pt,!Ps)
+# 011010110110--ssPP0---tt------dd
+# 
+# PREDUSE_TIMING;
+# Pd = Pt & (~Ps);
+# 
+:Q6_P_and_P_not_P Pd_1_0, Pt_9_8, Ps_17_16
+        is bits_31_20=0b011010110110 & Ps_17_16 & bits_13_13=0b0 & Pt_9_8 & Pd_1_0 {
+    Pd_1_0 = (Pt_9_8 & (~Ps_17_16));
+}
+
+# 
+# Pd=or(Ps,or(Pt,Pu))
+# 011010110111--ssPP0---ttuu----dd
+# 
+# PREDUSE_TIMING;
+# Pd = Ps | Pt | Pu;
+# 
+:Q6_P_or_P_or_P_P Pd_1_0, Ps_17_16, Pt_9_8, Pu_7_6
+        is bits_31_20=0b011010110111 & Ps_17_16 & bits_13_13=0b0 & Pt_9_8 & Pu_7_6 & Pd_1_0 {
+    Pd_1_0 = ((Ps_17_16 | Pt_9_8) | Pu_7_6);
+}
+
+# 
+# Pd=and(Ps,and(Pt,!Pu))
+# 011010111001--ssPP0---ttuu----dd
+# 
+# PREDUSE_TIMING;
+# Pd = Ps & Pt & (~Pu);
+# 
+:Q6_P_and_P_and_P_not_P Pd_1_0, Ps_17_16, Pt_9_8, Pu_7_6
+        is bits_31_20=0b011010111001 & Ps_17_16 & bits_13_13=0b0 & Pt_9_8 & Pu_7_6 & Pd_1_0 {
+    Pd_1_0 = ((Ps_17_16 & Pt_9_8) & (~Pu_7_6));
+}
+
+# 
+# Pd=and(Ps,or(Pt,!Pu))
+# 011010111011--ssPP0---ttuu----dd
+# 
+# PREDUSE_TIMING;
+# Pd = Ps & (Pt | (~Pu));
+# 
+:Q6_P_and_P_or_P_not_P Pd_1_0, Ps_17_16, Pt_9_8, Pu_7_6
+        is bits_31_20=0b011010111011 & Ps_17_16 & bits_13_13=0b0 & Pt_9_8 & Pu_7_6 & Pd_1_0 {
+    Pd_1_0 = (Ps_17_16 & (Pt_9_8 | (~Pu_7_6)));
+}
+
+# 
+# Pd=not(Ps)
+# 011010111100--ssPP0-----------dd
+# 
+# PREDUSE_TIMING;
+# Pd = ~Ps;
+# 
+:Q6_P_not_P Pd_1_0, Ps_17_16
+        is bits_31_20=0b011010111100 & Ps_17_16 & bits_13_13=0b0 & Pd_1_0 {
+    Pd_1_0 = (~Ps_17_16);
+}
+
+# 
+# Pd=or(Ps,and(Pt,!Pu))
+# 011010111101--ssPP0---ttuu----dd
+# 
+# PREDUSE_TIMING;
+# Pd = Ps | (Pt & (~Pu));
+# 
+:Q6_P_or_P_and_P_not_P Pd_1_0, Ps_17_16, Pt_9_8, Pu_7_6
+        is bits_31_20=0b011010111101 & Ps_17_16 & bits_13_13=0b0 & Pt_9_8 & Pu_7_6 & Pd_1_0 {
+    Pd_1_0 = (Ps_17_16 | (Pt_9_8 & (~Pu_7_6)));
+}
+
+# 
+# Pd=or(Pt,!Ps)
+# 011010111110--ssPP0---tt------dd
+# 
+# PREDUSE_TIMING;
+# Pd = Pt | (~Ps);
+# 
+:Q6_P_or_P_not_P Pd_1_0, Pt_9_8, Ps_17_16
+        is bits_31_20=0b011010111110 & Ps_17_16 & bits_13_13=0b0 & Pt_9_8 & Pd_1_0 {
+    Pd_1_0 = (Pt_9_8 | (~Ps_17_16));
+}
+
+# 
+# Pd=or(Ps,or(Pt,!Pu))
+# 011010111111--ssPP0---ttuu----dd
+# 
+# PREDUSE_TIMING;
+# Pd = Ps | Pt | (~Pu);
+# 
+:Q6_P_or_P_or_P_not_P Pd_1_0, Ps_17_16, Pt_9_8, Pu_7_6
+        is bits_31_20=0b011010111111 & Ps_17_16 & bits_13_13=0b0 & Pt_9_8 & Pu_7_6 & Pd_1_0 {
+    Pd_1_0 = ((Ps_17_16 | Pt_9_8) | (~Pu_7_6));
+}
+
+# 
+# Cd=Rs
+# 01100010001sssssPP---------ddddd
+# 
+# Cd = Rs;
+# 
+:Q6_C_R Cd_4_0, Rs_20_16
+        is bits_31_21=0b01100010001 & Rs_20_16 & Cd_4_0 {
+    Cd_4_0 = Rs_20_16;
+}
+
+# 
+# Cdd=Rss
+# 01100011001sssssPP---------ddddd
+# 
+# Cdd = Rss;
+# 
+:Q6_CC_RR Cdd_4_0, Rss_20_16
+        is bits_31_21=0b01100011001 & Rss_20_16 & Cdd_4_0 {
+    Cdd_4_0 = Rss_20_16;
+}
+
+# 
+# Rdd=Css
+# 01101000000sssssPP---------ddddd
+# 
+# Rdd = Css;
+# 
+:Q6_RR_CC Rdd_4_0, Css_20_16
+        is bits_31_21=0b01101000000 & Css_20_16 & Rdd_4_0 {
+    Rdd_4_0 = Css_20_16;
 }
