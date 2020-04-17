@@ -19,6 +19,7 @@ REGISTER_SIZES = {
     "SS": 64,
     "P": 8,
     "M": 32,
+    "N": 32,
     "r": 32,
 }
 
@@ -316,15 +317,17 @@ class Integer(Type):
         return "Integer({}, {})".format(length, signed)
 
 class Pointer(Type):
-    def __init__(self, pointed):
+    def __init__(self, space, pointed):
+        self.space = space
         self.pointed = pointed
 
     def __eq__(self, other):
         return isinstance(other, Pointer) \
+                and self.space == other.space \
                 and self.pointed == other.pointed
 
     def __repr__(self):
-        return "Pointer({!r})".format(self.pointed)
+        return "Pointer({}, {!r})".format(self.space, self.pointed)
 
 class Scope:
     def __init__(self, parent=None):
@@ -552,9 +555,10 @@ class ArrayRef(Node, c_ast.ArrayRef):
         if isinstance(self.name.type, Pointer):
             array = self.name.print(scope)
             index = self.subscript.print(scope)
+            space = self.name.type.space
             length = self.type.length // 8
             expr = "({} + {} * {})".format(array, length, index)
-            return "*[register]:{} {}".format(length, expr)
+            return "*[{}]:{} {}".format(space, length, expr)
 
         if self.name.is_ident() and self.name.type.length > 0:
             array = self.name.print(scope)
@@ -573,7 +577,10 @@ class Assignment(Node, c_ast.Assignment):
             self.check(self.lvalue.is_assignable())
             self.rvalue = self.rvalue.eval(scope)
             self.check(self.rvalue.returns_value())
-            self.rvalue = self.rvalue.resize(scope, self.lvalue.type.length)
+            if self.lvalue.type.length == 0:
+                self.lvalue = self.lvalue.resize(scope, self.rvalue.type.length)
+            else:
+                self.rvalue = self.rvalue.resize(scope, self.lvalue.type.length)
             self.type = Void()
             return self
 
@@ -828,6 +835,13 @@ class FuncCall(Node, c_ast.FuncCall):
             self.args = self.args.eval(scope)
             self.check(len(self.args.exprs) == 1)
             self.check(self.args.exprs[0].is_assignable())
+            # FIXME: Workaround for new-values
+            arg = self.args.exprs[0]
+            token = arg.print(scope)
+            if re.match(r"N[s-v]_\d+\d+", token):
+                arg_name = "arg_{}".format(Node.labelify(token))
+                scope.decl_variable(arg_name, arg.type, arg)
+                self.args.exprs[0] = ID(arg_name).eval(scope)
             self.type = self.args.exprs[0].type
             return self
 
@@ -848,9 +862,27 @@ class FuncCall(Node, c_ast.FuncCall):
             self.check(len(self.args.exprs) == 3)
             # FIXME: Workaround for immediates
             arg = self.args.exprs[1]
-            arg_name = "arg_{}".format(Node.labelify(arg.print(scope)))
-            scope.decl_variable(arg_name, arg.type, arg)
-            self.args.exprs[1] = ID(arg_name).eval(scope)
+            token = arg.print(scope)
+            if re.match(r"[sSuUrR]\d+", token):
+                arg_name = "arg_{}".format(Node.labelify(token))
+                scope.decl_variable(arg_name, arg.type, arg)
+                self.args.exprs[1] = ID(arg_name).eval(scope)
+            self.type = self.args.exprs[0].type
+            return self
+
+        elif self.name.get_name() == "bitsRev":
+            self.args = self.args.eval(scope)
+            self.check(len(self.args.exprs) == 1)
+            self.check(self.args.exprs[0].returns_value())
+            self.type = self.args.exprs[0].type
+            return self
+
+        elif self.name.get_name() == "frameUnscramble":
+            self.args = self.args.eval(scope)
+            self.check(len(self.args.exprs) == 1)
+            self.check(self.args.exprs[0].returns_value())
+            self.check(self.args.exprs[0].type.length == 64)
+            self.check(self.args.exprs[0].type.signed == False)
             self.type = self.args.exprs[0].type
             return self
 
@@ -872,8 +904,9 @@ class Goto(Node, c_ast.Goto):
 
 class ID(Node, c_ast.ID):
     IGNORED_FUNCTIONS = ["PREDUSE_TIMING", "NOP"]
-    BUILTIN_FUNCTIONS = ["apply_extension", "sat", "usat", "sxt", "zxt",
-                         "newSuffix", "nextPacket", "constExtend", "circAdd"]
+    BUILTIN_FUNCTIONS = ["apply_extension", "sat", "usat", "sxt", "zxt"]
+    PCODEOP_FUNCTIONS = ["newSuffix", "nextPacket", "constExtend",
+                         "circAdd", "bitsRev", "frameUnscramble"]
     SUBPIECE_KEYWORDS = ["b", "ub", "h", "uh", "w", "uw", "new"]
 
     def eval(self, scope):
@@ -881,6 +914,7 @@ class ID(Node, c_ast.ID):
             return Compound([]).eval(scope)
 
         if self.name in ID.BUILTIN_FUNCTIONS \
+                or self.name in ID.PCODEOP_FUNCTIONS \
                 or self.name in ID.SUBPIECE_KEYWORDS:
             self.type = Void()
             return self
@@ -914,6 +948,12 @@ class ID(Node, c_ast.ID):
 
             if self.name == "circ_add":
                 return ID("circAdd").eval(scope)
+
+            if self.name == "brev":
+                return ID("bitsRev").eval(scope)
+
+            if self.name == "frame_unscramble":
+                return ID("frameUnscramble").eval(scope)
 
             # Check if it is a register name
             for reg_type, tokens in REGISTER_NAMES.items():
@@ -1054,7 +1094,10 @@ class StructRef(Node, c_ast.StructRef):
         self.check(self.name.type.length >= length)
 
         ref_name = "{}_{}".format(self.name.get_name(), field)
-        ref_type = Pointer(Integer(length, signed))
+        space = "register"
+        if not re.match(r"[A-Z][a-z]{1,2}_\d+_\d+", self.name.get_name()):
+            space = "ram"
+        ref_type = Pointer(space, Integer(length, signed))
         ref_expr = UnaryOp("&", self.name).eval(scope)
         scope.decl_variable(ref_name, ref_type, ref_expr)
         return ID(ref_name).eval(scope)
@@ -1117,7 +1160,11 @@ class UnaryOp(Node, c_ast.UnaryOp):
 
         elif self.op == "&":
             self.check(self.expr.is_assignable())
-            self.type = Pointer(self.expr.type)
+            self.check(self.expr.is_ident())
+            space = "register"
+            if not re.match(r"[A-Z][a-z]{1,2}_\d+_\d+", self.expr.get_name()):
+                space = "ram"
+            self.type = Pointer(space, self.expr.type)
 
         elif self.op == "*":
             self.check(self.expr.is_ident())
@@ -1161,6 +1208,9 @@ class UnaryOp(Node, c_ast.UnaryOp):
         elif self.op in ["+", "-", "~", "!"]:
             return "({}{})".format(self.op, expr)
 
+    def is_assignable(self):
+        return self.op.startswith(":") or self.op == "*"
+
 class Union(Node, c_ast.Union):
     pass
 
@@ -1188,20 +1238,19 @@ class Behavior:
         assert node in globals(), node
         return globals()[node](*args)
 
-    def __init__(self, behavior, tmp=None):
+    def __init__(self, behavior):
         self.behavior = behavior
         # Remove comments
         behavior = "\n".join([line.split("//")[0] for line in behavior.split("\n")])
         text = "int main() {{\n{}\n}}".format(behavior)
         ast = cparser.parse(text, filename='<none>')
         self.nodes = Behavior.convert_node(ast.ext[0].body)
-        self.scope = Scope()
 
 class Constructor:
     def __init__(self, syntax, encoding, behavior):
         self.mnemonic = Mnemonic(syntax)
         self.encoding = Encoding(syntax, encoding)
-        self.behavior = Behavior(behavior, syntax)
+        self.behavior = Behavior(behavior)
 
         self.comments = []
         self.generate_comments()
@@ -1273,6 +1322,12 @@ class Constructor:
         self.pattern.sort(key=lambda token: int(token.split("_")[1], 10), reverse=True)
 
     def generate_executor(self):
+        scope = Scope()
+
+        # FIXME: Workaround for frames
+        if "frame_unscramble(tmp)" in self.behavior.behavior:
+            scope.decl_variable("tmp", Integer(64, False))
+
         for register in self.encoding.registers[::-1]:
             reg_beg, reg_end = register.ranges[0]
             reg_length = reg_end - reg_beg + 1
@@ -1284,17 +1339,21 @@ class Constructor:
             if reg_type not in self.variables:
                 self.variables[reg_type] = []
             self.variables[reg_type].append(token)
-            self.behavior.scope.add_mapping(register.token, token)
-            self.behavior.scope.add_variable(token, Integer(reg_length, None))
+            scope.add_mapping(register.token, token)
+            scope.add_variable(token, Integer(reg_length, None))
 
         for immediate in self.encoding.immediates[::-1]:
             token = immediate.token
             imm_signed = immediate.token[0] in "sSrR"
-            self.behavior.scope.add_mapping("imm_{}".format(token[0]), token)
-            self.behavior.scope.add_variable(immediate.token, Integer(32, imm_signed))
+            scope.add_mapping("imm_{}".format(token[0]), token)
+            scope.add_variable(immediate.token, Integer(32, imm_signed))
 
         try:
-            self.behavior.nodes.eval(self.behavior.scope)
+            self.behavior.nodes.eval(scope)
+            scope.print(self.behavior.nodes)
+            for line in scope.lines:
+                if line:
+                    self.semantic.append(line)
         except NodeException as e:
             print((" " + self.mnemonic.syntax + " ").center(80, "#"), file=sys.stderr)
             print(self.behavior.behavior, file=sys.stderr)
@@ -1316,11 +1375,6 @@ class Constructor:
                 if key not in ["self", "scope"]:
                     print(" - {}: {!r}".format(key, val), file=sys.stderr)
             exit()
-
-        self.behavior.scope.print(self.behavior.nodes)
-        for line in self.behavior.scope.lines:
-            if line:
-                self.semantic.append(line)
 
     def __str__(self):
         lines = []
@@ -1377,6 +1431,13 @@ def main(args):
     print(";")
 
     for reg_type, tokens in variables.items():
+        if reg_type == "N":
+            print("")
+            print("attach values [ {} ]".format(" ".join(tokens)))
+            print("    [ 0 1 2 3 4 5 6 7 ]")
+            print(";")
+            continue
+
         assert reg_type in REGISTER_NAMES
         values = REGISTER_NAMES[reg_type]
         print("")
@@ -1389,8 +1450,7 @@ def main(args):
         print(";")
 
     print("")
-    pcodeops = ["newSuffix", "nextPacket", "constExtend", "circAdd"]
-    for pcodeop in pcodeops:
+    for pcodeop in ID.PCODEOP_FUNCTIONS:
         print("define pcodeop {};".format(pcodeop))
 
     for constructor in constructors:
